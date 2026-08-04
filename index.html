@@ -1,0 +1,1665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Everyday Decisions Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F2EC;
+    --card:#FBF9F5;
+    --ink:#1E2126;
+    --ink-soft:#565B64;
+    --line:#E2DCD0;
+    --line-strong:#CFC7B6;
+    --accent:#3D5A80;
+    --accent-soft:#E7ECF2;
+    --agent-font:'Space Grotesk','Inter',sans-serif;
+    --warm:#A9603A;
+    --good:#3F6B52;
+    --radius:14px;
+    --maxw:720px;
+    --shadow:0 1px 2px rgba(30,33,38,.04), 0 8px 30px rgba(30,33,38,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 96px}
+  /* ---- top bar ---- */
+  header.bar{
+    position:sticky;top:0;z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar-inner{max-width:var(--maxw);margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+  .backbtn{appearance:none;border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);width:30px;height:30px;border-radius:99px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s ease;flex:none}
+  .backbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .mark{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .mark b{color:var(--ink);font-weight:500}
+  .progress{flex:1;height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .phasetag{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--accent);letter-spacing:.08em;white-space:nowrap}
+  /* ---- screen ---- */
+  main{padding-top:34px}
+  .eyebrow{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--warm);margin:0 0 12px}
+  h1{font-family:"Newsreader",serif;font-weight:500;font-size:38px;line-height:1.12;letter-spacing:-.01em;margin:0 0 16px}
+  h2{font-family:"Newsreader",serif;font-weight:500;font-size:26px;line-height:1.2;margin:0 0 12px}
+  p.lead{font-size:17px;color:var(--ink-soft);margin:0 0 18px}
+  p{margin:0 0 14px}
+  .muted{color:var(--ink-soft)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin:0 0 18px}
+  .note{font-size:13.5px;color:var(--ink-soft);background:#FFFDF8;border:1px dashed var(--line-strong);border-radius:10px;padding:12px 14px;margin:14px 0}
+  .note b{color:var(--warm)}
+  /* ---- buttons ---- */
+  .btnrow{display:flex;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap}
+  button{font-family:inherit}
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    background:var(--accent);color:#fff;
+    font-size:15px;font-weight:500;
+    padding:13px 24px;border-radius:99px;
+    transition:transform .08s ease, background .2s ease, opacity .2s;
+  }
+  .btn:hover{background:#34507a}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--ink-soft);padding:13px 14px}
+  .btn.ghost:hover{color:var(--ink);background:transparent}
+  .btn.line{background:transparent;color:var(--accent);border:1px solid var(--line-strong)}
+  .btn.line:hover{background:var(--accent-soft)}
+  /* ---- consent / checks ---- */
+  label.check{display:flex;gap:11px;align-items:flex-start;cursor:pointer;font-size:15px;padding:6px 0}
+  label.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent)}
+  /* ---- PVQ ---- */
+  .qitem{padding:18px 0;border-bottom:1px solid var(--line)}
+  .qitem:last-child{border-bottom:none}
+  .qtext{font-size:16px;margin:0 0 12px}
+  .qtext .n{font-family:"Spline Sans Mono",monospace;color:var(--ink-soft);font-size:13px;margin-right:8px}
+  .scale{display:flex;gap:6px;flex-wrap:wrap}
+  .scale.likert7 .opt{min-width:40px}
+  .scale.likert5 .opt{min-width:52px}
+  .opt{flex:1;min-width:64px}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt label{
+    display:block;text-align:center;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:9px;
+    padding:9px 4px;font-size:12.5px;color:var(--ink-soft);line-height:1.2;
+    transition:all .12s ease;background:var(--card);
+    min-height:46px;display:flex;align-items:center;justify-content:center;
+  }
+  .opt input:checked + label{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
+  .opt label:hover{border-color:var(--accent)}
+  .opt input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+  .scalecaps{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);margin-top:7px;font-family:"Spline Sans Mono",monospace;letter-spacing:.02em}
+  /* ---- dilemma ---- */
+  .dilemma{font-family:"Newsreader",serif;font-size:19px;line-height:1.5}
+  .options{display:grid;gap:10px;margin-top:18px}
+  .bigopt{
+    display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:12px;padding:15px 16px;background:var(--card);
+    transition:all .12s ease;
+  }
+  .bigopt:hover{border-color:var(--accent)}
+  .bigopt input{margin-top:2px;accent-color:var(--accent);width:18px;height:18px}
+  .bigopt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .bigopt .lab{font-family:"Inter";font-size:15px}
+  /* ---- AI response ---- */
+  .ai{border:1px solid var(--line);border-left:3px solid var(--accent);background:#FBFAF7;border-radius:10px;padding:18px 20px;margin:6px 0 6px}
+  .ai .who{display:flex;align-items:center;gap:9px;margin:0 0 12px}
+  .who .ava{width:25px;height:25px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;background:var(--accent-soft);border:1px solid #cdd8e6;border-radius:7px;box-shadow:inset 0 1px 0 #fff,0 1px 1px rgba(30,33,38,.05)}
+  .who b{font-family:"Inter";font-weight:700;color:var(--accent);font-size:13.5px;letter-spacing:.01em}
+  .ai .verdict{font-weight:600;margin:0 0 8px}
+  .ai .reason{color:var(--ink);margin:0;font-family:var(--agent-font);font-size:15px;line-height:1.55}
+  .ai .verdict{font-family:var(--agent-font)}
+  .agentref{font-family:var(--agent-font);font-weight:600;color:var(--accent);white-space:nowrap}
+  .rlabel{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:2px 0 4px;opacity:.85}
+  .compbox{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+  .compq{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
+  .compopts{display:flex;flex-direction:column;gap:8px}
+  .compopt{text-align:left;border:1px solid var(--line-strong);background:var(--card);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--ink);transition:all .12s}
+  .compopt:hover{border-color:var(--accent)}
+  .compopt.sel{background:var(--accent-soft);border-color:var(--accent)}
+  .compopt.wrong{background:#FBE9E4;border-color:#C6543B;color:#7A2417}
+  .comphint{font-size:13px;color:#A9603A;margin:12px 0 0;font-style:italic}
+  .stepnum{flex:none;width:24px;height:24px;border-radius:99px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  /* ---- circumplex ---- */
+  .wheelwrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .legend{font-size:13px;color:var(--ink-soft);display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+  .legend .ho{font-weight:600;color:var(--ink);grid-column:1/-1;margin-top:6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .legend .v{display:flex;justify-content:space-between;gap:10px}
+  .legend .v b{font-weight:500;color:var(--ink)}
+  /* ---- delegation grid ---- */
+  .deltask{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;background:var(--card)}
+  .deltask h3{font-family:"Newsreader",serif;font-weight:500;font-size:18px;margin:0 0 4px}
+  .deltask .tags{font-family:"Spline Sans Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:12px}
+  .deltask .tags span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-right:6px}
+  .frame{margin:14px 0 4px}
+  .frame .q{font-size:14.5px;margin:0 0 8px}
+  .frame .q .pill{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:99px;padding:2px 7px;margin-right:7px}
+  /* ---- summary / export ---- */
+  table.sum{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+  table.sum td{padding:7px 8px;border-bottom:1px solid var(--line)}
+  table.sum td:first-child{color:var(--ink-soft)}
+  table.sum td:last-child{text-align:right;font-family:"Spline Sans Mono",monospace}
+  .pillbig{display:inline-block;font-family:"Spline Sans Mono",monospace;font-size:13px;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:5px 14px;letter-spacing:.04em}
+  /* ---- researcher strip ---- */
+  .rstrip{margin-top:40px;padding-top:18px;border-top:1px dashed var(--line-strong);font-size:13px;color:var(--ink-soft)}
+  .rstrip summary{cursor:pointer;font-family:"Spline Sans Mono",monospace;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+  .rstrip .row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .rstrip select{font-family:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line-strong);background:var(--card)}
+  /* ---- chat (behavioral choice-shift) ---- */
+  .chat{display:flex;flex-direction:column;gap:11px;margin:4px 0 2px}
+  .msg{max-width:84%;padding:13px 16px;border-radius:16px;font-size:15px;line-height:1.5}
+  .msg.ai{align-self:flex-start;background:#FBFAF7;border:1px solid var(--line);border-bottom-left-radius:5px}
+  .msg.ai .who{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .msg.ai .verdict{font-weight:600;margin:0 0 6px}
+  .msg.ai p{margin:0;font-family:var(--agent-font)}
+  .msg.ai .verdict{font-family:var(--agent-font)}
+  .msg.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+  .msg.sys{align-self:center;background:transparent;border:1px dashed var(--line-strong);color:var(--ink-soft);font-size:13px;text-align:center;border-radius:10px}
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:14px 16px;background:#FBFAF7;border:1px solid var(--line);border-radius:16px;border-bottom-left-radius:5px}
+  .typing i{width:7px;height:7px;border-radius:99px;background:var(--line-strong);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .chatask{margin-top:6px;font-size:14px;color:var(--ink-soft)}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .chip{border:1px solid var(--line-strong);background:var(--card);border-radius:99px;padding:11px 18px;cursor:pointer;font-size:14.5px;font-family:inherit;color:var(--ink);transition:all .12s ease}
+  .chip:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .binary{display:flex;gap:10px;margin-top:8px}
+  .binary .opt{flex:1}
+  .binary .opt label{min-height:46px;font-size:14.5px}
+  .fade{animation:fade .45s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  @media (max-width:560px){
+    h1{font-size:30px}
+    .opt{min-width:42px}
+    .opt label{font-size:11px;min-height:42px}
+    .legend{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-inner">
+    <button class="backbtn" id="backbtn" onclick="goBack()" aria-label="Go back" title="Back" style="visibility:hidden">&larr;</button>
+    <span class="mark"><b>Everyday Decisions</b></span>
+    <div class="progress"><i id="progbar"></i></div>
+    <span class="phasetag" id="phasetag">·</span>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+
+<script>
+// DEMO MODE: when true, section buttons advance without requiring all fields.
+// Set to false before fielding the study.
+const DEMO = false;
+
+/* ============================================================
+   BACKEND: RESPONSE LOGGING + CONDITION ASSIGNMENT
+   Set LOG_ENDPOINT to your deployed Google Apps Script web app URL
+   (study_backend/apps_script_logger.gs — deployment steps in
+   study_backend/SETUP.md). Empty string = fully offline: conditions are
+   assigned locally and the export buttons still work for testing.
+   ============================================================ */
+const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqYFdc9W4dHGXSBevmphP56uxLfLw_atxuiNKza32pqsm2bYUWkp6LuwLNjyZaYXhN/exec';
+const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
+const ASSIGN_TIMEOUT_MS = 8000;     // after this the participant is assigned locally instead of waiting
+const COMPLETION_CODE = 'CXXXXXXX'; // Prolific completion code, shown on the final screen
+
+const URLP = new URLSearchParams(location.search);
+// Anything logged while DEMO is on, or with ?test=1, is flagged so it can be
+// excluded from condition balancing and stripped from the sheet before fielding.
+const IS_TEST = DEMO || URLP.has('test');
+
+const PARTICIPANT = (function(){
+  const fresh = () => Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+  // Persisted so a refresh or a resumed session keeps the same identity (and the same condition).
+  let local;
+  try{
+    local = localStorage.getItem('ras_local_id');
+    if(!local){ local = fresh(); localStorage.setItem('ras_local_id', local); }
+  }catch(e){ local = fresh(); }   // private mode / storage blocked
+  const pid = URLP.get('PROLIFIC_PID') || null;
+  return {
+    prolific_pid: pid,
+    study_id:     URLP.get('STUDY_ID') || null,
+    session_id:   URLP.get('SESSION_ID') || null,
+    local_id:     local,
+    participant_key: pid || local,   // key the backend stores rows against
+  };
+})();
+
+function endpointURL(params){
+  const u = new URL(LOG_ENDPOINT);
+  Object.entries(params).forEach(([k,v])=>{ if(v!=null && v!=='') u.searchParams.set(k,v); });
+  if(BACKEND_SECRET) u.searchParams.set('secret', BACKEND_SECRET);
+  return u.toString();
+}
+
+let _logQueue = [];
+const _inFlight = new Set();
+function logSnapshot(phase, complete){
+  if(!LOG_ENDPOINT) return;
+  const payload = JSON.stringify({
+    participant: PARTICIPANT,
+    phase, complete: !!complete,
+    is_test: IS_TEST,
+    client_ts: new Date().toISOString(),
+    data: collect(),
+  });
+  _logQueue.push(payload);
+  flushLog();
+}
+function flushLog(){
+  if(!LOG_ENDPOINT || !_logQueue.length) return;
+  _logQueue.slice().forEach(payload=>{
+    if(_inFlight.has(payload)) return;
+    _inFlight.add(payload);
+    // text/plain + no-cors avoids the CORS preflight that Apps Script can't answer
+    fetch(LOG_ENDPOINT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload, keepalive:true})
+      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==payload); _inFlight.delete(payload); })
+      .catch(()=>{ _inFlight.delete(payload); /* stays queued; retried on next snapshot or unload */ });
+  });
+}
+window.addEventListener('beforeunload', ()=>{
+  if(!LOG_ENDPOINT) return;
+  // last-ditch partial save for dropouts
+  try{
+    const payload=JSON.stringify({participant:PARTICIPANT, phase:'unload_partial', complete:false, is_test:IS_TEST, client_ts:new Date().toISOString(), data:collect()});
+    navigator.sendBeacon(LOG_ENDPOINT, new Blob([payload], {type:'text/plain'}));
+    _logQueue.forEach(q=>navigator.sendBeacon(LOG_ENDPOINT, new Blob([q], {type:'text/plain'})));
+  }catch(e){}
+});
+
+// Advisor persona label (one place to change the name/emoji)
+const ADVISOR_NAME = 'AdvisorBot';
+const ADVISOR_EMOJI = '🤖';
+const AGENT_LABEL = `<span class="ava">${ADVISOR_EMOJI}</span><b>${ADVISOR_NAME}</b>`;
+const AGENT_INLINE = `<span class="agentref">${ADVISOR_EMOJI} ${ADVISOR_NAME}</span>`;
+
+/* ============================================================
+   STUDY CONFIG: edit dilemmas / tasks / items here
+   ============================================================ */
+
+// Schwartz 10 basic values: circumplex order + higher-order group
+const VALUES = [
+  {key:'self_direction', label:'Self-Direction', ho:'Openness to Change'},
+  {key:'stimulation',    label:'Stimulation',    ho:'Openness to Change'},
+  {key:'hedonism',       label:'Hedonism',       ho:'Openness / Self-Enhancement'},
+  {key:'achievement',    label:'Achievement',    ho:'Self-Enhancement'},
+  {key:'power',          label:'Power',          ho:'Self-Enhancement'},
+  {key:'security',       label:'Security',       ho:'Conservation'},
+  {key:'conformity',     label:'Conformity',     ho:'Conservation'},
+  {key:'tradition',      label:'Tradition',      ho:'Conservation'},
+  {key:'benevolence',    label:'Benevolence',    ho:'Self-Transcendence'},
+  {key:'universalism',   label:'Universalism',   ho:'Self-Transcendence'},
+];
+const VAL_LABEL = Object.fromEntries(VALUES.map(v=>[v.key,v.label]));
+
+// PVQ-21 items, transcribed VERBATIM from the team's source document (all 21 confirmed).
+// 6-point response: "Not like me at all" -> "Very much like me" (anchors confirmed from source).
+const PVQ_ITEMS = [
+  {v:'self_direction', t:'Thinking up new ideas and being creative is important to me.'},
+  {v:'power',          t:'It is important for me to be rich and have a lot of money.'},
+  {v:'universalism',   t:'I believe that every person in the world should be treated equally.'},
+  {v:'achievement',    t:'It is important for me to show my abilities. I want other people to admire what I do.'},
+  {v:'security',       t:'It is important for me to live in a safe and secure surrounding.'},
+  {v:'stimulation',    t:'I love surprises and always want to try something new.'},
+  {v:'conformity',     t:'I believe that I should obey rules even when no one is around.'},
+  {v:'tradition',      t:'It is important for me to stay humble and modest.'},
+  {v:'universalism',   t:'I believe in listening to people who are different from me and try to understand them.'},
+  {v:'hedonism',       t:'Having a good time is important to me. I like to \u2018spoil\u2019 myself at times.'},
+  {v:'self_direction', t:'I prefer to make my own decisions and do what feels right to me.'},
+  {v:'benevolence',    t:'I like helping people around me.'},
+  {v:'achievement',    t:'Being successful is important to me'},
+  {v:'security',       t:'It is important for me to ensure that the government is taking care of my safety concerns.'},
+  {v:'stimulation',    t:'I want to take up new adventures and want to live an exciting life.'},
+  {v:'conformity',     t:'It is important for me to behave properly at all times and not do anything that people consider wrong.'},
+  {v:'power',          t:'It is important for me to earn respect from others.'},
+  {v:'benevolence',    t:'Being loyal to my friends is a priority in my life.'},
+  {v:'tradition',      t:'I try to follow my traditional values and customs that my family and society have endowed on me.'},
+  {v:'universalism',   t:'I strongly believe that we should care about nature.'},
+  {v:'hedonism',       t:'It is important for me to do things that give me pleasure.'},
+];
+const PVQ_SCALE = ['Not like me at all','Not like me','A little like me','Somewhat like me','Like me','Very much like me'];
+
+// Dilemmas. Each declares the Schwartz AXIS it pulls apart (two basic-value keys).
+// reasoning[pole][decision] gives the AI justification for choosing that option, framed from that pole.
+const DILEMMAS = [
+  {
+    id:"d1_waterfilter", domain:"shared apartment", axis:"benevolence-power", dim:"ST-SE",
+    poles:{pos:["benevolence"], neg:["power"]},
+    optA:"Refill the water filter before leaving.",
+    optB:"Leave for the meeting without refilling the water filter.",
+    recap:{A:"Take a moment to refill it for the household", B:"Head to the meeting and leave it empty"},
+    prompt:"I live in a shared apartment where we all drink from the same filter pitcher, which takes a while to filter water before you can drink it. After using up all of the already-filtered water, I am in a rush for an urgent meeting and don't have time to refill it. Do I leave without refilling the filter, or refill it and risk being late?",
+    detail:{q:"Before we go on, what is this person rushing off to?",
+      answers:["An urgent meeting","A doctor's appointment","A friend's birthday party"]},
+    consider:{
+      pos:{A:"Being considerate of the people you live with", B:"Being considerate of your housemates without giving up the meeting"},
+      neg:{A:"Protecting your reputation with the people you live with", B:"Protecting your standing by putting the urgent meeting first"},
+      foil:"The cost of replacing the filter cartridge"},
+    reasoning:{
+      pos:{A:"Being late to something urgent is a real cost, no question. Still, the filter is a small shared trust, and refilling it is a thirty-second kindness to the people you live with. Here I'd let that consideration edge out the couple of minutes it costs you.", B:"Looking after your housemates matters. But leaving it empty once, in a genuine rush, doesn't undo that care. A quick message so the next person isn't caught out is itself a considerate move, and you can refill it the moment you're back."},
+      neg:{A:"The meeting matters, and you shouldn't be late lightly. But being known as someone who cuts corners at home follows you too. Refilling is a tiny investment in looking reliable, and lateness is easier to recover from than that impression.", B:"Your housemates will be fine without filtered water for an hour. An urgent meeting is where your standing is actually on the line, so protect the thing that advances you and don't let a trivial chore make you late."}
+    }
+  },
+  {
+    id:"d2_fortnite", domain:"family", axis:"benevolence-achievement", dim:"ST-SE",
+    poles:{pos:["benevolence"], neg:["achievement"]},
+    optA:"Ease off and support your brother's interest.",
+    optB:"Keep giving your brother a hard time about the game.",
+    recap:{A:"Back off and support what your brother likes", B:"Keep ribbing him about the game"},
+    prompt:"I am an avid gamer who looks down on people who enjoy Fortnite. My little brother loves the game and I often ridicule him for it. Should I ease off my bias and support what he enjoys, or keep giving him a hard time about it?",
+    detail:{q:"Before we go on, which game does the little brother love?",
+      answers:["Fortnite","Minecraft","Roblox"]},
+    consider:{
+      pos:{A:"Being supportive and kind to your brother", B:"Staying close to your brother by keeping the teasing warm"},
+      neg:{A:"Showing your skill by being generous to a beginner", B:"Keeping up the gaming standards you've earned"},
+      foil:"Limiting how much time your brother spends gaming"},
+    reasoning:{
+      pos:{A:"Your taste is your own, and you're allowed to think the game is beneath you. But your brother looks up to you, and the mockery lands harder than the opinion. Easing off costs you nothing and gives him an ally in his corner, which I'd weigh more.", B:"Caring about him doesn't require sharing his taste. What matters is that the teasing stays warm and he never doubts you're on his side. Play a round with him, let him show you what he loves about it, and keep the ribbing the affectionate kind that pulls you closer."},
+      neg:{A:"You've built real identity around your taste in games, and that's fair. But nothing shows real mastery like being generous to a beginner. Lifting your brother's game reads as confidence in your own level, whereas pettiness reads as doubt about it.", B:"Standards are standards. You've earned your taste, and pretending Fortnite sits on the same tier would cheapen the distinction you've worked for. Holding the line, even with your brother, is how you keep it."}
+    }
+  },
+  {
+    id:"d3_alex", domain:"friendship", axis:"self_direction-security", dim:"O-C",
+    poles:{pos:["self_direction"], neg:["security"]},
+    optA:"Tell Alex about your feelings in a gentle, direct conversation.",
+    optB:"Keep your romantic feelings private for now.",
+    recap:{A:"Have an honest conversation about your feelings", B:"Hold off and keep your feelings private"},
+    prompt:"I've been close friends with Alex for years, and lately romantic feelings have developed. But Alex just got out of a long-term relationship, and our friendship is one of the few steady, reliable things in both our lives right now. Do I tell him how I feel, or keep it to myself rather than risk destabilizing what we have?",
+    detail:{q:"Before we go on, what did Alex recently go through?",
+      answers:["The end of a long-term relationship","Being laid off from a job","A move to a new city"]},
+    consider:{
+      pos:{A:"Being honest and living on your own terms", B:"Choosing your own moment instead of feeling forced to speak"},
+      neg:{A:"Keeping the friendship on solid, honest ground", B:"Keeping the friendship steady while Alex recovers"},
+      foil:"What mutual friends might think of the two of you"},
+    reasoning:{
+      pos:{A:"His timing genuinely might be off, and that's worth weighing. Still, living honestly means not managing someone else's feelings by hiding your own. A gentle, direct conversation treats him as an adult who can decide for himself, and frees you from carrying this in secret.", B:"Choosing your own moment is itself a real choice, not just fear. You're not obligated to disclose the instant a feeling appears. Waiting until it feels right, on your terms, can be the freer and more deliberate path."},
+      neg:{A:"Yes, he just came out of something serious. But a feeling left unspoken between you is its own quiet instability. Naming it carefully is how you keep the friendship on honest, solid ground rather than letting things unsaid distort it.", B:"Feelings are real, but he isn't steady yet after a long relationship. The caring, stable move is to hold yours for now, protect the friendship you both rely on and don't put weight on him he can't carry right now."}
+    }
+  },
+  {
+    id:"d4_parenting", domain:"co-parenting", axis:"self_direction-tradition", dim:"O-C",
+    poles:{pos:["self_direction"], neg:["tradition"]},
+    optA:"Let your partner's more lenient style continue.",
+    optB:"Raise it with your partner to set consistent rules.",
+    recap:{A:"Leave your partner\u2019s looser style alone", B:"Push for shared, consistent rules"},
+    prompt:"My partner and I discipline our kids differently. Our family has always run on firm, consistent rules, the way both of us were raised, but lately my partner has drifted toward a much more lenient style and the kids are pushing limits. Do I accept that our family's rules are changing, or push to keep the way our household has always worked?",
+    detail:{q:"Before we go on, what is straining things between the partners?",
+      answers:["Different approaches to discipline","Disagreements about money","How to divide household chores"]},
+    consider:{
+      pos:{A:"Giving the kids room to make their own calls", B:"Using your own voice as a parent"},
+      neg:{A:"Keeping the family united rather than at war over rules", B:"Making sure the family's rules hold"},
+      foil:"What the kids' teachers would recommend"},
+    reasoning:{
+      pos:{A:"Consistency has genuine value, and the friction is wearing on you. But a looser hand also gives your kids room to make their own calls and learn from them, and forcing a united front may cost more in tension and control than the messiness it's meant to fix.", B:"Wanting your home to reflect your own approach is legitimate. You don't have to defer to a style you don't believe in. Raising it directly is you exercising your own voice as a parent, on your own terms, rather than quietly going along."},
+      neg:{A:"Clashing openly over parenting can crack the order kids depend on most. What a family's continuity really rests on is the two of you standing together. A united front, even a lenient one, is calmer than a home at war over its own rules.", B:"An argument is unpleasant, true. But a family runs on its rules meaning something, and letting things slide teaches the kids the household's word doesn't hold. Setting clear, shared discipline is how you keep the order a family is built on."}
+    }
+  },
+  {
+    id:"d5_overwhelmed", domain:"friendship", axis:"self_direction-conformity", dim:"O-C",
+    poles:{pos:["self_direction"], neg:["conformity"]},
+    optA:"Step back from your friends to protect your own wellbeing.",
+    optB:"Keep showing up for your struggling friend despite the strain.",
+    recap:{A:"Put your own wellbeing first and step back", B:"Stay and keep supporting your friend"},
+    prompt:"Constant socializing has left me overwhelmed and stressed. One friend is going through a hard time and leans heavily on me, and I've always been the one who shows up: everyone in our circle just assumes I will. Do I protect my mental health and take a break, even if it means stepping back when people expect me to be there?",
+    detail:{q:"Before we go on, why is this person feeling overwhelmed?",
+      answers:["Constant socializing","Long hours at work","Trouble sleeping"]},
+    consider:{
+      pos:{A:"Honoring your own limits and wellbeing", B:"Freely choosing who is worth your energy"},
+      neg:{A:"Stepping back the proper way without dropping anyone", B:"Being someone people can count on"},
+      foil:"Suggesting your friend see a professional"},
+    reasoning:{
+      pos:{A:"Your friend leaning on you is real, and stepping back will sting. But you can't pour from an empty cup. Honoring your own limits isn't abandonment, it's the only way you'll have anything left to give, and choosing your wellbeing here is legitimate.", B:"Showing up for people can be its own freely chosen commitment, not an obligation dragging you down. If this friendship matters to you, staying isn't self-neglect. It's you deciding, on your own terms, who's worth the cost."},
+      neg:{A:"Running yourself into the ground helps no one and quietly lets down the people who expect you to show up. The responsible move is a brief, well-signaled break: you step back the expected way, without dropping anyone unannounced, and stay the person who does things properly.", B:"You're stretched thin, and that's real. But a friend in crisis is exactly when loyalty is tested. People count on you to be there, and stepping away now breaks a bond others rely on. Staying the course is what keeps you someone people can trust."}
+    }
+  },
+  {
+    id:"d6_grant", domain:"community group", axis:"universalism-power", dim:"ST-SE",
+    poles:{pos:["universalism"], neg:["power"]},
+    optA:"Spread the grant across all the projects.",
+    optB:"Concentrate it on the program you lead.",
+    recap:{A:"Split the money across everyone's projects", B:"Put it behind your own program"},
+    prompt:"I volunteer with a small community group that just got a modest grant. I wrote the application, so the committee is letting me steer how it's spent. I could spread it across everyone's projects, or concentrate it on the program I lead, which would grow my role in the group. What should I do?",
+    detail:{q:"Before we go on, how did this person get a say in the money?",
+      answers:["They wrote the grant application","They chair the committee","They donated the most"]},
+    consider:{
+      pos:{A:"Giving every project a fair share", B:"Doing the most good overall with the money"},
+      neg:{A:"Building trust that grows your role in the group", B:"Strengthening your own program and voice"},
+      foil:"How much paperwork the grant requires"},
+    reasoning:{
+      pos:{A:"You earned the pen, but the grant belongs to the group's mission, not to the person who wrote for it. Spreading it gives every project a real chance and treats the members as equals. That wider fairness is worth more than any single program's growth.", B:"Fair doesn't always mean equal slices. If your program reaches the most people, concentrating the money there can do the most good overall. Just make the case openly, so the group can weigh it and the choice serves everyone rather than just you."},
+      neg:{A:"Your influence in the group is built on trust, and nothing builds it faster than being visibly even-handed with money. Spread it now and you become the person they hand the next, bigger pot to. That's the longer game for your role.", B:"You did the work that won this money, and steering it toward the program you lead is a fair return on that. A stronger program under your name means a stronger voice in the group, and that position lets you shape what comes next."}
+    }
+  },
+  {
+    id:"d7_race", domain:"personal goals", axis:"universalism-achievement", dim:"ST-SE",
+    poles:{pos:["universalism"], neg:["achievement"]},
+    optA:"Donate the $120 to the relief fund.",
+    optB:"Register for the race you trained for.",
+    recap:{A:"Give the money to the relief fund", B:"Pay the entry fee and run the race"},
+    prompt:"I've spent months training for a race, and the $120 entry fee is due this week. The same week, a flood relief fund is collecting donations where every dollar goes directly to affected families. I can't afford both. Do I register for the race I trained for, or donate the money?",
+    detail:{q:"Before we go on, what is the $120 for if they don't donate it?",
+      answers:["A race entry fee","A concert ticket","New running shoes"]},
+    consider:{
+      pos:{A:"Helping families who urgently need it", B:"Balancing generosity with your own plans"},
+      neg:{A:"Recognizing the training itself as the real achievement", B:"Following through on the goal you trained for"},
+      foil:"How the weather will be on race day"},
+    reasoning:{
+      pos:{A:"The months of training were real, and giving up the race stings. But set the two side by side: a finish line for you, or direct help for families who lost the floor under them. The wider need outweighs the personal milestone, and the training isn't wasted; the fitness stays.", B:"Caring about strangers doesn't mean every dollar you spend on yourself is taken from them. You can run this race and give in other ways, other weeks. A one-time entry fee isn't the measure of your concern for the world."},
+      neg:{A:"Skipping one race doesn't erase the training; the discipline you built is the real achievement, and it stays with you. Giving the money away from a position of strength, having already done the work, costs your progress almost nothing.", B:"You set a goal, you trained for months, and this is the finish it points at. Following through is how goals come to mean anything at all. Pay the fee, run the race, and let your effort become a result you can stand on."}
+    }
+  },
+  {
+    id:"d8_trip", domain:"personal finances", axis:"stimulation-security", dim:"O-C",
+    poles:{pos:["stimulation"], neg:["security"]},
+    optA:"Take the trip while the chance is there.",
+    optB:"Keep your emergency savings intact.",
+    recap:{A:"Dip into savings and take the trip", B:"Pass on the trip and keep the cushion"},
+    prompt:"A close friend found absurdly cheap flights and wants me to join a last-minute week abroad, leaving this Friday. Going means dipping into the emergency savings I've slowly built up. Do I keep the cushion intact, or take the trip?",
+    detail:{q:"Before we go on, when would the trip leave?",
+      answers:["This Friday","Next month","Over the winter holidays"]},
+    consider:{
+      pos:{A:"Seizing a rare chance for a real adventure", B:"Holding out for an adventure on your own terms"},
+      neg:{A:"Going, but with a spending cap and a refill plan", B:"Keeping your financial safety cushion intact"},
+      foil:"How many vacation days you have left"},
+    reasoning:{
+      pos:{A:"The savings exist so that life stays livable, and a week like this is the living part. Chances this cheap, with this friend, don't repeat on schedule. Take it while it's real, and rebuild the cushion with the same discipline that built it.", B:"Wanting the adventure doesn't mean this adventure. Saying no to a rushed version keeps you free to plan a better one on your own terms, one you can enjoy without a knot in your stomach about the balance."},
+      neg:{A:"A cushion is for weathering surprises, and one carefully chosen trip won't sink you if you cap the spending and start refilling next month. Going with a plan is different from going blind.", B:"The cushion is doing its job precisely by being boring. Drain it for a spontaneous week and the next surprise lands on a credit card. The safe base you've built is worth more than a deal that expires Friday."}
+    }
+  },
+  {
+    id:"d9_dinner", domain:"family", axis:"stimulation-tradition", dim:"O-C",
+    poles:{pos:["stimulation"], neg:["tradition"]},
+    optA:"Reinvent the dinner this year.",
+    optB:"Keep the dinner the way it's always been.",
+    recap:{A:"Try a completely new format this year", B:"Host it exactly the way it's always run"},
+    prompt:"It's my year to host our family's big holiday dinner, which has run the same way, same dishes, same rituals, for as long as anyone remembers. I want to reinvent it completely: new venue, new format, new food. Do I shake it up, or keep it exactly as it's always been?",
+    detail:{q:"Before we go on, what is this person hosting?",
+      answers:["The family's holiday dinner","A friend's engagement party","A neighborhood potluck"]},
+    consider:{
+      pos:{A:"Making the evening something new and memorable", B:"Adding fresh touches without gambling the whole evening"},
+      neg:{A:"Keeping the heart of the ritual through the changes", B:"Preserving the family's dinner exactly as it's always been"},
+      foil:"Keeping the cost of hosting down"},
+    reasoning:{
+      pos:{A:"Hosting is your one real chance to make the evening yours. A new format wakes everyone up, gives the night a story, and the family gets a memory instead of a rerun. Every tradition started as someone's experiment once, too.", B:"Novelty for its own sake can land flat. Keep the frame this year and pour your creativity into the corners: one new dish, one surprise. You get the spark without gambling the whole evening on it."},
+      neg:{A:"Change can honor a ritual if you keep its heart. Carry the two or three things the family would grieve, the toast, the one dish, into the new format, and the tradition bends without breaking.", B:"The sameness is the point. That dinner is how your family tells itself it's still one thing across the years, and hosts are stewards of it, not authors. Keep it as it's always been; there are other nights for invention."}
+    }
+  },
+  {
+    id:"d10_reunion", domain:"friend group", axis:"stimulation-conformity", dim:"O-C",
+    poles:{pos:["stimulation"], neg:["conformity"]},
+    optA:"Pitch the wild idea.",
+    optB:"Go along with the usual plan.",
+    recap:{A:"Propose the unexpected activity", B:"Stick with the weekend everyone expects"},
+    prompt:"My friend group's yearly reunion weekend always follows the same comfortable script that everyone quietly expects. This year I want to pitch something totally different, an activity some of them will find too much. Do I push the wild idea, or go along with the usual plan?",
+    detail:{q:"Before we go on, what kind of weekend is being planned?",
+      answers:["A friend group's yearly reunion","A company retreat","A family camping trip"]},
+    consider:{
+      pos:{A:"Bringing a jolt of something new to the weekend", B:"Slipping one new thing into the familiar plan"},
+      neg:{A:"Testing the group's temperature without disturbing the harmony", B:"Going along with what the group expects"},
+      foil:"How far everyone has to travel"},
+    reasoning:{
+      pos:{A:"Comfortable scripts slowly turn reunions into reruns nobody remembers. Pitching the wild idea risks a few groans, but it offers the group a jolt of the thing that made these weekends fun in the first place. Someone has to be the spark.", B:"You don't need the whole weekend to change for it to feel new. Slip one unexpected evening into the familiar script and you get your jolt without making anyone brace. New works best when people opt into it."},
+      neg:{A:"Groups stay easy because someone occasionally tests the temperature, openly and good-naturedly. Pitch it as a question, not a plan, and let the group decide. If they say no, you fold gracefully, and no harmony is lost.", B:"The script is comfortable because it's what everyone signed up for. People plan their year around this weekend being exactly what it is. Going along isn't timid; it's respecting what the group actually wants from it."}
+    }
+  },
+];
+
+// Delegation tasks (advisor vs delegate framing), from the study spec
+const DELEGATION = [
+  {id:'conflict', title:'Conflict with someone close', self:'High', other:'Low',
+   advisor:'You’re in a disagreement with someone you care about. Would you consult AdvisorBot on how to handle it?',
+   delegate:'Would you let AdvisorBot write and send your reply on your behalf?'},
+  {id:'comment', title:'Provocative public comment', self:'High', other:'Low',
+   advisor:'Someone leaves a hostile comment on your public post. Would you consult AdvisorBot on how to respond?',
+   delegate:'Would you let AdvisorBot post a reply on your behalf?'},
+  {id:'apology', title:'Apology / repair message', self:'High', other:'Med',
+   advisor:'You’ve hurt a friend and need to make it right. Would you consult AdvisorBot on what to say?',
+   delegate:'Would you let AdvisorBot write and send the apology on your behalf?'},
+  {id:'charityd', title:'Charity allocation', self:'Low', other:'Med-High',
+   advisor:'You have $1,000 to give. Would you consult AdvisorBot on how to distribute it across causes?',
+   delegate:'Would you let AdvisorBot decide how to split your $1,000 across causes on your behalf?'},
+  {id:'cv', title:'CV / candidate screening', self:'Low', other:'High',
+   advisor:'You’re reviewing applications and must choose who advances. Would you consult AdvisorBot on which candidates to move forward?',
+   delegate:'Would you let AdvisorBot decide which candidates advance on your behalf?'},
+  {id:'modd', title:'Content moderation', self:'Low', other:'High',
+   advisor:'You moderate a community forum. Would you consult AdvisorBot on which borderline posts should be removed?',
+   delegate:'Would you let AdvisorBot remove posts on your behalf?'},
+];
+
+const LIKERT7 = ['Strongly disagree','Disagree','Slightly disagree','Neither agree nor disagree','Slightly agree','Agree','Strongly agree'];
+
+// Behavioral-intention (self-report) uptake items
+const UPTAKE_INTENT = [
+  {key:'follow',     t:'If I faced one of these dilemmas in real life, I would follow AdvisorBot’s choice.'},
+  {key:'unchecked',  t:'I would act on AdvisorBot’s choice without checking it against another source.'},
+  {key:'reconsider', t:'If AdvisorBot’s choice differed from my initial choice, I would seriously reconsider mine.'},
+  {key:'useful',     t:'I would find it useful to consult with AdvisorBot when I face challenging situations in real life.'},
+];
+
+
+// Fresh dilemmas for the live choice-shift test (NOT shown in Phase 2).
+// One per Phase 2 topic, same Schwartz axis as its source dilemma, so the
+// behavioral readout stays within the domains the trust impressions were formed in.
+// Option A is always the pos-pole-favored horn, matching the DILEMMAS convention.
+const BEHAVIORALS = [
+  { id:'b1_blender', domain:'shared apartment', source:'d1_waterfilter', axis:'benevolence-power', dim:'ST-SE',
+    poles:{pos:["benevolence"], neg:["power"]},
+    prompt:'You borrowed your housemate’s blender and cracked the lid. You’re heading into a brutal week of deadlines. Do you tell them today and sort a replacement now, or handle it once your week clears?',
+    optA:'Tell them today and sort a replacement',
+    optB:'Handle it after your deadline week',
+    reasoning:{
+      pos:{
+        A:'The people you live with are affected either way, and a cracked lid they discover on their own lands worse than a heads-up. Telling them today, even in a busy week, treats their things and their trust as worth a two-minute message.',
+        B:'Being considerate doesn’t require dropping everything. If you replace the lid properly once the week clears, they end up whole, and you avoid a rushed half-fix. The care is in the follow-through, not the timing.'
+      },
+      neg:{
+        A:'Your name in that apartment is worth protecting. Owning it today, before anyone finds it, keeps you the person whose word doesn’t need checking, and that reputation outlasts one awkward message.',
+        B:'Your week is where your standing actually gets decided. A lid can wait; the ground you’d lose by fumbling your deadlines can’t be won back as easily. Protect your position first and settle the small stuff after.'
+      }
+    } },
+  { id:'b2_cousin', domain:'family', source:'d2_fortnite', axis:'benevolence-achievement', dim:'ST-SE',
+    poles:{pos:["benevolence"], neg:["achievement"]},
+    prompt:'Your younger cousin proudly shows you a school art project they’ve entered in a contest. You can see flaws a judge will notice. They ask what you honestly think.',
+    optA:'Focus on what’s working and encourage them',
+    optB:'Point out the flaws so they can fix them',
+    reasoning:{
+      pos:{
+        A:'They came to you proud, not for a critique. What a kid remembers from this is whether showing you their work felt safe. Encouragement now keeps them making things, and that matters more than one contest.',
+        B:'Kindness can include the truth when it’s offered gently. Walking them through the fixable flaws, while making clear you’re impressed, gives them a real shot at the result they clearly want.'
+      },
+      neg:{
+        A:'You don’t have to spend your credibility on a school contest. Cheer them on, let the judges do the judging, and save your sharper eye for the moments that carry real stakes.',
+        B:'They asked what you honestly think, and your eye is exactly what they need. Naming the flaws now, while there’s still time to fix them, is what raises their standard and their result.'
+      }
+    } },
+  { id:'b3_wedding', domain:'friendship', source:'d3_alex', axis:'self_direction-security', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["security"]},
+    prompt:'Your close friend just got engaged and asked you to be in the wedding party. You have real doubts about the relationship. Do you share them, or accept the role and keep them to yourself?',
+    optA:'Share your doubts honestly before committing',
+    optB:'Accept warmly and keep your doubts to yourself',
+    reasoning:{
+      pos:{
+        A:'Standing up at a wedding you have doubts about means performing something you don’t feel. Saying what you actually see, carefully and once, is you acting on your own judgment instead of a script.',
+        B:'Your doubts are yours to hold, and accepting the role doesn’t erase them. You can step into the day on your own terms and stay honest in the ways that matter, without turning their news into your verdict.'
+      },
+      neg:{
+        A:'A friendship this close can survive one careful conversation better than years of something unsaid sitting between you. Raising it now, before the roles are set, protects the foundation the friendship rests on.',
+        B:'This is a moment the friendship has a shape for: you show up and stand where they asked you to stand. Keeping your doubts private protects them, the occasion, and the steady thing between you.'
+      }
+    } },
+  { id:'b4_reward', domain:'co-parenting', source:'d4_parenting', axis:'self_direction-tradition', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["tradition"]},
+    prompt:'Your partner promised your kid a reward for good grades that you think is far too big. The kid delivered. Privately, you’d scale it back. Do you reopen it with your partner, or let it stand?',
+    optA:'Tell your partner you want to rethink the reward',
+    optB:'Honor the promise exactly as it was made',
+    reasoning:{
+      pos:{
+        A:'You’re a parent in this house too, and a reward you think is wrong shouldn’t stand just because it was said first. Reopening it with your partner is you using your voice where you’re entitled to one.',
+        B:'You can honor this promise and still claim your say going forward. Letting this one stand as made, then agreeing on how rewards get set next time, keeps your voice intact without a retroactive fight.'
+      },
+      neg:{
+        A:'A quick private word with your partner before anything reaches your kid keeps the two of you deciding together. Renegotiating as a team now beats one of you quietly resenting the deal later.',
+        B:'Your kid held up their end, and a promise from one parent is a promise from the household. Honoring it as made teaches them the family’s word is solid, and that’s worth more than the difference in the reward.'
+      }
+    } },
+  { id:'b5_move', domain:'friendship', source:'d5_overwhelmed', axis:'self_direction-conformity', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["conformity"]},
+    prompt:'You planned your first free weekend in a month to recharge. A friend asks you to help them move on Saturday; they’re short on hands. Do you keep the weekend, or show up?',
+    optA:'Keep the weekend for yourself and say no',
+    optB:'Show up and help with the move',
+    reasoning:{
+      pos:{
+        A:'You planned that weekend because you needed it, and that need is real. Saying no to one move is not abandoning anyone; it’s you keeping the commitment you made to yourself first.',
+        B:'Helping can be something you freely choose rather than something extracted from you. If this friend matters, a few hours on Saturday on your own terms can sit fine alongside a restful Sunday.'
+      },
+      neg:{
+        A:'Being dependable in the long run means not running yourself to empty. A rested you shows up better for the next ask; a burned-out you eventually stops showing up at all. Protecting this weekend protects your reliability.',
+        B:'This is exactly when being someone people can count on gets tested. They’re short on hands and they asked you. Showing up costs you a morning and keeps you the friend who comes through.'
+      }
+    } },
+];
+
+// AI experience / literacy covariate block (shown after consent, before the PVQ).
+// Wording follows common practice in chatbot-trust studies: use frequency
+// (Never -> Multiple times a day), advice-specific frequency, self-rated
+// understanding, and general attitude.
+const AIEXP_FREQ = ['Never','Less than once a month','A few times a month','A few times a week','About once a day','Multiple times a day'];
+const AIEXP_ITEMS = [
+  {key:'use_freq',    type:'freq', t:'How often do you use AI chatbots (for example ChatGPT, Claude, Gemini, Copilot)?'},
+  {key:'advice_freq', type:'freq', t:'How often do you ask an AI chatbot for advice on personal decisions or dilemmas?'},
+  {key:'understand',  type:'l7',   t:'I have a good understanding of how AI chatbots produce their answers.'},
+  {key:'helpful',     type:'l7',   t:'I think AI chatbots are helpful.'},
+];
+const AIEXP_TOOLS = ['ChatGPT','Claude','Gemini','Copilot','Meta AI','Other','None of these'];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const S = {
+  condition:null,          // 'C1' | 'C2' | 'C3'
+  assignment:null,         // {source:'server'|'server_existing'|'local'|'local_fallback'|'forced', counts, error}
+  forcedCondition:null,    // researcher override
+  aiexp:{tools:[]},        // AI experience covariates
+  pvq:{},                  // item index -> 1..6
+  valueScores:{},          // value key -> mean
+  topValuesByAxis:{},      // dilemma id -> aligned pole key
+  order:[],                // shuffled dilemma indices
+  decisions:{},            // dilemma id -> 'A'|'B'
+  reflect:{},              // dilemma id -> {decmatch, reasonmatch, integrity}
+  interaction:{},          // {competence, overlap, predictability, reliance}
+  delegation:{},           // task id -> {advisor, delegate}
+  mcheck:{},               // manipulation checks
+  uptake:{intent:{}, stage:'intent', ui:0, runs:{}},
+  p2seen:{}, p2stage:null, p2token:0, comp:{}, delIdx:0,
+  behaviorCounter:'opposite', // researcher: AI recommends 'opposite' of pre-choice (room to shift) or 'same'
+  step:0,
+};
+
+const SCREENS = ['welcome','pvq','dilemmaIntro','dilemmas','phase3Intro','interaction','uptake','delegation','checks','done'];
+const PHASE_OF = {welcome:'Intro',aiexp:'Intro',pvq:'Part 1',dilemmaIntro:'Part 2',dilemmas:'Part 2',interaction:'Part 2',perception:'Part 2',intent:'Part 2',phase3Intro:'Part 3',uptake:'Part 3',delegation:'Part 3',checks:'Part 3',done:'Done'};
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const CONDITIONS = ['C1','C2','C3'];
+
+/* Local assignment. Used when there is no backend, and as the fallback if the
+   backend is unreachable — a participant must never be stuck on a spinner.
+   Deterministic in the participant key, so a refresh reproduces the same arm. */
+function assignCondition(){
+  if(S.forcedCondition) return S.forcedCondition;            // researcher override (testing only)
+  const key = PARTICIPANT.participant_key;
+  if(key){
+    let h=0;
+    for(let i=0;i<key.length;i++){ h=((h<<5)-h+key.charCodeAt(i))|0; }
+    return CONDITIONS[Math.abs(h)%3];
+  }
+  return CONDITIONS[Math.floor(Math.random()*3)];
+}
+
+/* Server assignment: the backend keeps the three arms balanced across participants
+   and remembers this key, so the same person always returns to the same arm.
+   Resolves to {condition, source}; never rejects. Cached, so the prefetch fired
+   when the PVQ opens is simply awaited later rather than re-requested. */
+let _assignPromise = null;
+function assignConditionRemote(){
+  if(_assignPromise) return _assignPromise;
+  if(S.forcedCondition) return Promise.resolve({condition:S.forcedCondition, source:'forced'});
+  if(!LOG_ENDPOINT)     return Promise.resolve({condition:assignCondition(), source:'local'});
+
+  const url = endpointURL({
+    action:'assign',
+    key:     PARTICIPANT.participant_key,
+    pid:     PARTICIPANT.prolific_pid,
+    study:   PARTICIPANT.study_id,
+    session: PARTICIPANT.session_id,
+    test:    IS_TEST ? '1' : '',
+  });
+  // One retry: Apps Script occasionally answers a request with a transient Drive error
+  // page instead of JSON. Assignment is idempotent (sticky on the key), so retrying
+  // returns the same arm rather than burning a second slot.
+  const attempt = () => {
+    const ctl = ('AbortController' in window) ? new AbortController() : null;
+    const timer = setTimeout(()=>{ if(ctl) ctl.abort(); }, ASSIGN_TIMEOUT_MS);
+    return fetch(url, {method:'GET', signal: ctl?ctl.signal:undefined})
+      .then(r=>r.text())
+      .then(txt=>{
+        clearTimeout(timer);
+        let j; try{ j=JSON.parse(txt); }catch(e){ throw new Error('non-JSON response (transient Google error?)'); }
+        if(!j || !j.ok || CONDITIONS.indexOf(j.condition)<0) throw new Error(j && j.error || 'bad assign response');
+        return {condition:j.condition, source: j.existing?'server_existing':'server', counts:j.counts||null};
+      })
+      .catch(err=>{ clearTimeout(timer); throw err; });
+  };
+
+  _assignPromise = attempt()
+    .catch(()=>attempt())
+    .catch(err=>({condition:assignCondition(), source:'local_fallback', error:String(err && err.message || err)}));
+  return _assignPromise;
+}
+
+/* Connectivity probe for the researcher strip — does not create an assignment. */
+function pingBackend(){
+  if(!LOG_ENDPOINT) return Promise.resolve({ok:false, error:'LOG_ENDPOINT is empty'});
+  return fetch(endpointURL({action:'ping'}), {method:'GET'})
+    .then(r=>r.json())
+    .catch(err=>({ok:false, error:String(err && err.message || err)}));
+}
+
+/* ---- scoring ---- */
+function scorePVQ(){
+  const sums={}, counts={};
+  PVQ_ITEMS.forEach((it,i)=>{
+    if(S.pvq[i]==null) return;
+    sums[it.v]=(sums[it.v]||0)+S.pvq[i];
+    counts[it.v]=(counts[it.v]||0)+1;
+  });
+  // mean-centre (ipsatise) per Schwartz convention so high-low is relative
+  const raw={}; let all=0,n=0;
+  VALUES.forEach(v=>{ if(counts[v.key]){ raw[v.key]=sums[v.key]/counts[v.key]; all+=raw[v.key]; n++; } });
+  const grand = n? all/n : 0;
+  const out={};
+  VALUES.forEach(v=> out[v.key] = raw[v.key]!=null ? +(raw[v.key]-grand).toFixed(3) : 0);
+  S.valueScores=out;
+  // aligned pole per dilemma = the pole (pos/neg) the participant leans toward
+  const poleScore=(keys)=>{ const xs=keys.map(k=>out[k]??0); return xs.reduce((a,b)=>a+b,0)/(xs.length||1); };
+  DILEMMAS.forEach(d=>{
+    S.topValuesByAxis[d.id] = poleScore(d.poles.pos) >= poleScore(d.poles.neg) ? 'pos' : 'neg';
+  });
+}
+
+/* ---- AI response construction: condition × decision × value pole ---- */
+function aiResponseFor(d){
+  const alignedPole = S.topValuesByAxis[d.id];      // 'pos' | 'neg'
+  const otherPole = alignedPole==='pos' ? 'neg' : 'pos';
+  const alignedDecision = alignedPole==='pos' ? 'A' : 'B';  // value-favored horn (A=decision_pos)
+  // C3 = decision misaligned (opposite of the value-favored horn); else aligned
+  const aiDecision = (S.condition==='C3') ? (alignedDecision==='A'?'B':'A') : alignedDecision;
+  // C2 = reasoning misaligned (opposing pole); else aligned pole
+  const reasonPole = (S.condition==='C2') ? otherPole : alignedPole;
+  const verdict = aiDecision==='A' ? d.optA : d.optB;
+  const reason = d.reasoning[reasonPole][aiDecision];
+  return {verdict, reason, aiDecision, reasonPole};
+}
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+const app = document.getElementById('app');
+
+/* ---- back/forward navigation history ---- */
+let NAV=[]; let restoring=false;
+function snapshot(){
+  return {
+    screenName:S.screenName, di:S.di, dStage:S.dStage, delIdx:S.delIdx,
+    uptake:{ stage:S.uptake.stage, ui:S.uptake.ui,
+      runs:JSON.parse(JSON.stringify(S.uptake.runs)) }
+  };
+}
+function markNav(){
+  if(restoring) return;
+  const snap=snapshot();
+  const top=NAV[NAV.length-1];
+  if(top && JSON.stringify(top)===JSON.stringify(snap)) return;
+  NAV.push(snap);
+}
+function dispatch(name){
+  ({welcome:Screens.welcome, aiexp:Screens.aiExperience, pvq:Screens.pvq, dilemmaIntro:Screens.dilemmaIntro, phase3Intro:Screens.phase3Intro, profile:Screens.profile, dilemmas:Screens.dilemmas,
+    interaction:Screens.interaction, perception:Screens.perception, intent:Screens.intent, uptake:Screens.uptake, delegation:Screens.delegation,
+    checks:Screens.checks, done:Screens.done}[name] || Screens.welcome)();
+}
+function goBack(){
+  if(NAV.length<2) return;
+  NAV.pop();
+  const p=NAV[NAV.length-1];
+  restoring=true;
+  S.di=p.di; S.dStage=p.dStage; S.delIdx=p.delIdx||0;
+  S.uptake.stage=p.uptake.stage; S.uptake.ui=p.uptake.ui||0;
+  S.uptake.runs=JSON.parse(JSON.stringify(p.uptake.runs||{}));
+  dispatch(p.screenName);
+  restoring=false;
+  updateBack();
+}
+function updateBack(){
+  const b=document.getElementById('backbtn');
+  if(!b) return;
+  // lock back during the behavioral block so the pre-advice choice can't be revised
+  const locked = S.screenName==='uptake' && (S.uptake.stage==='decide' || S.uptake.stage==='chat');
+  b.style.visibility = (NAV.length>1 && !locked) ? 'visible' : 'hidden';
+}
+
+function setProgress(){
+  const idx = SCREENS.indexOf(S.screenName);
+  const pct = Math.round((idx/(SCREENS.length-1))*100);
+  document.getElementById('progbar').style.width = pct+'%';
+  document.getElementById('phasetag').textContent = PHASE_OF[S.screenName] || '';
+}
+let _renderKey = null;
+function render(html){
+  markNav();
+  // treat stage-updates within the same screen (chat typing, comprehension taps) as quiet updates
+  const key = S.screenName + '|' + (S.screenName==='dilemmas' ? S.di : '');
+  const fresh = (key !== _renderKey);
+  _renderKey = key;
+  const y = window.scrollY;
+  app.innerHTML = html;
+  if(fresh){
+    app.classList.remove('fade'); void app.offsetWidth; app.classList.add('fade');
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    app.classList.remove('fade');   // no re-fade: prevents the flash on every update
+    window.scrollTo({top:y});       // hold position instead of jumping
+  }
+  setProgress(); updateBack();
+}
+function likertRow(name, val, onpick){
+  return `<div class="scale likert7" role="radiogroup">${LIKERT7.map((lab,i)=>{
+    const v=i+1, id=`${name}_${v}`;
+    return `<div class="opt"><input type="radio" name="${name}" id="${id}" value="${v}" ${val==v?'checked':''} onchange="${onpick}(${v})"><label for="${id}" title="${lab}">${v}</label></div>`;
+  }).join('')}</div>
+  <div class="scalecaps"><span>1 · Strongly disagree</span><span>4 · Neither agree nor disagree</span><span>Strongly agree · 7</span></div>`;
+}
+const DELEG_SCALE=['Definitely not','Probably not','Unsure','Probably','Definitely'];
+function likert5Row(name, val, onpick){
+  return `<div class="scale likert5" role="radiogroup">${DELEG_SCALE.map((lab,i)=>{
+    const v=i+1, id=`${name}_${v}`;
+    return `<div class="opt"><input type="radio" name="${name}" id="${id}" value="${v}" ${val==v?'checked':''} onchange="${onpick}(${v})"><label for="${id}" title="${lab}">${v}</label></div>`;
+  }).join('')}</div>
+  <div class="scalecaps"><span>1 \u00b7 Definitely not</span><span>3 \u00b7 Unsure</span><span>Definitely \u00b7 5</span></div>`;
+}
+function binaryRow(name, val, onpick){
+  return `<div class="binary" role="radiogroup">${[['No',0],['Yes',1]].map(([lab,v])=>{
+    const id=`${name}_${v}`;
+    return `<div class="opt"><input type="radio" name="${name}" id="${id}" ${val===v?'checked':''} onchange="${onpick}(${v})"><label for="${id}">${lab}</label></div>`;
+  }).join('')}</div>`;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+const Screens = {
+  welcome(){
+    S.screenName='welcome';
+    render(`
+      <p class="eyebrow">Research study · about 20 minutes</p>
+      <h1>How you’d reason, and how an AI reasons it back.</h1>
+      <p class="lead">${ADVISOR_EMOJI} <b>${ADVISOR_NAME}</b> is an AI assistant that gives advice on everyday decisions: disagreements with people close to you, family choices, how to spend your time and money.</p>
+      <p class="lead">First, you'll rate 21 short statements about what is important to you in life. Next, you'll read ${DILEMMAS.length} situations other people have posed to AdvisorBot, along with AdvisorBot's responses. After each situation and response, we'll ask a question or two to make sure you understood what was asked and what was replied, and then for your overall impressions of AdvisorBot. Finally, you'll face five decisions of your own, see AdvisorBot's advice, and tell us whether you'd act on it and which tasks, if any, you'd let it handle for you.</p>
+      <p class="lead">There are no right or wrong answers anywhere in this study. We want your honest reactions.</p>
+      <div class="card">
+        <h2>Before you begin</h2>
+        <p class="muted">${LOG_ENDPOINT?'Your responses are recorded securely as you go for research purposes.':'Your responses are recorded only on this device and can be exported at the end.'}</p>
+        <label class="check"><input type="checkbox" id="c1"> I’m 18 or older and consent to take part.</label>
+        <label class="check"><input type="checkbox" id="c2"> I understand I can stop at any time.</label>
+        <div class="btnrow">
+          <button class="btn" id="start" disabled onclick="Screens.pvqIntro()">Begin</button>
+        </div>
+      </div>
+      ${researcherStrip()}
+    `);
+    const upd=()=>{document.getElementById('start').disabled = !(document.getElementById('c1').checked && document.getElementById('c2').checked);};
+    document.getElementById('c1').onchange=upd; document.getElementById('c2').onchange=upd;
+    wireResearcher();
+  },
+
+  pvqIntro(){
+    Screens.aiExperience();
+  },
+  aiExperience(){
+    S.screenName='aiexp';
+    const a=S.aiexp;
+    const freqRow=(key)=>`<div class="scale" role="radiogroup">${AIEXP_FREQ.map((lab,j)=>{
+      const v=j+1,id=`ax_${key}_${v}`;
+      return `<div class="opt"><input type="radio" name="ax_${key}" id="${id}" ${a[key]==v?'checked':''} onchange="setAiexp('${key}',${v})"><label for="${id}">${lab}</label></div>`;
+    }).join('')}</div>`;
+    const items=AIEXP_ITEMS.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${it.type==='freq'?freqRow(it.key):likertRow('ax_'+it.key, a[it.key], `setAiexp.bind(null,'${it.key}')`)}
+      <div style="height:20px"></div>`).join('');
+    const tools=AIEXP_TOOLS.map(tname=>`
+      <label class="check"><input type="checkbox" ${a.tools.includes(tname)?'checked':''} onchange="toggleAiexpTool('${tname}')"> ${tname}</label>`).join('');
+    render(`
+      <p class="eyebrow">Background · Your experience with AI</p>
+      <h1 style="font-size:30px">A little about your AI use</h1>
+      <p class="lead">Before we begin, a few quick questions about your experience with AI chatbots. There are no right or wrong answers.</p>
+      <div class="card">${items}
+        <p class="qtext">Which AI chatbots have you used? Select all that apply.</p>
+        <div style="display:grid;gap:8px;margin-top:8px">${tools}</div>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finishAiexp()">Continue</button></div>
+    `);
+  },
+  finishAiexp(){
+    if(!DEMO && (AIEXP_ITEMS.some(it=>S.aiexp[it.key]==null) || S.aiexp.tools.length===0)){ flashIncomplete(); return; }
+    Screens.pvq();
+  },
+
+  pvq(){
+    S.screenName='pvq';
+    const items = PVQ_ITEMS.map((it,i)=>`
+      <div class="qitem">
+        <p class="qtext"><span class="n">${String(i+1).padStart(2,'0')}</span>${it.t}</p>
+        <div class="scale" role="radiogroup" aria-label="response">
+          ${PVQ_SCALE.map((lab,j)=>{
+            const v=j+1,id=`pvq_${i}_${v}`;
+            return `<div class="opt"><input type="radio" name="pvq_${i}" id="${id}" ${S.pvq[i]==v?'checked':''} onchange="setPVQ(${i},${v})"><label for="${id}">${lab}</label></div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+    render(`
+      <p class="eyebrow">Part 1 · About you</p>
+      <h1>About you</h1>
+      <p class="lead">Please read each statement below and indicate how much you think it reflects how you see yourself. There are no right or wrong answers.</p>
+      <div class="card">${items}</div>
+      <div class="btnrow">
+        <span class="muted" id="pvqcount"></span>
+        <button class="btn" id="pvqnext" onclick="Screens.afterPVQ()">Continue</button>
+      </div>
+    `);
+    updatePVQCount();
+    // Warm the assignment now: the round trip finishes while the 21 items are being
+    // answered, so Part 2 opens with no visible wait. The condition does not depend
+    // on the PVQ, only on the balance of arms already filled.
+    assignConditionRemote();
+  },
+
+  async afterPVQ(){
+    const answered = PVQ_ITEMS.filter((_,i)=>S.pvq[i]!=null).length;
+    if(!DEMO && answered < PVQ_ITEMS.length){
+      const first = PVQ_ITEMS.findIndex((_,i)=>S.pvq[i]==null);
+      const el = document.querySelector(`[name="pvq_${first}"]`);
+      if(el){ el.closest('.qitem').scrollIntoView({behavior:'smooth',block:'center'}); el.closest('.qitem').style.background='#FFF6F0'; setTimeout(()=>el.closest('.qitem').style.background='',1200); }
+      return;
+    }
+    scorePVQ();
+
+    // Condition comes from the backend so the three arms stay balanced across
+    // participants. Normally already resolved from the prefetch; if it is still in
+    // flight (or the network is down) the button waits, then falls back locally.
+    const btn=document.getElementById('pvqnext');
+    if(btn){ btn.disabled=true; btn.textContent='Preparing…'; }
+    const a = await assignConditionRemote();
+    if(btn){ btn.disabled=false; btn.textContent='Continue'; }
+
+    S.condition = a.condition;
+    S.assignment = {source:a.source, counts:a.counts||null, error:a.error||null, assigned_at:new Date().toISOString()};
+    S.order = shuffle(DILEMMAS.map((_,i)=>i));
+    logSnapshot('pvq_done');
+    Screens.dilemmaIntro();  // Part 2 intro; profile revealed at END to avoid priming
+  },
+
+  profile(){
+    S.screenName='profile';
+    const sorted=[...VALUES].sort((a,b)=>(S.valueScores[b.key]||0)-(S.valueScores[a.key]||0));
+    const top=sorted.slice(0,3), bottom=sorted.slice(-2);
+    render(`
+      <p class="eyebrow">Phase 1 · Your profile</p>
+      <h1>Your value profile</h1>
+      <p class="lead">Built from your answers. In the next part, “reasoning that matches you” means reasoning that leans on the values near the top of this wheel.</p>
+      <div class="card">
+        <div class="wheelwrap">
+          ${circumplexSVG()}
+          <div class="legend">
+            ${legendHTML()}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <p style="margin:0 0 6px"><b>Most like you:</b> ${top.map(v=>v.label).join(', ')}.</p>
+        <p style="margin:0" class="muted"><b>Less like you:</b> ${bottom.map(v=>v.label).join(', ')}.</p>
+      </div>
+      <div class="btnrow">
+        <button class="btn" onclick="Screens.dilemmas()">See the situations</button>
+      </div>
+      ${researcherStrip(true)}
+    `);
+    wireResearcher();
+  },
+
+  dilemmaIntro(){
+    S.screenName='dilemmaIntro';
+    render(`
+      <p class="eyebrow">Part 2 · Getting to know ${ADVISOR_EMOJI} AdvisorBot</p>
+      <h1>Getting to know AdvisorBot</h1>
+      <p class="lead">In this part you'll see how ${ADVISOR_EMOJI} AdvisorBot makes decisions and what its reasoning is. You'll read ${DILEMMAS.length} short, everyday situations that other people have posed to AdvisorBot. Thoughtful people can reasonably disagree on all of them; none are about you, and there are no right or wrong answers.</p>
+      <div class="card">
+        <p style="margin:0 0 12px"><b>For each situation:</b></p>
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">1</span><p style="margin:0">You'll read a situation that someone else posed to <b>${ADVISOR_EMOJI} AdvisorBot</b>, as a quick chat.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start">
+          <span class="stepnum">2</span><p style="margin:0">You'll see AdvisorBot's reply: its decision and its reasoning.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-top:12px">
+          <span class="stepnum">3</span><p style="margin:0">We will ask you a question or two about how you understood the situation and AdvisorBot's decision and reasoning.</p></div>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.dilemmas()">Start Part 2</button></div>
+    `);
+  },
+
+  dilemmas(){
+    S.screenName='dilemmas';
+    S.di = S.di||0;
+    const d = DILEMMAS[S.order[S.di]];
+    const total = S.order.length;
+    const r = aiResponseFor(d);
+    if(S.p2seen[d.id]){ S.p2stage='shown'; }
+    else if(!S.p2stage){ S.p2stage='detail'; }
+    const stage = S.p2stage;
+    const ask = '<br><br><i style="opacity:.85">What would you do?</i>';
+    let chat = `<div class="msg me" id="userbub">${d.prompt+ask}</div>`;
+    if(stage==='shown') chat += `<div class="msg ai"><p class="who">${AGENT_LABEL}</p><p class="verdict">${r.verdict}.</p><p class="rlabel">AdvisorBot’s Reasoning</p><p id="aireason">${r.reason}</p></div>`;
+    let cont='';
+    const cls=(sel,wrong)=>'compopt'+(sel?(wrong?' wrong':' sel'):'');
+    if(stage==='detail'){
+      // Scenario-detail check: confirms the vignette was read BEFORE any advice is shown,
+      // so a later consideration-check failure can't be blamed on never reading the setup.
+      const c=ensureCompOrders(d);
+      const detailWrong = c.detail!=null && c.detail!==0;
+      cont = `
+        <div class="compbox">
+          <p class="compq">${d.detail.q}</p>
+          <div class="compopts">
+            ${c.detail_order.map(i=>`<button class="${cls(c.detail===i, detailWrong && c.detail===i)}" onclick="setDetail(${i})">${d.detail.answers[i]}</button>`).join('')}
+          </div>
+          ${detailWrong?`<p class="comphint">Not quite. Take another look at the situation above.</p>`:''}
+        </div>`;
+    }
+    if(stage==='shown'){
+      const c=ensureCompOrders(d);
+      const whyWrong = c.why && c.why!==r.reasonPole;
+      const ready = c.why===r.reasonPole || DEMO;
+      cont = `
+        <div class="compbox">
+          <p class="compq">AdvisorBot's advice primarily emphasized...</p>
+          <div class="compopts">
+            ${c.why_order.map(k=>`<button class="${cls(c.why===k, whyWrong && c.why===k)}" onclick="setComp('why','${k}')">${k==='foil'?d.consider.foil:d.consider[k][r.aiDecision]}</button>`).join('')}
+          </div>
+          ${whyWrong?`<p class="comphint">Not quite. Take another look at AdvisorBot's response above.</p>`:''}
+        </div>
+        <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="Screens.nextP2()">${S.di+1<total?'Next situation':'Continue'}</button></div>`;
+    }
+    render(`
+      <p class="eyebrow">Part 2 · Situation ${S.di+1} of ${total}</p>
+      <h1 style="font-size:30px">Someone asked ${ADVISOR_EMOJI} AdvisorBot</h1>
+      <div class="card"><div class="chat">${chat}</div>${cont}</div>
+    `);
+    const c=app.querySelector('.card'); if(c) c.scrollTop=99999;
+    if(stage==='shown'){ S.p2seen[d.id]=true; }
+  },
+  nextP2(){
+    if(S.di+1 < S.order.length){ S.di++; S.p2stage=null; Screens.dilemmas(); }
+    else { logSnapshot('dilemmas_done'); Screens.interaction(); }
+  },
+  phase3Intro(){
+    S.screenName='phase3Intro';
+    render(`
+      <p class="eyebrow">Part 3 · Making decisions with ${ADVISOR_EMOJI} AdvisorBot</p>
+      <h1>Now, making decisions</h1>
+      <p class="lead">You've now seen how and why ${ADVISOR_EMOJI} AdvisorBot makes decisions across a range of situations posed by <i>other people</i>. In this next part, we'll ask how <i>you</i> would actually <b>rely on</b> ${AGENT_INLINE}'s decisions. As before, there are no right or wrong answers.</p>
+      <div class="card">
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">1</span><p style="margin:0">Five <b>new situations</b> that you might encounter in your own life. For each, you'll make your own decision, then pose it to AdvisorBot.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start">
+          <span class="stepnum">2</span><p style="margin:0">Your overall impressions of how you'd <b>use (or not use)</b> AdvisorBot in your life.</p></div>
+      </div>
+      ${researcherUptakeStrip()}
+      <div class="btnrow"><button class="btn" onclick="Screens.startUptake()">Start Part 3</button></div>
+    `);
+    const sel=document.getElementById('bcounter');
+    if(sel) sel.onchange=()=>{ S.behaviorCounter=sel.value; };
+  },
+
+  interaction(){
+    S.screenName='interaction';
+    const x=S.interaction;
+    render(`
+      <p class="eyebrow">Part 2 · What you think of AdvisorBot</p>
+      <h1 style="font-size:30px">Thinking about ${ADVISOR_EMOJI} AdvisorBot</h1>
+      <p class="lead">Now a few questions about ${ADVISOR_EMOJI} AdvisorBot overall, based on everything you’ve seen. As before, there are no right answers, just your honest impression.</p>
+      <div class="card">
+        <p class="qtext">${AGENT_INLINE} is skilled at thinking through moral problems.</p>
+        ${likertRow('competence', x.competence, 'setInter.bind(null,\'competence\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">${AGENT_INLINE} seems to share my values.</p>
+        ${likertRow('overlap', x.overlap, 'setInter.bind(null,\'overlap\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">${AGENT_INLINE} makes decisions the same way I do.</p>
+        ${likertRow('decision_style', x.decision_style, 'setInter.bind(null,\'decision_style\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">${AGENT_INLINE} uses the same reasoning process I do.</p>
+        ${likertRow('reasoning_process', x.reasoning_process, 'setInter.bind(null,\'reasoning_process\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">I can anticipate what ${AGENT_INLINE} would choose in a new situation.</p>
+        ${likertRow('predictability', x.predictability, 'setInter.bind(null,\'predictability\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">I would trust ${AGENT_INLINE}’s choice on a moral question that matters to me.</p>
+        ${likertRow('reliance', x.reliance, 'setInter.bind(null,\'reliance\')')}
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.gotoUptake()">Continue</button></div>
+    `);
+  },
+  gotoUptake(){
+    const x=S.interaction;
+    if(!DEMO && ['competence','overlap','decision_style','reasoning_process','predictability','reliance'].some(k=>x[k]==null)){ flashIncomplete(); return; }
+    Screens.perception();
+  },
+  perception(){
+    S.screenName='perception';
+    const m=S.mcheck;
+    render(`
+      <p class="eyebrow">Part 2 · What you think of AdvisorBot</p>
+      <h1 style="font-size:30px">How did you think about ${ADVISOR_EMOJI} AdvisorBot?</h1>
+      <div class="card">
+        <p class="qtext">Overall, AdvisorBot tended to <b>make the same choices</b> I would have made.</p>
+        ${likertRow('mc_dec', m.dec, 'setMCheck.bind(null,\'dec\')')}
+        <div style="height:20px"></div>
+        <p class="qtext">Overall, AdvisorBot tended to <b>reason in a way that matched how I think</b>.</p>
+        ${likertRow('mc_reason', m.reason, 'setMCheck.bind(null,\'reason\')')}
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finishPerception()">Continue</button></div>
+    `);
+  },
+  finishPerception(){
+    const m=S.mcheck;
+    if(!DEMO && (m.dec==null||m.reason==null)){ flashIncomplete(); return; }
+    Screens.intent();
+  },
+
+  uptake(){
+    S.screenName='uptake';
+    return Screens.uptakeDecide();
+  },
+  intent(){
+    S.screenName='intent';
+    const u=S.uptake;
+    const items = UPTAKE_INTENT.map(it=>`
+      <p class="qtext">${it.t.split('AdvisorBot').join(AGENT_INLINE)}</p>
+      ${likertRow('intent_'+it.key, u.intent[it.key], `setIntent.bind(null,'${it.key}')`)}
+      <div style="height:20px"></div>`).join('');
+    render(`
+      <p class="eyebrow">Part 2 · Acting on advice</p>
+      <h1 style="font-size:30px">Would you act on it?</h1>
+      <p class="lead">A couple of questions about acting on advice like ${AGENT_INLINE}’s when you can see it in front of you. There are no right or wrong answers.</p>
+      <div class="card">${items}</div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finishIntent()">Continue</button></div>
+    `);
+  },
+  finishIntent(){
+    if(!DEMO && UPTAKE_INTENT.some(it=>S.uptake.intent[it.key]==null)){ flashIncomplete(); return; }
+    logSnapshot('part2_measures_done');
+    Screens.phase3Intro();
+  },
+  startUptake(){
+    S.uptake.stage='decide';
+    Screens.uptakeDecide();
+  },
+  uptakeDecide(){
+    S.screenName='uptake';
+    const d=curB(), u=curU();
+    const pre=u.pre;
+    const locked=!!u.asked;
+    let adviceBlock='';
+    if(u.asked){
+      adviceBlock = `
+        <div class="msg ai" style="max-width:none;margin-top:18px">
+          <p class="who">${AGENT_LABEL}</p>
+          <p class="verdict">${u.verdict}.</p>
+          <p class="rlabel">AdvisorBot’s Reasoning</p>
+          <p>${u.reason}</p>
+        </div>`;
+      if(u.final==null){
+        adviceBlock += `
+        <p class="chatask" style="margin-top:18px">After seeing what AdvisorBot says, what is your decision?</p>
+        <div class="chips">
+          <button class="chip ${u.final==='A'?'sel':''}" onclick="uptakeChoose('A')">${d.optA}</button>
+          <button class="chip ${u.final==='B'?'sel':''}" onclick="uptakeChoose('B')">${d.optB}</button>
+        </div>`;
+      } else {
+        adviceBlock += `
+        <p class="chatask" style="margin-top:18px">Your decision: <b>${u.final==='A'?d.optA:d.optB}</b></p>
+        <p class="chatask" style="margin-top:14px">How sure are you about your final decision?</p>
+        <div class="scale likert7" role="radiogroup">${[1,2,3,4,5,6,7].map(v=>`<div class="opt"><input type="radio" name="upconf" id="uc${v}" value="${v}" ${u.confidence==v?'checked':''} onchange="uptakeConfidence(${v})"><label for="uc${v}">${v}</label></div>`).join('')}</div>
+        <div class="scalecaps"><span>1 · Not at all sure</span><span>Very sure · 7</span></div>`;
+      }
+    }
+    render(`
+      <p class="eyebrow">Part 3 · Live decision ${S.uptake.ui+1} of ${BEHAVIORALS.length}</p>
+      <h1 style="font-size:30px">Read the situation</h1>
+      <p class="muted" style="margin:-6px 0 16px;font-size:14.5px">Imagine you are faced with the following situation in your life:</p>
+      <div class="card">
+        <p class="dilemma">${d.prompt}</p>
+        <p class="muted" style="margin-top:16px;font-size:14px">Before you ask anyone, what’s your own call?</p>
+        <div class="options">
+          <label class="bigopt ${pre==='A'?'sel':''}" ${locked?'style="pointer-events:none;opacity:.75"':''}><input type="radio" name="pre" ${pre==='A'?'checked':''} ${locked?'disabled':''} onchange="uptakePre('A',event)"><span class="lab">${d.optA}</span></label>
+          <label class="bigopt ${pre==='B'?'sel':''}" ${locked?'style="pointer-events:none;opacity:.75"':''}><input type="radio" name="pre" ${pre==='B'?'checked':''} ${locked?'disabled':''} onchange="uptakePre('B',event)"><span class="lab">${d.optB}</span></label>
+        </div>
+        ${adviceBlock}
+      </div>
+      ${u.asked
+        ? `<div class="btnrow"><button class="btn" ${((u.final&&u.confidence)||DEMO)?'':'disabled'} onclick="finishUptake()">${S.uptake.ui+1<BEHAVIORALS.length?'Next situation':'Continue'}</button></div>`
+        : `<div class="btnrow"><button class="btn" id="prego" ${(pre||DEMO)?'':'disabled'} onclick="askAdvice()">Ask ${ADVISOR_EMOJI} AdvisorBot</button></div>`}
+    `);
+  },
+  delegation(){
+    S.screenName='delegation';
+    S.delIdx = S.delIdx||0;
+    const total = DELEGATION.length;
+    const t = DELEGATION[S.delIdx];
+    const cur = S.delegation[t.id]||{};
+    const ready = (cur.advisor!=null && cur.delegate!=null) || DEMO;
+    const frame=(f)=>`
+        <div class="frame">
+          <p class="q">${(f==='advisor'?t.advisor:t.delegate).split('AdvisorBot').join(AGENT_INLINE)}</p>
+          ${likert5Row(f.slice(0,3)+'_'+t.id, cur[f], `setDeleg.bind(null,'${t.id}','${f}')`)}
+        </div>`;
+    render(`
+      <p class="eyebrow">Part 3 · Using AdvisorBot · Task ${S.delIdx+1} of ${total}</p>
+      <h1 style="font-size:30px">Would you hand this over?</h1>
+      <div class="deltask">
+        <h3>${t.title}</h3>
+        ${frame('advisor')}
+        ${frame('delegate')}
+      </div>
+      <div class="btnrow"><button class="btn" id="delnext" ${ready?'':'disabled'} onclick="Screens.nextDeleg()">${S.delIdx+1<total?'Next':'Continue'}</button></div>
+    `);
+  },
+  nextDeleg(){
+    const t = DELEGATION[S.delIdx];
+    const cur = S.delegation[t.id]||{};
+    if(!DEMO && (cur.advisor==null || cur.delegate==null)){ flashIncomplete(); return; }
+    if(S.delIdx+1 < DELEGATION.length){ S.delIdx++; Screens.delegation(); }
+    else { Screens.gotoChecks(); }
+  },
+  gotoChecks(){
+    logSnapshot('delegation_done');
+    const done=DELEGATION.every(t=>{const c=S.delegation[t.id]||{};return c.advisor!=null&&c.delegate!=null;});
+    if(!DEMO && !done){ flashIncomplete(); return; }
+    Screens.checks();
+  },
+
+  checks(){
+    S.screenName='checks';
+    const m=S.mcheck;
+    render(`
+      <p class="eyebrow">Part 3 · Almost done</p>
+      <h1 style="font-size:30px">Any final thoughts?</h1>
+      <div class="card">
+        <p class="qtext" style="margin-bottom:8px">Anything you'd like to add about how you assessed AdvisorBot's advice, or how it made you feel? (optional)</p>
+        <textarea id="freetext" rows="3" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-family:inherit;font-size:15px;background:var(--card)" placeholder="Type here…">${m.free||''}</textarea>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finish()">Finish</button></div>
+    `);
+  },
+  finish(){
+    S.mcheck.free=(document.getElementById('freetext')||{}).value||'';
+    logSnapshot('complete', true);
+    Screens.done();
+  },
+
+  done(){
+    S.screenName='done';
+    const data=collect();
+    render(`
+      <p class="eyebrow">Complete</p>
+      <h1>Thank you.</h1>
+      <p class="lead">${LOG_ENDPOINT?'Your responses have been submitted automatically. You can close this window.':'Your responses are recorded on this device. You can export them below.'}</p>
+      ${LOG_ENDPOINT?`<div class="card" style="text-align:center"><p class="muted" style="margin:0 0 6px">Your completion code</p><p style="font-family:'Spline Sans Mono',monospace;font-size:22px;letter-spacing:.08em;margin:0"><b>${COMPLETION_CODE}</b></p></div>`:''}
+      <div class="card">
+        <p style="margin:0 0 10px"><span class="pillbig">Condition ${S.condition}</span></p>
+        <table class="sum">
+          <tr><td>Perceived value overlap</td><td>${S.interaction.overlap??'-'}</td></tr>
+          <tr><td>Reliance / moral trust</td><td>${S.interaction.reliance??'-'}</td></tr>
+          <tr><td>Behavioral choice-shift</td><td>${(function(){const n=BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).shifted?1:0),0);const done=BEHAVIORALS.some(b=>(S.uptake.runs[b.id]||{}).final!=null);return done?(n+' of '+BEHAVIORALS.length+' shifted'):'-';})()}</td></tr>
+          <tr><td>Delegation discount (advisor − delegate, mean)</td><td>${delegationDiscount()}</td></tr>
+        </table>
+      </div>
+      <div class="btnrow">
+        <button class="btn ${LOG_ENDPOINT?'ghost':''}" onclick="downloadJSON()">${LOG_ENDPOINT?'Download a copy (JSON)':'Download responses (JSON)'}</button>
+        <button class="btn ${LOG_ENDPOINT?'ghost':'line'}" onclick="downloadCSV()">Download (CSV)</button>
+        <button class="btn ghost" onclick="restart()">New session</button>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="margin:0 0 12px" class="muted">Curious what your answers say about your values?</p>
+        <button class="btn line" id="showprofile" onclick="toggleProfile()">Show my value profile</button>
+        <div id="profilereveal" style="display:none;margin-top:20px">
+          <div class="wheelwrap">${circumplexSVG()}<div class="legend">${legendHTML()}</div></div>
+          <p class="muted" style="font-size:13px;margin-top:14px">Shown only now, after your responses were recorded, so it couldn’t affect your answers.</p>
+        </div>
+      </div>
+    `);
+  }
+};
+
+/* ============================================================
+   SETTERS
+   ============================================================ */
+function setAiexp(key,v){ S.aiexp[key]=v; }
+function toggleAiexpTool(t){
+  const a=S.aiexp;
+  if(t==='None of these'){ a.tools = a.tools.includes(t) ? [] : ['None of these']; }
+  else {
+    a.tools = a.tools.filter(x=>x!=='None of these');
+    a.tools.includes(t) ? a.tools=a.tools.filter(x=>x!==t) : a.tools.push(t);
+  }
+  Screens.aiExperience();
+}
+function setPVQ(i,v){ S.pvq[i]=v; updatePVQCount(); }
+function ensureCompOrders(d){
+  // Per-participant shuffled display order for the check options, fixed on first render,
+  // so the correct answer / foil never sits in a predictable position.
+  const c=(S.comp[d.id]=S.comp[d.id]||{});
+  if(!c.detail_order) c.detail_order=shuffle([0,1,2]);          // 0 = correct answer
+  if(!c.why_order) c.why_order=shuffle(['pos','neg','foil']);   // correct = r.reasonPole
+  return c;
+}
+function setDetail(idx){
+  const d=DILEMMAS[S.order[S.di]];
+  const c=(S.comp[d.id]=S.comp[d.id]||{});
+  if(c.detail===idx) return; // ignore repeat taps on the same option
+  const correct = (idx===0);
+  if(c.detail_first===undefined) c.detail_first=correct; // first-attempt correctness, logged once
+  c.detail_tries=(c.detail_tries||0)+1;
+  c.detail=idx;
+  Screens.dilemmas();
+  if(correct){
+    const dd=d;
+    setTimeout(()=>{
+      if(S.screenName!=='dilemmas' || S.p2stage!=='detail') return;
+      if(DILEMMAS[S.order[S.di]]!==dd) return;
+      S.p2stage='shown'; Screens.dilemmas();
+    }, reduceMotion()?0:400);
+  }
+}
+function setComp(field,val){
+  const d=DILEMMAS[S.order[S.di]]; const r=aiResponseFor(d);
+  const c=(S.comp[d.id]=S.comp[d.id]||{});
+  if(c[field]===val) return; // ignore repeat taps on the same option
+  const correct = (field==='rec') ? (val===r.aiDecision) : (val===r.reasonPole);
+  if(c[field+'_first']===undefined) c[field+'_first']=correct; // log first-attempt correctness once
+  c[field+'_tries']=(c[field+'_tries']||0)+1;
+  if(field==='why' && !correct){
+    // Distinguish the two error types: foil = didn't encode the reasoning at all (inattention);
+    // opposite = encoded a different consideration than the one shown (manipulation may not have landed).
+    if(val==='foil') c.why_foil_errors=(c.why_foil_errors||0)+1;
+    else c.why_opposite_errors=(c.why_opposite_errors||0)+1;
+  }
+  c[field]=val;
+  Screens.dilemmas();
+}
+function toggleProfile(){
+  const r=document.getElementById('profilereveal'); const b=document.getElementById('showprofile');
+  if(!r) return;
+  const open = r.style.display!=='none';
+  r.style.display = open ? 'none' : 'block';
+  if(b) b.textContent = open ? 'Show my value profile' : 'Hide my value profile';
+}
+function updatePVQCount(){
+  const a=PVQ_ITEMS.filter((_,i)=>S.pvq[i]!=null).length;
+  const el=document.getElementById('pvqcount'); if(el) el.textContent=`${a} / ${PVQ_ITEMS.length} answered`;
+}
+function pickDecision(x,ev){ const d=DILEMMAS[S.order[S.di]]; S.decisions[d.id]=x; document.querySelectorAll('.bigopt').forEach(o=>o.classList.remove('sel')); ev.target.closest('.bigopt').classList.add('sel'); const b=document.getElementById('dgo'); if(b) b.disabled=false; }
+function setReflect(field,v){ const d=DILEMMAS[S.order[S.di]]; (S.reflect[d.id]=S.reflect[d.id]||{})[field]=v; }
+function setInter(field,v){ S.interaction[field]=v; }
+function setDeleg(id,frame,v){ const c=(S.delegation[id]=S.delegation[id]||{}); c[frame]=v; const b=document.getElementById('delnext'); if(b && c.advisor!=null && c.delegate!=null) b.disabled=false; }
+function setMCheck(field,v){ S.mcheck[field]=v; }
+function setIntent(key,v){ S.uptake.intent[key]=v; }
+function reduceMotion(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches; }
+function curB(){ return BEHAVIORALS[S.uptake.ui||0]; }
+function curU(){
+  const b=curB();
+  return S.uptake.runs[b.id] = S.uptake.runs[b.id] || {pre:null, asked:false, verdict:null, reason:null, final:null, confidence:null, posts:[], adviceTurns:0, recommended:null, reasonPole:null, shifted:null, turnsToShift:null};
+}
+function behavioralPoles(b){
+  // same projection as the Phase 2 dilemmas: mean value score per pole, pick the higher
+  const score=(keys)=>keys.map(k=>S.valueScores[k]??0).reduce((a,x)=>a+x,0)/(keys.length||1);
+  const aligned = score(b.poles.pos)>=score(b.poles.neg) ? 'pos':'neg';
+  return {aligned, other: aligned==='pos'?'neg':'pos'};
+}
+function uptakeAdvice(){
+  const d=curB(), u=curU();
+  const {aligned,other}=behavioralPoles(d);
+  const reasonPole = S.condition==='C2' ? other : aligned;
+  const recommended = S.behaviorCounter==='opposite' ? (u.pre==='A'?'B':'A') : u.pre;
+  u.recommended=recommended; u.reasonPole=reasonPole;
+  return { verdict: recommended==='A'?d.optA:d.optB, reason: d.reasoning[reasonPole][recommended] };
+}
+function askAdvice(){
+  const u=curU();
+  if(!DEMO && !u.pre){ flashIncomplete(); return; }
+  const a=uptakeAdvice();
+  u.verdict=a.verdict; u.reason=a.reason;
+  u.asked=true; u.adviceTurns=1;
+  Screens.uptakeDecide();
+}
+function uptakePre(opt,ev){
+  curU().pre=opt;
+  document.querySelectorAll('.bigopt').forEach(o=>o.classList.remove('sel'));
+  if(ev&&ev.target) ev.target.closest('.bigopt').classList.add('sel');
+  const b=document.getElementById('prego'); if(b) b.disabled=false;
+}
+function uptakeChoose(opt){
+  const u=curU();
+  if(!u.asked || u.final!=null) return;
+  u.final=opt; u.posts=[opt];
+  u.shifted = (opt!==u.pre); u.turnsToShift = u.shifted?1:0;
+  Screens.uptakeDecide();
+}
+function uptakeConfidence(v){ curU().confidence=v; Screens.uptakeDecide(); }
+function finishUptake(){
+  const u=curU();
+  if(!DEMO && (u.final==null || u.confidence==null)){ flashIncomplete(); return; }
+  logSnapshot('live_decision_'+(S.uptake.ui+1)+'_done');
+  if(S.uptake.ui+1 < BEHAVIORALS.length){
+    S.uptake.ui++; S.uptake.stage='decide';
+    Screens.uptakeDecide();
+  } else {
+    S.uptake.stage='done';
+    Screens.delegation();
+  }
+}
+function researcherUptakeStrip(){
+  return `<details class="rstrip"><summary>Researcher preview</summary>
+    <div class="row">
+      <label>In each live situation, the AI recommends:</label>
+      <select id="bcounter">
+        <option value="opposite" ${S.behaviorCounter==='opposite'?'selected':''}>opposite of your first choice: lets choice-shift be measured</option>
+        <option value="same" ${S.behaviorCounter==='same'?'selected':''}>same as your first choice: agreement / ceiling</option>
+      </select>
+    </div>
+    <p style="margin-top:10px">Reasoning is framed from your <b>${S.condition==='C2'?'opposing':'top'}</b> pole on each scenario's axis (condition ${S.condition||'-'}). Each of the 5 scenarios reuses the axis of its Phase 2 source dilemma. AdvisorBot gives a single choice-aware response. The behavioral measure is the shift (final vs. pre-advice choice) plus the 1-7 confidence rating, which keeps the readout graded. Note the confound you flagged: with trust already built in Phase 2, a shift may reflect <i>established</i> trust rather than in-the-moment alignment. The same/opposite toggle and the condition arm let you pull those apart.</p>
+  </details>`;
+}
+function flashIncomplete(){
+  const btn=document.querySelector('.btnrow .btn'); if(!btn) return;
+  btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:250});
+  let t=document.getElementById('incomplete'); if(!t){t=document.createElement('span');t.id='incomplete';t.className='muted';t.style.marginLeft='10px';t.textContent='Please answer all items above.';btn.parentNode.appendChild(t);}
+}
+
+/* ============================================================
+   CIRCUMPLEX  (signature element)
+   ============================================================ */
+function circumplexSVG(){
+  const cx=130,cy=130,rIn=30,rOut=100, n=VALUES.length;
+  const scores=VALUES.map(v=>S.valueScores[v.key]||0);
+  const max=Math.max(0.5,...scores.map(Math.abs));
+  const hoColor={'Openness to Change':'#3D7A8C','Openness / Self-Enhancement':'#6A7A8C','Self-Enhancement':'#A9603A','Conservation':'#8A7A4A','Self-Transcendence':'#3F6B52'};
+  let segs='';
+  for(let i=0;i<n;i++){
+    const a0=(i/n)*2*Math.PI - Math.PI/2 - Math.PI/n;
+    const a1=((i+1)/n)*2*Math.PI - Math.PI/2 - Math.PI/n;
+    const norm=(scores[i]+max)/(2*max); // 0..1
+    const r=rIn+(rOut-rIn)*Math.max(.08,norm);
+    const p=(ang,rr)=>[cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)];
+    const [x0,y0]=p(a0,rIn),[x1,y1]=p(a0,r),[x2,y2]=p(a1,r),[x3,y3]=p(a1,rIn);
+    const large=0;
+    const fill=hoColor[VALUES[i].ho]||'#888';
+    const op=(0.25+0.6*norm).toFixed(2);
+    segs+=`<path d="M${x0},${y0} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${rIn},${rIn} 0 ${large} 0 ${x0},${y0} Z" fill="${fill}" fill-opacity="${op}" stroke="#fff" stroke-width="1"/>`;
+    // label
+    const am=(a0+a1)/2; const lr=rOut+10;
+    const [lx,ly]=p(am,lr);
+    const anchor = Math.cos(am)>0.2?'start':(Math.cos(am)<-0.2?'end':'middle');
+    segs+=`<text x="${lx}" y="${ly}" font-size="8" fill="#565B64" text-anchor="${anchor}" dominant-baseline="middle" font-family="Spline Sans Mono, monospace">${VALUES[i].label}</text>`;
+  }
+  return `<svg viewBox="-74 -22 418 322" width="300" height="231" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schwartz value circumplex">${segs}<circle cx="${cx}" cy="${cy}" r="${rIn-2}" fill="#FBF9F5" stroke="var(--line)"/></svg>`;
+}
+function legendHTML(){
+  const groups={};
+  VALUES.forEach(v=>{(groups[v.ho]=groups[v.ho]||[]).push(v);});
+  let h='';
+  Object.entries(groups).forEach(([ho,vs])=>{
+    h+=`<div class="ho">${ho}</div>`;
+    vs.forEach(v=>{ h+=`<div class="v"><b>${v.label}</b><span>${(S.valueScores[v.key]>=0?'+':'')}${(S.valueScores[v.key]||0).toFixed(2)}</span></div>`; });
+  });
+  return h;
+}
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+function collect(){
+  return {
+    timestamp:new Date().toISOString(),
+    participant:PARTICIPANT,
+    ai_experience:S.aiexp,
+    condition:S.condition,
+    assignment:S.assignment,
+    is_test:IS_TEST,
+    valueScores:S.valueScores,
+    topValuesByAxis:S.topValuesByAxis,
+    pvq_raw:S.pvq,
+    dilemma_order:S.order.map(i=>DILEMMAS[i].id),
+    decisions:S.decisions,
+    dilemma_axes:Object.fromEntries(DILEMMAS.map(dd=>[dd.id,{axis:dd.axis,dim:dd.dim,lean:S.topValuesByAxis[dd.id]||null}])),
+    ai_responses:Object.fromEntries(DILEMMAS.map(d=>{
+      const r=(S.condition && S.topValuesByAxis[d.id]) ? aiResponseFor(d) : {aiDecision:null, reasonPole:null};
+      return [d.id,{aiDecision:r.aiDecision,reasonPole:r.reasonPole,alignedPole:S.topValuesByAxis[d.id]||null}];
+    })),
+    comprehension:Object.fromEntries(DILEMMAS.map(d=>{
+      const c=S.comp[d.id]||{};
+      const r=(S.condition && S.topValuesByAxis[d.id]) ? aiResponseFor(d) : {aiDecision:null, reasonPole:null};
+      return [d.id,{why:c.why||null, detail:c.detail??null,
+        why_first_ok:c.why_first??null, detail_first_ok:c.detail_first??null,
+        why_tries:c.why_tries||0, detail_tries:c.detail_tries||0,
+        why_foil_errors:c.why_foil_errors||0, why_opposite_errors:c.why_opposite_errors||0,
+        why_final_ok:c.why?(c.why===r.reasonPole):null,
+        detail_final_ok:c.detail!=null?(c.detail===0):null}];
+    })),
+    reflection:S.reflect,
+    interaction:S.interaction,
+    uptake:{
+      behavioral_intent:S.uptake.intent,
+      ai_recommends:S.behaviorCounter,
+      scenarios:BEHAVIORALS.map(b=>{
+        const u=S.uptake.runs[b.id]||{};
+        return { id:b.id, source_dilemma:b.source, domain:b.domain, axis:b.axis, dim:b.dim,
+          reason_pole:u.reasonPole??null, recommended_option:u.recommended??null,
+          pre_choice:u.pre??null, post_choices:u.posts||[],
+          shifted:u.shifted??null, turns_to_shift:u.turnsToShift??null,
+          final_choice:u.final??null, confidence:u.confidence??null };
+      }),
+      shift_count:BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).shifted?1:0),0),
+    },
+    delegation:S.delegation,
+    open_response:S.mcheck.free||'',
+    manipulation_checks:S.mcheck,
+  };
+}
+function meanOf(bucket,key){
+  const xs=Object.values(S[bucket]).map(o=>o&&o[key]).filter(v=>v!=null);
+  return xs.length?(xs.reduce((a,b)=>a+b,0)/xs.length).toFixed(2):'-';
+}
+function delegationDiscount(){
+  const ds=DELEGATION.map(t=>{const c=S.delegation[t.id]||{};return (c.advisor!=null&&c.delegate!=null)?c.advisor-c.delegate:null;}).filter(v=>v!=null);
+  return ds.length?(ds.reduce((a,b)=>a+b,0)/ds.length).toFixed(2):'-';
+}
+function dl(name,text,type){
+  const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+function downloadJSON(){ dl(`alignment_${S.condition}_${Date.now()}.json`, JSON.stringify(collect(),null,2),'application/json'); }
+function downloadCSV(){
+  const d=collect(); const rows=[['field','value']];
+  rows.push(['condition',d.condition]);
+  VALUES.forEach(v=>rows.push(['value_'+v.key, d.valueScores[v.key]]));
+  DILEMMAS.forEach(x=>{
+    rows.push(['decision_'+x.id, d.decisions[x.id]||'']);
+    const rf=d.reflection[x.id]||{};
+    rows.push(['decmatch_'+x.id, rf.decmatch??'']);
+    rows.push(['reasonmatch_'+x.id, rf.reasonmatch??'']);
+    rows.push(['integrity_'+x.id, rf.integrity??'']);
+  });
+  ['competence','overlap','decision_style','reasoning_process','predictability','reliance'].forEach(k=>rows.push(['interaction_'+k, d.interaction[k]??'']));
+  const _comp=Object.values(d.comprehension||{});
+  rows.push(['comprehension_detail_first_correct', _comp.filter(c=>c.detail_first_ok).length]);
+  rows.push(['comprehension_why_first_correct', _comp.filter(c=>c.why_first_ok).length]);
+  rows.push(['comprehension_why_foil_errors', _comp.reduce((a,c)=>a+(c.why_foil_errors||0),0)]);
+  rows.push(['comprehension_why_opposite_errors', _comp.reduce((a,c)=>a+(c.why_opposite_errors||0),0)]);
+  rows.push(['comprehension_total_retries', _comp.reduce((a,c)=>a+(c.why_tries-1>0?c.why_tries-1:0)+(c.detail_tries-1>0?c.detail_tries-1:0),0)]);
+  rows.push(['comprehension_total', _comp.length]);
+  UPTAKE_INTENT.forEach(it=>rows.push(['intent_'+it.key, d.uptake.behavioral_intent[it.key]??'']));
+  rows.push(['uptake_ai_recommends', d.uptake.ai_recommends]);
+  d.uptake.scenarios.forEach(sc=>{
+    rows.push(['uptake_'+sc.id+'_pre', sc.pre_choice||'']);
+    rows.push(['uptake_'+sc.id+'_final', sc.final_choice||'']);
+    rows.push(['uptake_'+sc.id+'_shifted', sc.shifted==null?'':(sc.shifted?1:0)]);
+    rows.push(['uptake_'+sc.id+'_confidence', sc.confidence??'']);
+    rows.push(['uptake_'+sc.id+'_reason_pole', sc.reason_pole||'']);
+  });
+  rows.push(['uptake_shift_count', d.uptake.shift_count??'']);
+  DELEGATION.forEach(t=>{const c=d.delegation[t.id]||{};rows.push(['advisor_'+t.id,c.advisor??'']);rows.push(['delegate_'+t.id,c.delegate??'']);});
+  ['use_freq','advice_freq','understand','helpful'].forEach(k=>rows.push(['aiexp_'+k, d.ai_experience[k]??'']));
+  rows.push(['aiexp_tools', '"'+(d.ai_experience.tools||[]).join('|')+'"']);
+  rows.push(['mcheck_decision', d.manipulation_checks.dec??'']);
+  rows.push(['mcheck_reason', d.manipulation_checks.reason??'']);
+  rows.push(['open_response', '"'+String(d.manipulation_checks.free||'').replace(/"/g,'""').replace(/\r?\n/g,' ')+'"']);
+  rows.push(['free_text', '"'+String(d.manipulation_checks.free||'').replace(/"/g,'""')+'"']);
+  dl(`alignment_${S.condition}_${Date.now()}.csv`, rows.map(r=>r.join(',')).join('\n'),'text/csv');
+}
+function restart(){
+  _assignPromise=null;   // a new session re-asks the backend (same key => same arm back)
+  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{tools:[]},di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
+    uptake:{intent:{}, stage:'intent', ui:0, runs:{}}});
+  NAV=[];  Screens.welcome();
+}
+
+/* ============================================================
+   RESEARCHER STRIP
+   ============================================================ */
+function researcherStrip(showCond){
+  return `<details class="rstrip"><summary>Researcher preview</summary>
+    <div class="row">
+      <label>Force condition:</label>
+      <select id="rcond">
+        <option value="">Random</option>
+        <option value="C1" ${S.forcedCondition==='C1'?'selected':''}>C1 · decision+ reasoning+</option>
+        <option value="C2" ${S.forcedCondition==='C2'?'selected':''}>C2 · decision+ reasoning−</option>
+        <option value="C3" ${S.forcedCondition==='C3'?'selected':''}>C3 · decision− reasoning+</option>
+      </select>
+    </div>
+    ${showCond?`<p style="margin-top:10px">Assigned this session: <b>${S.condition||'-'}</b>${S.assignment?` <span class="muted">(via ${S.assignment.source}${S.assignment.error?': '+S.assignment.error:''})</span>`:''}. ${S.condition?'Reasoning pole shown = '+(S.condition==='C2'?'opposing':'your top')+' value on each dilemma’s axis; AI decision = '+(S.condition==='C3'?'opposite of':'same as')+' your choice.':''}</p>`:''}
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost" type="button" id="rping" onclick="testBackend()">Test backend</button>
+      <span class="muted" id="rpingout">${LOG_ENDPOINT?'Logging + balanced assignment enabled.':'No LOG_ENDPOINT set — offline mode: local condition assignment, no logging.'}</span>
+    </div>
+    <p style="margin-top:10px" class="muted">Participant key: <code>${PARTICIPANT.participant_key}</code>${IS_TEST?' · <b>test session</b> (excluded from balancing; DEMO=true or ?test=1)':''}</p>
+    <p style="margin-top:10px">The <code>DILEMMAS</code> array covers all 10 value-level tension axes exactly once: 4 on Self-Transcendence vs Self-Enhancement (benevolence/universalism crossed with power/achievement) and 6 on Openness vs Conservation (self-direction/stimulation crossed with security/tradition/conformity). Hedonism is excluded because it straddles quadrants and has no clean opposite. Per-dilemma alignment projects the participant's two specific value scores, not pooled quadrant means.</p>
+  </details>`;
+}
+function wireResearcher(){
+  const sel=document.getElementById('rcond');
+  if(sel) sel.onchange=()=>{
+    S.forcedCondition=sel.value||null;
+    _assignPromise=null;                                   // let the override take effect
+    if(S.condition && S.screenName==='profile'){ S.condition=assignCondition(); Screens.profile(); }
+  };
+}
+function testBackend(){
+  const out=document.getElementById('rpingout');
+  if(out) out.textContent='Checking…';
+  pingBackend().then(j=>{
+    if(!out) return;
+    out.textContent = j && j.ok
+      ? `Backend reachable (v${j.version}). Live cells — ${Object.entries(j.counts||{}).map(([k,v])=>k+': '+v).join(', ')||'none yet'}.`
+      : `Backend unreachable: ${j && j.error || 'unknown error'} — participants would be assigned locally.`;
+  });
+}
+
+/* ---- boot ---- */
+Screens.welcome();
+</script>
+</body>
+</html>
