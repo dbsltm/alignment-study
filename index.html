@@ -219,7 +219,7 @@ const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Scri
 // After this the participant is assigned locally instead of waiting. Generous on purpose:
 // a cold Apps Script instance regularly takes 8-12s to answer, and this request is
 // prefetched when the PVQ opens, minutes before the answer is needed.
-const ASSIGN_TIMEOUT_MS = 20000;
+const ASSIGN_TIMEOUT_MS = 30000;
 const COMPLETION_CODE = 'C1QOC0OL'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
@@ -1672,6 +1672,11 @@ function testBackend(){
 
 /* ---- boot ---- */
 Screens.welcome();
+
+// Wake the Apps Script instance on page load. A cold instance answers in ~15s where a warm
+// one takes ~3s, and this costs nothing: it creates no rows and nothing waits on it. By the
+// time the real assign call fires (PVQ screen) the backend is warm.
+if(LOG_ENDPOINT){ try{ fetch(endpointURL({action:'ping'}), {method:'GET', mode:'no-cors'}).catch(()=>{}); }catch(e){} }
 </script>
 </body>
 </html>
