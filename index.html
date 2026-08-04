@@ -216,10 +216,15 @@ const DEMO = new URLSearchParams(location.search).has('demo');
    ============================================================ */
 const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqYFdc9W4dHGXSBevmphP56uxLfLw_atxuiNKza32pqsm2bYUWkp6LuwLNjyZaYXhN/exec';
 const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
-// After this the participant is assigned locally instead of waiting. Generous on purpose:
-// a cold Apps Script instance regularly takes 8-12s to answer, and this request is
-// prefetched when the PVQ opens, minutes before the answer is needed.
-const ASSIGN_TIMEOUT_MS = 30000;
+// After this the participant is assigned locally instead of waiting.
+// Real participants: very generous. The call is prefetched when the PVQ opens and isn't
+// needed until they finish 21 items, so ~2 min of cover — a slow answer is invisible, and
+// waiting is strictly better than falling back, which silently unbalances the arms.
+// Apps Script is slow under load: ~3s warm, ~15s cold, and tens of seconds when several
+// participants start at once (assignment serialises on a script lock).
+// Demo mode: short, because you click straight through. A demo session is flagged is_test,
+// so falling back locally costs nothing.
+const ASSIGN_TIMEOUT_MS = DEMO ? 6000 : 90000;
 const COMPLETION_CODE = 'C1QOC0OL'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
