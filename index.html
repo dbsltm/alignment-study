@@ -202,9 +202,10 @@
 <main><div class="wrap" id="app"></div></main>
 
 <script>
-// DEMO MODE: when true, section buttons advance without requiring all fields.
-// Set to false before fielding the study.
-const DEMO = false;
+// DEMO MODE: section buttons advance without requiring every field to be filled.
+// Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
+// A ?demo=1 session is automatically flagged is_test, so it never counts as data.
+const DEMO = new URLSearchParams(location.search).has('demo');
 
 /* ============================================================
    BACKEND: RESPONSE LOGGING + CONDITION ASSIGNMENT
@@ -215,7 +216,10 @@ const DEMO = false;
    ============================================================ */
 const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqYFdc9W4dHGXSBevmphP56uxLfLw_atxuiNKza32pqsm2bYUWkp6LuwLNjyZaYXhN/exec';
 const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
-const ASSIGN_TIMEOUT_MS = 8000;     // after this the participant is assigned locally instead of waiting
+// After this the participant is assigned locally instead of waiting. Generous on purpose:
+// a cold Apps Script instance regularly takes 8-12s to answer, and this request is
+// prefetched when the PVQ opens, minutes before the answer is needed.
+const ASSIGN_TIMEOUT_MS = 20000;
 const COMPLETION_CODE = 'C1QOC0OL'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
@@ -714,7 +718,8 @@ function assignConditionRemote(){
   // returns the same arm rather than burning a second slot.
   const attempt = () => {
     const ctl = ('AbortController' in window) ? new AbortController() : null;
-    const timer = setTimeout(()=>{ if(ctl) ctl.abort(); }, ASSIGN_TIMEOUT_MS);
+    let timedOut = false;
+    const timer = setTimeout(()=>{ timedOut = true; if(ctl) ctl.abort(); }, ASSIGN_TIMEOUT_MS);
     return fetch(url, {method:'GET', signal: ctl?ctl.signal:undefined})
       .then(r=>r.text())
       .then(txt=>{
@@ -723,11 +728,18 @@ function assignConditionRemote(){
         if(!j || !j.ok || CONDITIONS.indexOf(j.condition)<0) throw new Error(j && j.error || 'bad assign response');
         return {condition:j.condition, source: j.existing?'server_existing':'server', counts:j.counts||null};
       })
-      .catch(err=>{ clearTimeout(timer); throw err; });
+      .catch(err=>{
+        clearTimeout(timer);
+        const e = new Error(timedOut ? 'timed out after '+ASSIGN_TIMEOUT_MS+'ms' : String(err && err.message || err));
+        e.timedOut = timedOut;
+        throw e;
+      });
   };
 
+  // Retry a fast failure (transient Google HTML error page, network blip), but never a
+  // timeout — a timeout means slow, and retrying would just double what the participant waits.
   _assignPromise = attempt()
-    .catch(()=>attempt())
+    .catch(err => err.timedOut ? Promise.reject(err) : attempt())
     .catch(err=>({condition:assignCondition(), source:'local_fallback', error:String(err && err.message || err)}));
   return _assignPromise;
 }
