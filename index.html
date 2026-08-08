@@ -1313,7 +1313,7 @@ const Screens = {
       <p class="eyebrow">Complete</p>
       <h1>Thank you.</h1>
       <p class="lead">${LOG_ENDPOINT?'Your responses have been submitted automatically. You can close this window.':'Your responses are recorded on this device. You can export them below.'}</p>
-      ${LOG_ENDPOINT?`<div class="card" style="text-align:center"><p class="muted" style="margin:0 0 6px">Your completion code</p><p style="font-family:'Spline Sans Mono',monospace;font-size:22px;letter-spacing:.08em;margin:0"><b>${COMPLETION_CODE}</b></p></div>`:''}
+      ${(LOG_ENDPOINT && PARTICIPANT.prolific_pid)?`<div class="card" style="text-align:center"><p class="muted" style="margin:0 0 6px">Your completion code</p><p style="font-family:'Spline Sans Mono',monospace;font-size:22px;letter-spacing:.08em;margin:0"><b>${COMPLETION_CODE}</b></p></div>`:''}
       <div class="card">
         <p style="margin:0 0 10px"><span class="pillbig">Condition ${S.condition}</span></p>
         <table class="sum">
@@ -1627,7 +1627,18 @@ function downloadCSV(){
   dl(`alignment_${S.condition}_${Date.now()}.csv`, rows.map(r=>r.join(',')).join('\n'),'text/csv');
 }
 function restart(){
-  _assignPromise=null;   // a new session re-asks the backend (same key => same arm back)
+  _assignPromise=null;
+  // Hand the next person a fresh identity when there's no Prolific ID to key on. The
+  // responses sheet upserts on participant_key, so reusing the browser's stored id would
+  // make participant 2 silently overwrite participant 1 — the failure mode for a link
+  // shared round a room or a laptop passed between people. Prolific sessions keep their
+  // PID, so a refresh still resumes into the same arm.
+  if(!PARTICIPANT.prolific_pid){
+    const fresh = Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+    try{ localStorage.setItem('ras_local_id', fresh); }catch(e){}
+    PARTICIPANT.local_id = fresh;
+    PARTICIPANT.participant_key = fresh;
+  }
   Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{tools:[]},di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
     uptake:{intent:{}, stage:'intent', ui:0, runs:{}}});
   NAV=[];  Screens.welcome();
