@@ -645,15 +645,13 @@ const BEHAVIORALS = [
 ];
 
 // AI experience / literacy covariate block (shown after consent, before the PVQ).
-// Wording follows common practice in chatbot-trust studies: use frequency
-// (Never -> Multiple times a day), advice-specific frequency, self-rated
-// understanding, and general attitude.
+// Two frequency items: overall chatbot use and advice-specific use. Self-rated
+// understanding and general attitude used to live here too; they were dropped as
+// redundant with the AI literacy scale below, which measures both more carefully.
 const AIEXP_FREQ = ['Never','Less than once a month','A few times a month','A few times a week','About once a day','Multiple times a day'];
 const AIEXP_ITEMS = [
   {key:'use_freq',    type:'freq', t:'How often do you use AI chatbots (for example ChatGPT, Claude, Gemini, Copilot)?'},
   {key:'advice_freq', type:'freq', t:'How often do you ask an AI chatbot for advice on personal decisions or dilemmas?'},
-  {key:'understand',  type:'l7',   t:'I have a good understanding of how AI chatbots produce their answers.'},
-  {key:'helpful',     type:'l7',   t:'I think AI chatbots are helpful.'},
 ];
 // Replaces the old "which chatbots have you used" checklist: same frequency scale as the
 // items above, so all use questions sit on one comparable metric.
