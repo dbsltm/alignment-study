@@ -1007,6 +1007,10 @@ const Screens = {
     if(!DEMO && (AIEXP_ITEMS.some(it=>S.aiexp[it.key]==null)
               || AIEXP_TASKS.some(it=>S.aiexp[it.key]==null)
               || AI_LITERACY.some(it=>S.ailit[it.key]==null))){ flashIncomplete(); return; }
+    // First checkpoint. Demographics and the AI literacy scale are answered before the
+    // PVQ, so without this they would only reach the sheet via the unload beacon —
+    // which browsers do not reliably fire — if someone quit during the 21 PVQ items.
+    logSnapshot('intake_done');
     Screens.pvq();
   },
 
