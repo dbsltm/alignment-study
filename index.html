@@ -655,7 +655,40 @@ const AIEXP_ITEMS = [
   {key:'understand',  type:'l7',   t:'I have a good understanding of how AI chatbots produce their answers.'},
   {key:'helpful',     type:'l7',   t:'I think AI chatbots are helpful.'},
 ];
-const AIEXP_TOOLS = ['ChatGPT','Claude','Gemini','Copilot','Meta AI','Other','None of these'];
+// Replaces the old "which chatbots have you used" checklist: same frequency scale as the
+// items above, so all use questions sit on one comparable metric.
+const AIEXP_TASKS = [
+  {key:'task_info',    t:'Finding information or getting something explained'},
+  {key:'task_writing', t:'Writing, editing, or summarising text'},
+  {key:'task_work',    t:'Work or study tasks'},
+];
+
+// AI literacy scale, AI-Q1..AI-Q8, 7-point.
+// AI-Q5 is negatively worded — it must be reverse-scored before it is summed with the rest.
+// AI-Q7/Q8 keep the same 1-7 numeric scale so the scale total still works, but carry their
+// own anchor captions: "strongly disagree" is meaningless for a frequency or familiarity item.
+const AI_LITERACY = [
+  {key:'ail1', t:'I can identify the AI technology employed in the applications and products I use.'},
+  {key:'ail2', t:'I can skillfully use AI applications or products to help me with my daily work.'},
+  {key:'ail3', t:'I can choose the most appropriate AI application or product from a variety for a particular task.'},
+  {key:'ail4', t:'I always comply with ethical principles when using AI applications or products.'},
+  {key:'ail5', t:'I am never alert to privacy and information security issues when using AI applications or products.', reverse:true},
+  {key:'ail6', t:'I am always alert to the abuse of AI technology.'},
+  {key:'ail7', t:'How frequently do you use generative AI (i.e., artificial intelligence that is capable of producing high quality texts, images, etc. in response to prompts) products such as ChatGPT, Gemini, DALL·E, Claude, etc.?',
+    caps:['1 · Never','4 · Sometimes','Very frequently · 7']},
+  {key:'ail8', t:'How familiar are you with limitations and shortcomings of generative AI?',
+    caps:['1 · Not at all familiar','4 · Moderately familiar','Extremely familiar · 7']},
+];
+
+// Demographics, asked on the consent screen. Every question offers "Prefer not to say".
+const DEMOGRAPHICS = [
+  {key:'age', label:'Age group',
+    options:['18–24','25–34','35–44','45–54','55–64','65 or older','Prefer not to say']},
+  {key:'gender', label:'Gender',
+    options:['Woman','Man','Non-binary','Prefer to self-describe','Prefer not to say']},
+  {key:'education', label:'Highest level of education completed',
+    options:['Less than high school','High school / secondary','Some college, no degree','Associate / vocational qualification','Bachelor’s degree','Master’s degree','Doctorate or professional degree','Prefer not to say']},
+];
 
 /* ============================================================
    STATE
@@ -664,7 +697,9 @@ const S = {
   condition:null,          // 'C1' | 'C2' | 'C3'
   assignment:null,         // {source:'server'|'server_existing'|'local'|'local_fallback'|'forced', counts, error}
   forcedCondition:null,    // researcher override
-  aiexp:{tools:[]},        // AI experience covariates
+  aiexp:{},                // AI use frequency covariates
+  demog:{},                // age / gender / education, collected at consent
+  ailit:{},                // AI literacy scale AI-Q1..AI-Q8
   pvq:{},                  // item index -> 1..6
   valueScores:{},          // value key -> mean
   topValuesByAxis:{},      // dilemma id -> aligned pole key
@@ -863,12 +898,14 @@ function render(html){
   }
   setProgress(); updateBack();
 }
-function likertRow(name, val, onpick){
+function likertRow(name, val, onpick, caps){
+  // caps overrides the agree/disagree anchors for items that aren't agreement items.
+  const c = caps || ['1 · Strongly disagree','4 · Neither agree nor disagree','Strongly agree · 7'];
   return `<div class="scale likert7" role="radiogroup">${LIKERT7.map((lab,i)=>{
     const v=i+1, id=`${name}_${v}`;
-    return `<div class="opt"><input type="radio" name="${name}" id="${id}" value="${v}" ${val==v?'checked':''} onchange="${onpick}(${v})"><label for="${id}" title="${lab}">${v}</label></div>`;
+    return `<div class="opt"><input type="radio" name="${name}" id="${id}" value="${v}" ${val==v?'checked':''} onchange="${onpick}(${v})"><label for="${id}" title="${caps?v:lab}">${v}</label></div>`;
   }).join('')}</div>
-  <div class="scalecaps"><span>1 · Strongly disagree</span><span>4 · Neither agree nor disagree</span><span>Strongly agree · 7</span></div>`;
+  <div class="scalecaps"><span>${c[0]}</span><span>${c[1]}</span><span>${c[2]}</span></div>`;
 }
 const DELEG_SCALE=['Definitely not','Probably not','Unsure','Probably','Definitely'];
 function likert5Row(name, val, onpick){
@@ -898,6 +935,22 @@ const Screens = {
       <p class="lead">First, you'll rate 21 short statements about what is important to you in life. Next, you'll read ${DILEMMAS.length} situations other people have posed to AdvisorBot, along with AdvisorBot's responses. After each situation and response, we'll ask a question or two to make sure you understood what was asked and what was replied, and then for your overall impressions of AdvisorBot. Finally, you'll face five decisions of your own, see AdvisorBot's advice, and tell us whether you'd act on it and which tasks, if any, you'd let it handle for you.</p>
       <p class="lead">There are no right or wrong answers anywhere in this study. We want your honest reactions.</p>
       <div class="card">
+        <h2 style="margin-top:0">A little about you</h2>
+        <p class="muted" style="margin-top:0">Used only to describe the sample as a whole. Every question has a “prefer not to say”.</p>
+        ${DEMOGRAPHICS.map(q=>`
+          <div style="margin-bottom:16px">
+            <label class="qtext" for="dg_${q.key}" style="display:block;margin-bottom:6px">${q.label}</label>
+            <select id="dg_${q.key}" onchange="setDemog('${q.key}',this.value)"
+              style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:var(--card);font-family:inherit;font-size:15px;color:var(--ink)">
+              <option value="">Select…</option>
+              ${q.options.map(o=>`<option value="${o}" ${S.demog[q.key]===o?'selected':''}>${o}</option>`).join('')}
+            </select>
+            ${q.key==='gender'?`<input type="text" id="dg_gender_self" placeholder="How would you describe yourself? (optional)"
+              value="${S.demog.gender_self||''}" oninput="S.demog.gender_self=this.value"
+              style="display:${S.demog.gender==='Prefer to self-describe'?'block':'none'};width:100%;margin-top:8px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:var(--card);font-family:inherit;font-size:15px">`:''}
+          </div>`).join('')}
+      </div>
+      <div class="card">
         <h2>Before you begin</h2>
         <p class="muted">${LOG_ENDPOINT?'Your responses are recorded securely as you go for research purposes.':'Your responses are recorded only on this device and can be exported at the end.'}</p>
         <label class="check"><input type="checkbox" id="c1"> I’m 18 or older and consent to take part.</label>
@@ -908,8 +961,9 @@ const Screens = {
       </div>
       ${researcherStrip()}
     `);
-    const upd=()=>{document.getElementById('start').disabled = !(document.getElementById('c1').checked && document.getElementById('c2').checked);};
-    document.getElementById('c1').onchange=upd; document.getElementById('c2').onchange=upd;
+    document.getElementById('c1').onchange=updateStartBtn;
+    document.getElementById('c2').onchange=updateStartBtn;
+    updateStartBtn();
     wireResearcher();
   },
 
@@ -927,21 +981,34 @@ const Screens = {
       <p class="qtext">${it.t}</p>
       ${it.type==='freq'?freqRow(it.key):likertRow('ax_'+it.key, a[it.key], `setAiexp.bind(null,'${it.key}')`)}
       <div style="height:20px"></div>`).join('');
-    const tools=AIEXP_TOOLS.map(tname=>`
-      <label class="check"><input type="checkbox" ${a.tools.includes(tname)?'checked':''} onchange="toggleAiexpTool('${tname}')"> ${tname}</label>`).join('');
+    const tasks=AIEXP_TASKS.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${freqRow(it.key)}
+      <div style="height:20px"></div>`).join('');
+    const lit=AI_LITERACY.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${likertRow('ail_'+it.key, S.ailit[it.key], `setAiLit.bind(null,'${it.key}')`, it.caps)}
+      <div style="height:20px"></div>`).join('');
     render(`
       <p class="eyebrow">Background · Your experience with AI</p>
       <h1 style="font-size:30px">A little about your AI use</h1>
-      <p class="lead">Before we begin, a few quick questions about your experience with AI chatbots. There are no right or wrong answers.</p>
-      <div class="card">${items}
-        <p class="qtext">Which AI chatbots have you used? Select all that apply.</p>
-        <div style="display:grid;gap:8px;margin-top:8px">${tools}</div>
+      <p class="lead">Before we begin, a few quick questions about your experience with AI. There are no right or wrong answers.</p>
+      <div class="card">${items}</div>
+      <div class="card">
+        <h2 style="margin-top:0">How often do you use AI for each of these?</h2>
+        ${tasks}
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">How much do you agree with each statement?</h2>
+        ${lit}
       </div>
       <div class="btnrow"><button class="btn" onclick="Screens.finishAiexp()">Continue</button></div>
     `);
   },
   finishAiexp(){
-    if(!DEMO && (AIEXP_ITEMS.some(it=>S.aiexp[it.key]==null) || S.aiexp.tools.length===0)){ flashIncomplete(); return; }
+    if(!DEMO && (AIEXP_ITEMS.some(it=>S.aiexp[it.key]==null)
+              || AIEXP_TASKS.some(it=>S.aiexp[it.key]==null)
+              || AI_LITERACY.some(it=>S.ailit[it.key]==null))){ flashIncomplete(); return; }
     Screens.pvq();
   },
 
@@ -1344,14 +1411,21 @@ const Screens = {
    SETTERS
    ============================================================ */
 function setAiexp(key,v){ S.aiexp[key]=v; }
-function toggleAiexpTool(t){
-  const a=S.aiexp;
-  if(t==='None of these'){ a.tools = a.tools.includes(t) ? [] : ['None of these']; }
-  else {
-    a.tools = a.tools.filter(x=>x!=='None of these');
-    a.tools.includes(t) ? a.tools=a.tools.filter(x=>x!==t) : a.tools.push(t);
+function setAiLit(key,v){ S.ailit[key]=v; }
+function setDemog(key,val){
+  S.demog[key]=val||null;
+  if(key==='gender'){
+    const self=document.getElementById('dg_gender_self');
+    if(self) self.style.display = (val==='Prefer to self-describe') ? 'block' : 'none';
   }
-  Screens.aiExperience();
+  updateStartBtn();
+}
+function updateStartBtn(){
+  const b=document.getElementById('start'); if(!b) return;
+  const c1=document.getElementById('c1'), c2=document.getElementById('c2');
+  const consented = !!(c1&&c1.checked && c2&&c2.checked);
+  const demogDone = DEMO || DEMOGRAPHICS.every(q=>S.demog[q.key]);
+  b.disabled = !(consented && demogDone);
 }
 function setPVQ(i,v){ S.pvq[i]=v; updatePVQCount(); }
 function ensureCompOrders(d){
@@ -1531,7 +1605,10 @@ function collect(){
   return {
     timestamp:new Date().toISOString(),
     participant:PARTICIPANT,
+    demographics:S.demog,
     ai_experience:S.aiexp,
+    ai_literacy:S.ailit,
+    ai_literacy_mean:aiLiteracyMean(),   // AI-Q5 reverse-scored before averaging
     condition:S.condition,
     assignment:S.assignment,
     is_test:IS_TEST,
@@ -1574,6 +1651,16 @@ function collect(){
     open_response:S.mcheck.free||'',
     manipulation_checks:S.mcheck,
   };
+}
+// Mean of AI-Q1..AI-Q8 with the negatively worded item flipped (8 - v on a 1-7 scale).
+// Null until every item is answered, so a partial row never looks like a real score.
+function aiLiteracyMean(){
+  const vs=AI_LITERACY.map(it=>{
+    const v=S.ailit[it.key];
+    return v==null ? null : (it.reverse ? (8-v) : v);
+  });
+  if(vs.some(v=>v==null)) return null;
+  return +(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(3);
 }
 function meanOf(bucket,key){
   const xs=Object.values(S[bucket]).map(o=>o&&o[key]).filter(v=>v!=null);
@@ -1618,8 +1705,12 @@ function downloadCSV(){
   });
   rows.push(['uptake_shift_count', d.uptake.shift_count??'']);
   DELEGATION.forEach(t=>{const c=d.delegation[t.id]||{};rows.push(['advisor_'+t.id,c.advisor??'']);rows.push(['delegate_'+t.id,c.delegate??'']);});
-  ['use_freq','advice_freq','understand','helpful'].forEach(k=>rows.push(['aiexp_'+k, d.ai_experience[k]??'']));
-  rows.push(['aiexp_tools', '"'+(d.ai_experience.tools||[]).join('|')+'"']);
+  AIEXP_ITEMS.forEach(it=>rows.push(['aiexp_'+it.key, d.ai_experience[it.key]??'']));
+  AIEXP_TASKS.forEach(it=>rows.push(['aiexp_'+it.key, d.ai_experience[it.key]??'']));
+  AI_LITERACY.forEach(it=>rows.push(['ailit_'+it.key, d.ai_literacy[it.key]??'']));
+  rows.push(['ailit_mean_reverse_scored', d.ai_literacy_mean??'']);
+  DEMOGRAPHICS.forEach(q=>rows.push(['demog_'+q.key, '"'+String(d.demographics[q.key]||'')+'"']));
+  rows.push(['demog_gender_self', '"'+String(d.demographics.gender_self||'').replace(/"/g,'""')+'"']);
   rows.push(['mcheck_decision', d.manipulation_checks.dec??'']);
   rows.push(['mcheck_reason', d.manipulation_checks.reason??'']);
   rows.push(['open_response', '"'+String(d.manipulation_checks.free||'').replace(/"/g,'""').replace(/\r?\n/g,' ')+'"']);
@@ -1639,7 +1730,7 @@ function restart(){
     PARTICIPANT.local_id = fresh;
     PARTICIPANT.participant_key = fresh;
   }
-  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{tools:[]},di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
+  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{},demog:{},ailit:{},di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
     uptake:{intent:{}, stage:'intent', ui:0, runs:{}}});
   NAV=[];  Screens.welcome();
 }
