@@ -701,6 +701,10 @@ const S = {
   pvq:{},                  // item index -> 1..6
   valueScores:{},          // value key -> mean
   topValuesByAxis:{},      // dilemma id -> aligned pole key
+  poleDelta:{},            // dilemma id -> |pos pole score - neg pole score|
+  poleScores:{},           // dilemma id -> {pos, neg} projected scores
+  valueScoresRaw:{},       // uncentred per-value means
+  pvqGrandMean:null,
   order:[],                // shuffled dilemma indices
   decisions:{},            // dilemma id -> 'A'|'B'
   reflect:{},              // dilemma id -> {decmatch, reasonmatch, integrity}
@@ -805,10 +809,20 @@ function scorePVQ(){
   const out={};
   VALUES.forEach(v=> out[v.key] = raw[v.key]!=null ? +(raw[v.key]-grand).toFixed(3) : 0);
   S.valueScores=out;
+  // Keep the uncentred means and the grand mean too: ipsatising is lossy, and without
+  // these an analyst cannot rescore the PVQ any other way after the fact.
+  S.valueScoresRaw={}; VALUES.forEach(v=> S.valueScoresRaw[v.key] = raw[v.key]!=null ? +raw[v.key].toFixed(3) : null);
+  S.pvqGrandMean = +grand.toFixed(3);
   // aligned pole per dilemma = the pole (pos/neg) the participant leans toward
   const poleScore=(keys)=>{ const xs=keys.map(k=>out[k]??0); return xs.reduce((a,b)=>a+b,0)/(xs.length||1); };
   DILEMMAS.forEach(d=>{
-    S.topValuesByAxis[d.id] = poleScore(d.poles.pos) >= poleScore(d.poles.neg) ? 'pos' : 'neg';
+    const sp=poleScore(d.poles.pos), sn=poleScore(d.poles.neg);
+    S.topValuesByAxis[d.id] = sp >= sn ? 'pos' : 'neg';
+    // How far apart the two poles sit for THIS person on THIS axis. Near zero means the
+    // projection is a coin flip and the alignment manipulation carries no signal, so the
+    // analysis needs this to weight items rather than treating them as equally assigned.
+    S.poleDelta[d.id] = +Math.abs(sp-sn).toFixed(3);
+    S.poleScores[d.id] = {pos:+sp.toFixed(3), neg:+sn.toFixed(3)};
   });
 }
 
@@ -1615,11 +1629,18 @@ function collect(){
     assignment:S.assignment,
     is_test:IS_TEST,
     valueScores:S.valueScores,
+    valueScoresRaw:S.valueScoresRaw,
+    pvq_grand_mean:S.pvqGrandMean,
+    pole_delta:S.poleDelta,
     topValuesByAxis:S.topValuesByAxis,
     pvq_raw:S.pvq,
     dilemma_order:S.order.map(i=>DILEMMAS[i].id),
     decisions:S.decisions,
-    dilemma_axes:Object.fromEntries(DILEMMAS.map(dd=>[dd.id,{axis:dd.axis,dim:dd.dim,lean:S.topValuesByAxis[dd.id]||null}])),
+    dilemma_axes:Object.fromEntries(DILEMMAS.map(dd=>[dd.id,{
+      axis:dd.axis, dim:dd.dim, lean:S.topValuesByAxis[dd.id]||null,
+      delta:S.poleDelta[dd.id]??null,
+      pole_pos:(S.poleScores[dd.id]||{}).pos??null,
+      pole_neg:(S.poleScores[dd.id]||{}).neg??null}])),
     ai_responses:Object.fromEntries(DILEMMAS.map(d=>{
       const r=(S.condition && S.topValuesByAxis[d.id]) ? aiResponseFor(d) : {aiDecision:null, reasonPole:null};
       return [d.id,{aiDecision:r.aiDecision,reasonPole:r.reasonPole,alignedPole:S.topValuesByAxis[d.id]||null}];
@@ -1732,7 +1753,7 @@ function restart(){
     PARTICIPANT.local_id = fresh;
     PARTICIPANT.participant_key = fresh;
   }
-  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{},demog:{},ailit:{},di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
+  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{},demog:{},ailit:{},poleDelta:{},poleScores:{},valueScoresRaw:{},pvqGrandMean:null,di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
     uptake:{intent:{}, stage:'intent', ui:0, runs:{}}});
   NAV=[];  Screens.welcome();
 }
