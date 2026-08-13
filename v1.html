@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Everyday Decisions Study</title>
+<title>ARCHIVED v1 · Everyday Decisions Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -122,30 +122,6 @@
   .ai .reason{color:var(--ink);margin:0;font-family:var(--agent-font);font-size:15px;line-height:1.55}
   .ai .verdict{font-family:var(--agent-font)}
   .agentref{font-family:var(--agent-font);font-weight:600;color:var(--accent);white-space:nowrap}
-  .msg.ai .answer{margin:0;line-height:1.6}
-  .gatehint{font-family:var(--sans, system-ui);font-size:13px;color:var(--soft,#565B64);
-    margin:12px 0 0;opacity:.85}
-  .gatehint b{font-variant-numeric:tabular-nums}
-  .forkbtn[disabled]{opacity:.45;cursor:default}
-  .forkbtn[disabled]:hover{border-color:var(--line)}
-  .dilemma.dim{opacity:.5;transition:opacity .25s}
-  .sending{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:15.5px;
-    color:var(--soft, #565B64)}
-  .dots{display:inline-flex;gap:4px}
-  .dots i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35;
-    animation:blip 1.1s infinite}
-  .dots i:nth-child(2){animation-delay:.18s} .dots i:nth-child(3){animation-delay:.36s}
-  @keyframes blip{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
-  @media (prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.5}}
-  .forkrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-  .forkbtn{font-family:inherit;font-size:15.5px;font-weight:600;line-height:1.35;padding:22px 18px;
-    border-radius:9px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;
-    text-align:left}
-  .forkbtn:hover{border-color:var(--accent)}
-  .forkbtn.bot{border-color:#D8C4B4}
-  .freetext{width:100%;font-family:inherit;font-size:16px;line-height:1.55;padding:12px 13px;
-    border:1px solid var(--line);border-radius:8px;margin-top:10px;resize:vertical}
-  @media(max-width:560px){.forkrow{grid-template-columns:1fr}}
   .rlabel{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:2px 0 4px;opacity:.85}
   .compbox{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
   .compq{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
@@ -181,7 +157,7 @@
   .rstrip summary{cursor:pointer;font-family:"Spline Sans Mono",monospace;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
   .rstrip .row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
   .rstrip select{font-family:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line-strong);background:var(--card)}
-  /* ---- chat (Part 2 advice, Part 3 advising) ---- */
+  /* ---- chat (behavioral choice-shift) ---- */
   .chat{display:flex;flex-direction:column;gap:11px;margin:4px 0 2px}
   .msg{max-width:84%;padding:13px 16px;border-radius:16px;font-size:15px;line-height:1.5}
   .msg.ai{align-self:flex-start;background:#FBFAF7;border:1px solid var(--line);border-bottom-left-radius:5px}
@@ -212,13 +188,6 @@
     .opt label{font-size:11px;min-height:42px}
     .legend{grid-template-columns:1fr}
   }
-#protobar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:6px;
-  align-items:center;flex-wrap:wrap;padding:7px 10px;background:#14181E;color:#E8ECF1;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
-#protobar span{opacity:.6;margin-right:6px;letter-spacing:.06em;text-transform:uppercase}
-#protobar button{font:inherit;background:#2A313B;color:#E8ECF1;border:1px solid #3A424E;
-  border-radius:4px;padding:4px 9px;cursor:pointer}
-#protobar button:hover{background:#3A424E}
 </style>
 </head>
 <body>
@@ -236,7 +205,6 @@
 // DEMO MODE: section buttons advance without requiring every field to be filled.
 // Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
 // A ?demo=1 session is automatically flagged is_test, so it never counts as data.
-const STUDY_VERSION = 'v2-delegation';
 const DEMO = new URLSearchParams(location.search).has('demo');
 
 /* ============================================================
@@ -297,9 +265,6 @@ function logSnapshot(phase, complete){
     participant: PARTICIPANT,
     phase, complete: !!complete,
     is_test: IS_TEST,
-    // v1 measured a choice shift in Part 3; v2 measures who writes the reply. The
-    // columns differ, so every row records which instrument produced it.
-    study_version: STUDY_VERSION,
     client_ts: new Date().toISOString(),
     data: collect(),
   });
@@ -597,12 +562,12 @@ const UPTAKE_INTENT = [
 ];
 
 
-// Fresh situations for Part 3, where the participant advises a friend (NOT shown in Part 2).
+// Fresh dilemmas for the live choice-shift test (NOT shown in Phase 2).
 // One per Phase 2 topic, same Schwartz axis as its source dilemma, so the
 // behavioral readout stays within the domains the trust impressions were formed in.
 // Option A is always the pos-pole-favored horn, matching the DILEMMAS convention.
 const BEHAVIORALS = [
-  { id:'b1_blender', advisee:'Dana', advisePrompt:'Your friend Dana borrowed a housemate’s blender and cracked the lid. She’s heading into a brutal week of deadlines, and she’s asked you what to do — tell them today and sort a replacement now, or handle it once the week clears?', domain:'shared apartment', source:'d1_waterfilter', axis:'benevolence-power', dim:'ST-SE',
+  { id:'b1_blender', domain:'shared apartment', source:'d1_waterfilter', axis:'benevolence-power', dim:'ST-SE',
     poles:{pos:["benevolence"], neg:["power"]},
     prompt:'You borrowed your housemate’s blender and cracked the lid. You’re heading into a brutal week of deadlines. Do you tell them today and sort a replacement now, or handle it once your week clears?',
     optA:'Tell them today and sort a replacement',
@@ -617,7 +582,7 @@ const BEHAVIORALS = [
         B:'Your week is where your standing actually gets decided. A lid can wait; the ground you’d lose by fumbling your deadlines can’t be won back as easily. Protect your position first and settle the small stuff after.'
       }
     } },
-  { id:'b2_cousin', advisee:'Marco', advisePrompt:'Your friend Marco’s younger cousin proudly showed him a school art project entered in a contest. Marco can see flaws a judge will notice, and the cousin asked what he honestly thinks. He’s asked you what he should say.', domain:'family', source:'d2_fortnite', axis:'benevolence-achievement', dim:'ST-SE',
+  { id:'b2_cousin', domain:'family', source:'d2_fortnite', axis:'benevolence-achievement', dim:'ST-SE',
     poles:{pos:["benevolence"], neg:["achievement"]},
     prompt:'Your younger cousin proudly shows you a school art project they’ve entered in a contest. You can see flaws a judge will notice. They ask what you honestly think.',
     optA:'Focus on what’s working and encourage them',
@@ -632,7 +597,7 @@ const BEHAVIORALS = [
         B:'They asked what you honestly think, and your eye is exactly what they need. Naming the flaws now, while there’s still time to fix them, is what raises their standard and their result.'
       }
     } },
-  { id:'b3_wedding', advisee:'Priya', advisePrompt:'Your friend Priya’s close friend just got engaged and asked her to be in the wedding party. Priya has real doubts about the relationship. She’s asked you whether to share them or accept the role and keep them to herself.', domain:'friendship', source:'d3_alex', axis:'self_direction-security', dim:'O-C',
+  { id:'b3_wedding', domain:'friendship', source:'d3_alex', axis:'self_direction-security', dim:'O-C',
     poles:{pos:["self_direction"], neg:["security"]},
     prompt:'Your close friend just got engaged and asked you to be in the wedding party. You have real doubts about the relationship. Do you share them, or accept the role and keep them to yourself?',
     optA:'Share your doubts honestly before committing',
@@ -647,7 +612,7 @@ const BEHAVIORALS = [
         B:'This is a moment the friendship has a shape for: you show up and stand where they asked you to stand. Keeping your doubts private protects them, the occasion, and the steady thing between you.'
       }
     } },
-  { id:'b4_reward', advisee:'Sam', advisePrompt:'Your friend Sam’s partner promised their kid a reward for good grades that Sam thinks is far too big. The kid delivered. Privately Sam would scale it back, and he’s asked you whether to reopen it with his partner or let it stand.', domain:'co-parenting', source:'d4_parenting', axis:'self_direction-tradition', dim:'O-C',
+  { id:'b4_reward', domain:'co-parenting', source:'d4_parenting', axis:'self_direction-tradition', dim:'O-C',
     poles:{pos:["self_direction"], neg:["tradition"]},
     prompt:'Your partner promised your kid a reward for good grades that you think is far too big. The kid delivered. Privately, you’d scale it back. Do you reopen it with your partner, or let it stand?',
     optA:'Tell your partner you want to rethink the reward',
@@ -662,7 +627,7 @@ const BEHAVIORALS = [
         B:'Your kid held up their end, and a promise from one parent is a promise from the household. Honoring it as made teaches them the family’s word is solid, and that’s worth more than the difference in the reward.'
       }
     } },
-  { id:'b5_move', advisee:'Ellie', advisePrompt:'Your friend Ellie planned her first free weekend in a month to recharge. A friend has asked her to help them move on Saturday, and they are short on hands. She’s asked you whether to keep the weekend or show up.', domain:'friendship', source:'d5_overwhelmed', axis:'self_direction-conformity', dim:'O-C',
+  { id:'b5_move', domain:'friendship', source:'d5_overwhelmed', axis:'self_direction-conformity', dim:'O-C',
     poles:{pos:["self_direction"], neg:["conformity"]},
     prompt:'You planned your first free weekend in a month to recharge. A friend asks you to help them move on Saturday; they’re short on hands. Do you keep the weekend, or show up?',
     optA:'Keep the weekend for yourself and say no',
@@ -748,6 +713,7 @@ const S = {
   mcheck:{},               // manipulation checks
   uptake:{intent:{}, stage:'intent', ui:0, runs:{}},
   p2seen:{}, p2stage:null, p2token:0, comp:{}, delIdx:0,
+  behaviorCounter:'opposite', // researcher: AI recommends 'opposite' of pre-choice (room to shift) or 'same'
   step:0,
 };
 
@@ -847,9 +813,6 @@ function scorePVQ(){
   // these an analyst cannot rescore the PVQ any other way after the fact.
   S.valueScoresRaw={}; VALUES.forEach(v=> S.valueScoresRaw[v.key] = raw[v.key]!=null ? +raw[v.key].toFixed(3) : null);
   S.pvqGrandMean = +grand.toFixed(3);
-  // Part 3 v2 runs as its own page and needs this profile to work out which pole is
-  // the participant's. Same origin, so it can read it back; harmless if unused.
-  try{ localStorage.setItem('rawr.valueScores', JSON.stringify(out)); }catch(e){}
   // aligned pole per dilemma = the pole (pos/neg) the participant leans toward
   const poleScore=(keys)=>{ const xs=keys.map(k=>out[k]??0); return xs.reduce((a,b)=>a+b,0)/(xs.length||1); };
   DILEMMAS.forEach(d=>{
@@ -875,18 +838,6 @@ function aiResponseFor(d){
   const verdict = aiDecision==='A' ? d.optA : d.optB;
   const reason = d.reasoning[reasonPole][aiDecision];
   return {verdict, reason, aiDecision, reasonPole};
-}
-
-/* One paragraph, reasoning first and the recommendation as its closing sentence.
-   Splitting them - verdict in bold on top, reasoning under a labelled header -
-   let a reader take the answer and skip the argument, which is the one thing this
-   study cannot afford. Concatenated, the recommendation cannot be reached without
-   passing through the reasons for it. */
-function adviceParagraph(r){
-  const v = String(r.verdict || '').trim();
-  if(!v) return r.reason;
-  const tail = v.charAt(0).toLowerCase() + v.slice(1);
-  return `${r.reason} So on balance, ${tail}`;
 }
 
 /* ============================================================
@@ -915,60 +866,6 @@ function dispatch(name){
     interaction:Screens.interaction, perception:Screens.perception, intent:Screens.intent, uptake:Screens.uptake, delegation:Screens.delegation,
     checks:Screens.checks, done:Screens.done}[name] || Screens.welcome)();
 }
-/* ===========================================================================
-   Prototype navigation. Only reachable with ?demo, which already flags every
-   row is_test and relaxes the "you must answer this" gates, so a participant
-   cannot land here by accident.
-
-     ?demo&skipto=uptake      jump straight to the five live decisions
-     ?demo&skipto=delegation  jump to the six delegation tasks
-     ?demo&skipto=interaction jump to the trust battery
-     ?demo&cond=C2            force an arm instead of asking the backend
-
-   Skipping seeds a plausible PVQ profile so the value projection, the
-   per-dilemma poles and the advisor construction all run for real. What you
-   see on a skipped-to screen is what a participant with that profile sees.
-   =========================================================================== */
-function seedPrototype(){
-  // a profile that leans self-transcendent and open, so pos poles win most axes
-  const LEAN = {self_direction:5.4, universalism:5.2, benevolence:5.5, stimulation:4.6,
-                hedonism:4.2, achievement:3.0, power:2.2, security:3.1,
-                conformity:2.6, tradition:2.4};
-  PVQ_ITEMS.forEach((it,i)=>{ if(S.pvq[i]==null) S.pvq[i] = Math.round(LEAN[it.v] ?? 3.5); });
-  scorePVQ();
-  if(!S.condition){
-    S.condition = new URLSearchParams(location.search).get('cond') || 'C1';
-    S.assignment = {source:'prototype', counts:null, error:null,
-                    assigned_at:new Date().toISOString()};
-  }
-  if(!S.order || !S.order.length) S.order = DILEMMAS.map((_,i)=>i);
-  // enough of Part 2 marked seen that Part 3 is not reached cold
-  DILEMMAS.forEach(d=> S.p2seen[d.id]=true);
-}
-
-function protoBar(){
-  if(!DEMO) return;
-  if(document.getElementById('protobar')) return;
-  const jumps = [['aiexp','AI use'],['pvq','PVQ'],['dilemmas','Part 2 · dilemmas'],
-                 ['interaction','trust'],['perception','checks'],['intent','intent'],
-                 ['uptake','Part 3 · behaviour'],['delegation','delegation'],['checks','final']];
-  const bar = document.createElement('div');
-  bar.id = 'protobar';
-  bar.innerHTML = `<span>prototype · ${S.condition||'…'}</span>` +
-    jumps.map(([k,l])=>`<button data-go="${k}">${l}</button>`).join('');
-  document.body.appendChild(bar);
-  document.body.style.paddingBottom = '46px';
-  bar.addEventListener('click', e=>{
-    const k = e.target && e.target.getAttribute('data-go');
-    if(!k) return;
-    seedPrototype();
-    S.uptake.stage='decide'; S.uptake.ui=0; S.di=0; S.p2stage=null; S.delIdx=0;
-    dispatch(k);
-    const s=document.getElementById('protobar').querySelector('span');
-    if(s) s.textContent = `prototype · ${S.condition}`;
-  });
-}
-
 function goBack(){
   if(NAV.length<2) return;
   NAV.pop();
@@ -1243,7 +1140,7 @@ const Screens = {
     const stage = S.p2stage;
     const ask = '<br><br><i style="opacity:.85">What would you do?</i>';
     let chat = `<div class="msg me" id="userbub">${d.prompt+ask}</div>`;
-    if(stage==='shown') chat += `<div class="msg ai"><p class="who">${AGENT_LABEL}</p><p class="answer" id="aireason">${adviceParagraph(r)}</p></div>`;
+    if(stage==='shown') chat += `<div class="msg ai"><p class="who">${AGENT_LABEL}</p><p class="verdict">${r.verdict}.</p><p class="rlabel">AdvisorBot’s Reasoning</p><p id="aireason">${r.reason}</p></div>`;
     let cont='';
     const cls=(sel,wrong)=>'compopt'+(sel?(wrong?' wrong':' sel'):'');
     if(stage==='detail'){
@@ -1289,20 +1186,20 @@ const Screens = {
   phase3Intro(){
     S.screenName='phase3Intro';
     render(`
-      <p class="eyebrow">Part 3 · Giving advice of your own</p>
-      <h1>Now it&rsquo;s your turn to advise</h1>
-      <p class="lead">You&rsquo;ve now seen how and why ${ADVISOR_EMOJI} AdvisorBot answers a range of situations. In this next part, friends of yours come to <i>you</i> for advice, and for each one you decide whether to answer yourself or hand it to ${AGENT_INLINE}. As before, there are no right or wrong answers.</p>
+      <p class="eyebrow">Part 3 · Making decisions with ${ADVISOR_EMOJI} AdvisorBot</p>
+      <h1>Now, making decisions</h1>
+      <p class="lead">You've now seen how and why ${ADVISOR_EMOJI} AdvisorBot makes decisions across a range of situations posed by <i>other people</i>. In this next part, we'll ask how <i>you</i> would actually <b>rely on</b> ${AGENT_INLINE}'s decisions. As before, there are no right or wrong answers.</p>
       <div class="card">
         <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
-          <span class="stepnum">1</span><p style="margin:0">Five <b>friends asking you for advice</b>. For each, you choose one thing: whether you would answer them yourself, or hand it to AdvisorBot.</p></div>
-        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
-          <span class="stepnum">2</span><p style="margin:0">You <b>won&rsquo;t see what AdvisorBot would say</b> before you choose, and you won&rsquo;t see it afterwards either. Go on what you already know about how it answers.</p></div>
+          <span class="stepnum">1</span><p style="margin:0">Five <b>new situations</b> that you might encounter in your own life. For each, you'll make your own decision, then pose it to AdvisorBot.</p></div>
         <div style="display:flex;gap:13px;align-items:flex-start">
-          <span class="stepnum">3</span><p style="margin:0">Your overall impressions of how you&rsquo;d <b>use (or not use)</b> AdvisorBot in your life.</p></div>
+          <span class="stepnum">2</span><p style="margin:0">Your overall impressions of how you'd <b>use (or not use)</b> AdvisorBot in your life.</p></div>
       </div>
       ${researcherUptakeStrip()}
       <div class="btnrow"><button class="btn" onclick="Screens.startUptake()">Start Part 3</button></div>
     `);
+    const sel=document.getElementById('bcounter');
+    if(sel) sel.onchange=()=>{ S.behaviorCounter=sel.value; };
   },
 
   interaction(){
@@ -1392,43 +1289,50 @@ const Screens = {
   uptakeDecide(){
     S.screenName='uptake';
     const d=curB(), u=curU();
-    if(!u.tShown) u.tShown = Date.now();
-    const n=BEHAVIORALS.length;
-
-    /* One binary choice per situation, taken with nothing shown about what
-       AdvisorBot would say. After the click the page locks briefly while the
-       reply is "written and sent" — the same wait on both paths, so neither
-       option is the cheaper one and the choice reflects preference rather than
-       effort. Nothing is ever revealed, so all five choices run off the model of
-       the advisor formed in Part 2. */
-    const body = u.mode ? `
-        <div class="card">
-          <p class="dilemma dim">${d.advisePrompt}</p>
-          <div class="sending">
-            <span class="dots"><i></i><i></i><i></i></span>
-            <span>Noted &mdash; ${u.mode==='bot'
-              ? ADVISOR_NAME+' would answer '+d.advisee
-              : 'you&rsquo;d answer '+d.advisee+' yourself'}.</span>
-          </div>
-        </div>` : `
-        <div class="card">
-          <p class="dilemma">${d.advisePrompt}</p>
-          <p class="chatask" style="margin-top:18px">${d.advisee} is waiting on an answer. Who should write it?</p>
-          <div class="forkrow">
-            <button class="forkbtn" id="fk-own" disabled onclick="uptakePick('own')">I&rsquo;ll write it myself</button>
-            <button class="forkbtn bot" id="fk-bot" disabled onclick="uptakePick('bot')">Let ${ADVISOR_EMOJI} AdvisorBot write it</button>
-          </div>
-          <p class="gatehint" id="gatehint">Take a moment with it &mdash; you can answer in <b id="gatesec"></b></p>
+    const pre=u.pre;
+    const locked=!!u.asked;
+    let adviceBlock='';
+    if(u.asked){
+      adviceBlock = `
+        <div class="msg ai" style="max-width:none;margin-top:18px">
+          <p class="who">${AGENT_LABEL}</p>
+          <p class="verdict">${u.verdict}.</p>
+          <p class="rlabel">AdvisorBot’s Reasoning</p>
+          <p>${u.reason}</p>
         </div>`;
-
+      if(u.final==null){
+        adviceBlock += `
+        <p class="chatask" style="margin-top:18px">After seeing what AdvisorBot says, what is your decision?</p>
+        <div class="chips">
+          <button class="chip ${u.final==='A'?'sel':''}" onclick="uptakeChoose('A')">${d.optA}</button>
+          <button class="chip ${u.final==='B'?'sel':''}" onclick="uptakeChoose('B')">${d.optB}</button>
+        </div>`;
+      } else {
+        adviceBlock += `
+        <p class="chatask" style="margin-top:18px">Your decision: <b>${u.final==='A'?d.optA:d.optB}</b></p>
+        <p class="chatask" style="margin-top:14px">How sure are you about your final decision?</p>
+        <div class="scale likert7" role="radiogroup">${[1,2,3,4,5,6,7].map(v=>`<div class="opt"><input type="radio" name="upconf" id="uc${v}" value="${v}" ${u.confidence==v?'checked':''} onchange="uptakeConfidence(${v})"><label for="uc${v}">${v}</label></div>`).join('')}</div>
+        <div class="scalecaps"><span>1 · Not at all sure</span><span>Very sure · 7</span></div>`;
+      }
+    }
     render(`
-      <p class="eyebrow">Part 3 · Situation ${S.uptake.ui+1} of ${n}</p>
-      <h1 style="font-size:30px">Someone asked you for advice</h1>
-      ${body}
+      <p class="eyebrow">Part 3 · Live decision ${S.uptake.ui+1} of ${BEHAVIORALS.length}</p>
+      <h1 style="font-size:30px">Read the situation</h1>
+      <p class="muted" style="margin:-6px 0 16px;font-size:14.5px">Imagine you are faced with the following situation in your life:</p>
+      <div class="card">
+        <p class="dilemma">${d.prompt}</p>
+        <p class="muted" style="margin-top:16px;font-size:14px">Before you ask anyone, what’s your own call?</p>
+        <div class="options">
+          <label class="bigopt ${pre==='A'?'sel':''}" ${locked?'style="pointer-events:none;opacity:.75"':''}><input type="radio" name="pre" ${pre==='A'?'checked':''} ${locked?'disabled':''} onchange="uptakePre('A',event)"><span class="lab">${d.optA}</span></label>
+          <label class="bigopt ${pre==='B'?'sel':''}" ${locked?'style="pointer-events:none;opacity:.75"':''}><input type="radio" name="pre" ${pre==='B'?'checked':''} ${locked?'disabled':''} onchange="uptakePre('B',event)"><span class="lab">${d.optB}</span></label>
+        </div>
+        ${adviceBlock}
+      </div>
+      ${u.asked
+        ? `<div class="btnrow"><button class="btn" ${((u.final&&u.confidence)||DEMO)?'':'disabled'} onclick="finishUptake()">${S.uptake.ui+1<BEHAVIORALS.length?'Next situation':'Continue'}</button></div>`
+        : `<div class="btnrow"><button class="btn" id="prego" ${(pre||DEMO)?'':'disabled'} onclick="askAdvice()">Ask ${ADVISOR_EMOJI} AdvisorBot</button></div>`}
     `);
-    if(!u.mode) armUptakeGate(u);
   },
-
   delegation(){
     S.screenName='delegation';
     S.delIdx = S.delIdx||0;
@@ -1498,7 +1402,7 @@ const Screens = {
         <table class="sum">
           <tr><td>Perceived value overlap</td><td>${S.interaction.overlap??'-'}</td></tr>
           <tr><td>Reliance / moral trust</td><td>${S.interaction.reliance??'-'}</td></tr>
-          <tr><td>Advice delegated</td><td>${(function(){const n=BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).delegated?1:0),0);const done=BEHAVIORALS.some(b=>(S.uptake.runs[b.id]||{}).mode!=null);return done?(n+' of '+BEHAVIORALS.length+' handed to AdvisorBot'):'-';})()}</td></tr>
+          <tr><td>Behavioral choice-shift</td><td>${(function(){const n=BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).shifted?1:0),0);const done=BEHAVIORALS.some(b=>(S.uptake.runs[b.id]||{}).final!=null);return done?(n+' of '+BEHAVIORALS.length+' shifted'):'-';})()}</td></tr>
           <tr><td>Delegation discount (advisor − delegate, mean)</td><td>${delegationDiscount()}</td></tr>
         </table>
       </div>
@@ -1603,9 +1507,7 @@ function reduceMotion(){ return window.matchMedia && window.matchMedia('(prefers
 function curB(){ return BEHAVIORALS[S.uptake.ui||0]; }
 function curU(){
   const b=curB();
-  return S.uptake.runs[b.id] = S.uptake.runs[b.id] || {mode:null, sent:null, tArmed:null, dwellMs:null,
-    delegated:null, tShown:null, decideMs:null, verdict:null, reason:null,
-    recommended:null, reasonPole:null, alignedPole:null};
+  return S.uptake.runs[b.id] = S.uptake.runs[b.id] || {pre:null, asked:false, verdict:null, reason:null, final:null, confidence:null, posts:[], adviceTurns:0, recommended:null, reasonPole:null, shifted:null, turnsToShift:null};
 }
 function behavioralPoles(b){
   // same projection as the Phase 2 dilemmas: mean value score per pole, pick the higher
@@ -1617,59 +1519,32 @@ function uptakeAdvice(){
   const d=curB(), u=curU();
   const {aligned,other}=behavioralPoles(d);
   const reasonPole = S.condition==='C2' ? other : aligned;
-  // Part 3 no longer collects a prior choice to argue against, so the advisor takes
-  // the same position it would in Part 2: the value-favoured horn, flipped in C3.
-  const alignedDecision = aligned==='pos' ? 'A' : 'B';
-  const recommended = S.condition==='C3' ? (alignedDecision==='A'?'B':'A') : alignedDecision;
-  u.recommended=recommended; u.reasonPole=reasonPole; u.alignedPole=aligned;
-  return { verdict: recommended==='A'?d.optA:d.optB,
-           reason: d.reasoning[reasonPole][recommended],
-           recommended, reasonPole };
+  const recommended = S.behaviorCounter==='opposite' ? (u.pre==='A'?'B':'A') : u.pre;
+  u.recommended=recommended; u.reasonPole=reasonPole;
+  return { verdict: recommended==='A'?d.optA:d.optB, reason: d.reasoning[reasonPole][recommended] };
 }
-/* A floor on how fast a situation can be answered. Without it the fastest way
-   through Part 3 is five reflexive clicks, and the delegation rate would measure
-   impatience rather than trust. The clock runs from when the situation appears,
-   so re-reading costs nothing. */
-const UPTAKE_MIN_READ_MS = 3000;
-let _gateTimer = null;
-
-function armUptakeGate(u){
-  const own=document.getElementById('fk-own'), bot=document.getElementById('fk-bot');
-  const hint=document.getElementById('gatehint'), sec=document.getElementById('gatesec');
-  if(!own||!bot) return;
-  const floor = DEMO ? 1200 : UPTAKE_MIN_READ_MS;
-  const open = () => {
-    clearInterval(_gateTimer); _gateTimer=null;
-    own.disabled=false; bot.disabled=false;
-    if(hint) hint.remove();
-    u.tArmed = Date.now();
-  };
-  const tick = () => {
-    const left = floor - (Date.now() - (u.tShown||Date.now()));
-    if(left <= 0){ open(); return; }
-    if(sec) sec.textContent = Math.ceil(left/1000) + 's';
-  };
-  clearInterval(_gateTimer);
-  tick();
-  if(!own.disabled) return;
-  _gateTimer = setInterval(tick, 200);
-}
-
-const UPTAKE_LOCK_MS = 1500;   // the pause after choosing, identical on both paths
-
-function uptakePick(mode){
+function askAdvice(){
   const u=curU();
-  if(u.mode) return;                       // already chosen; ignore double clicks
-  u.mode = mode;
-  u.delegated = mode==='bot';
-  u.decideMs = Date.now() - (u.tArmed || u.tShown || Date.now());
-  u.dwellMs  = Date.now() - (u.tShown || Date.now());
-  const a = uptakeAdvice();                // computed and recorded, never shown
-  u.verdict=a.verdict; u.reason=a.reason; u.reasonPole=a.reasonPole;
-  u.recommended=a.recommended; u.sent=true;
-  Screens.uptakeDecide();                  // repaint into the locked state
-  setTimeout(finishUptake, DEMO ? 900 : UPTAKE_LOCK_MS);
+  if(!DEMO && !u.pre){ flashIncomplete(); return; }
+  const a=uptakeAdvice();
+  u.verdict=a.verdict; u.reason=a.reason;
+  u.asked=true; u.adviceTurns=1;
+  Screens.uptakeDecide();
 }
+function uptakePre(opt,ev){
+  curU().pre=opt;
+  document.querySelectorAll('.bigopt').forEach(o=>o.classList.remove('sel'));
+  if(ev&&ev.target) ev.target.closest('.bigopt').classList.add('sel');
+  const b=document.getElementById('prego'); if(b) b.disabled=false;
+}
+function uptakeChoose(opt){
+  const u=curU();
+  if(!u.asked || u.final!=null) return;
+  u.final=opt; u.posts=[opt];
+  u.shifted = (opt!==u.pre); u.turnsToShift = u.shifted?1:0;
+  Screens.uptakeDecide();
+}
+function uptakeConfidence(v){ curU().confidence=v; Screens.uptakeDecide(); }
 function finishUptake(){
   const u=curU();
   if(!DEMO && (u.final==null || u.confidence==null)){ flashIncomplete(); return; }
@@ -1684,22 +1559,16 @@ function finishUptake(){
 }
 function researcherUptakeStrip(){
   return `<details class="rstrip"><summary>Researcher preview</summary>
-    <p>Part 3 asks one binary question per situation: write the advice yourself, or let
-    AdvisorBot write it. Nothing AdvisorBot would say is shown before or after the choice,
-    so all five decisions run off the model of the advisor formed in Part 2 rather than a
-    model that improves as the participant goes.</p>
-    <p style="margin-top:10px">The advice it <i>would</i> have written is still computed and
-    recorded, framed from your <b>${S.condition==='C2'?'opposing':'top'}</b> pole on each
-    scenario's axis (condition ${S.condition||'-'}), recommending the value-favoured option
-    ${S.condition==='C3'?'flipped, as C3 requires':'as C1 and C2 require'}. That lets the
-    delegation choice be read against advice the participant never saw. Each of the five
-    scenarios reuses the axis of its Part 2 source dilemma.</p>
-    <p style="margin-top:10px">Effort is asymmetric by design: writing costs more than
-    delegating, which is what makes the choice revealed rather than stated. That asymmetry is
-    constant across arms, so it shifts the baseline rate without threatening the contrast.</p>
+    <div class="row">
+      <label>In each live situation, the AI recommends:</label>
+      <select id="bcounter">
+        <option value="opposite" ${S.behaviorCounter==='opposite'?'selected':''}>opposite of your first choice: lets choice-shift be measured</option>
+        <option value="same" ${S.behaviorCounter==='same'?'selected':''}>same as your first choice: agreement / ceiling</option>
+      </select>
+    </div>
+    <p style="margin-top:10px">Reasoning is framed from your <b>${S.condition==='C2'?'opposing':'top'}</b> pole on each scenario's axis (condition ${S.condition||'-'}). Each of the 5 scenarios reuses the axis of its Phase 2 source dilemma. AdvisorBot gives a single choice-aware response. The behavioral measure is the shift (final vs. pre-advice choice) plus the 1-7 confidence rating, which keeps the readout graded. Note the confound you flagged: with trust already built in Phase 2, a shift may reflect <i>established</i> trust rather than in-the-moment alignment. The same/opposite toggle and the condition arm let you pull those apart.</p>
   </details>`;
 }
-
 function flashIncomplete(){
   const btn=document.querySelector('.btnrow .btn'); if(!btn) return;
   btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:250});
@@ -1790,16 +1659,16 @@ function collect(){
     interaction:S.interaction,
     uptake:{
       behavioral_intent:S.uptake.intent,
+      ai_recommends:S.behaviorCounter,
       scenarios:BEHAVIORALS.map(b=>{
         const u=S.uptake.runs[b.id]||{};
         return { id:b.id, source_dilemma:b.source, domain:b.domain, axis:b.axis, dim:b.dim,
           reason_pole:u.reasonPole??null, recommended_option:u.recommended??null,
-          aligned_pole:u.alignedPole??null,
-          // Part 3 v2: the outcome is who wrote the advice, not whether a choice moved
-          mode:u.mode??null, delegated:u.delegated??null,
-          decide_ms:u.decideMs??null, dwell_ms:u.dwellMs??null };
+          pre_choice:u.pre??null, post_choices:u.posts||[],
+          shifted:u.shifted??null, turns_to_shift:u.turnsToShift??null,
+          final_choice:u.final??null, confidence:u.confidence??null };
       }),
-      delegated_count:BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).delegated?1:0),0),
+      shift_count:BEHAVIORALS.reduce((a,b)=>a+((S.uptake.runs[b.id]||{}).shifted?1:0),0),
     },
     delegation:S.delegation,
     open_response:S.mcheck.free||'',
@@ -1849,15 +1718,15 @@ function downloadCSV(){
   rows.push(['comprehension_total_retries', _comp.reduce((a,c)=>a+(c.why_tries-1>0?c.why_tries-1:0)+(c.detail_tries-1>0?c.detail_tries-1:0),0)]);
   rows.push(['comprehension_total', _comp.length]);
   UPTAKE_INTENT.forEach(it=>rows.push(['intent_'+it.key, d.uptake.behavioral_intent[it.key]??'']));
+  rows.push(['uptake_ai_recommends', d.uptake.ai_recommends]);
   d.uptake.scenarios.forEach(sc=>{
-    rows.push(['uptake_'+sc.id+'_mode', sc.mode||'']);
-    rows.push(['uptake_'+sc.id+'_delegated', sc.delegated==null?'':(sc.delegated?1:0)]);
-    rows.push(['uptake_'+sc.id+'_decide_ms', sc.decide_ms??'']);
-    rows.push(['uptake_'+sc.id+'_dwell_ms', sc.dwell_ms??'']);
+    rows.push(['uptake_'+sc.id+'_pre', sc.pre_choice||'']);
+    rows.push(['uptake_'+sc.id+'_final', sc.final_choice||'']);
+    rows.push(['uptake_'+sc.id+'_shifted', sc.shifted==null?'':(sc.shifted?1:0)]);
+    rows.push(['uptake_'+sc.id+'_confidence', sc.confidence??'']);
     rows.push(['uptake_'+sc.id+'_reason_pole', sc.reason_pole||'']);
-    rows.push(['uptake_'+sc.id+'_aligned_pole', sc.aligned_pole||'']);
   });
-  rows.push(['uptake_delegated_count', BEHAVIORALS.filter(b=>(S.uptake.runs[b.id]||{}).delegated).length]);
+  rows.push(['uptake_shift_count', d.uptake.shift_count??'']);
   DELEGATION.forEach(t=>{const c=d.delegation[t.id]||{};rows.push(['advisor_'+t.id,c.advisor??'']);rows.push(['delegate_'+t.id,c.delegate??'']);});
   AIEXP_ITEMS.forEach(it=>rows.push(['aiexp_'+it.key, d.ai_experience[it.key]??'']));
   AIEXP_TASKS.forEach(it=>rows.push(['aiexp_'+it.key, d.ai_experience[it.key]??'']));
@@ -1932,17 +1801,7 @@ function testBackend(){
 }
 
 /* ---- boot ---- */
-(function boot(){
-  const SKIP = DEMO ? new URLSearchParams(location.search).get('skipto') : null;
-  if(SKIP){
-    seedPrototype();
-    S.uptake.stage='decide'; S.uptake.ui=0; S.di=0; S.p2stage=null; S.delIdx=0;
-    dispatch(SKIP);
-  } else {
-    Screens.welcome();
-  }
-  protoBar();
-})();
+Screens.welcome();
 
 // Wake the Apps Script instance on page load. A cold instance answers in ~15s where a warm
 // one takes ~3s, and this costs nothing: it creates no rows and nothing waits on it. By the
