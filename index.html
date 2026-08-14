@@ -1690,8 +1690,12 @@ function uptakePick(mode){
   setTimeout(finishUptake, DEMO ? 900 : UPTAKE_LOCK_MS);
 }
 function finishUptake(){
+  // Only ever reached from the timer that uptakePick starts, so the choice is
+  // already committed. The old gate here required u.final and u.confidence, which
+  // the choice-shift task collected and this one does not, so it blocked every
+  // advance outside demo mode.
   const u=curU();
-  if(!DEMO && (u.final==null || u.confidence==null)){ flashIncomplete(); return; }
+  if(!u.mode) return;
   logSnapshot('live_decision_'+(S.uptake.ui+1)+'_done');
   if(S.uptake.ui+1 < BEHAVIORALS.length){
     S.uptake.ui++; S.uptake.stage='decide';
