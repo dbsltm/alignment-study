@@ -776,6 +776,7 @@ function assignCondition(){
    Resolves to {condition, source}; never rejects. Cached, so the prefetch fired
    when the PVQ opens is simply awaited later rather than re-requested. */
 let _assignPromise = null;
+let _assignReady = null;
 function assignConditionRemote(){
   if(_assignPromise) return _assignPromise;
   if(S.forcedCondition) return Promise.resolve({condition:S.forcedCondition, source:'forced'});
@@ -969,6 +970,19 @@ function protoBar(){
   });
 }
 
+/* The only place the condition is genuinely required. By now the request has had
+   the whole intro screen to finish; if it somehow has not, wait here rather than
+   opening Part 2 with no advisor. */
+async function startDilemmas(btn){
+  if(!S.condition && _assignReady){
+    if(btn){ btn.disabled = true; btn.textContent = 'One moment…'; }
+    try{ await _assignReady; }catch(e){}
+    if(btn){ btn.disabled = false; btn.textContent = 'Continue'; }
+  }
+  if(!S.condition){ S.condition = assignCondition(); }   // local fallback
+  Screens.dilemmas();
+}
+
 function goBack(){
   if(NAV.length<2) return;
   NAV.pop();
@@ -1104,6 +1118,9 @@ const Screens = {
       <p class="qtext">${it.t}</p>
       ${likertRow('ail_'+it.key, S.ailit[it.key], `setAiLit.bind(null,'${it.key}')`, it.caps)}
       <div style="height:20px"></div>`).join('');
+    // The condition comes from the backend and takes several seconds; ask for it now
+    // so the answer is waiting by the time the PVQ ends. Idempotent.
+    assignConditionRemote();
     render(`
       <p class="eyebrow">Background · Your experience with AI</p>
       <h1 style="font-size:30px">A little about your AI use</h1>
@@ -1173,15 +1190,17 @@ const Screens = {
     // Condition comes from the backend so the three arms stay balanced across
     // participants. Normally already resolved from the prefetch; if it is still in
     // flight (or the network is down) the button waits, then falls back locally.
-    const btn=document.getElementById('pvqnext');
-    if(btn){ btn.disabled=true; btn.textContent='Preparing…'; }
-    const a = await assignConditionRemote();
-    if(btn){ btn.disabled=false; btn.textContent='Continue'; }
-
-    S.condition = a.condition;
-    S.assignment = {source:a.source, counts:a.counts||null, error:a.error||null, assigned_at:new Date().toISOString()};
+    // Do not hold the participant here. The condition is not needed until the first
+    // situation renders, and the intro screen in between is a good ten seconds of
+    // reading, which is longer than the round trip. Resolve it in the background.
     S.order = shuffle(DILEMMAS.map((_,i)=>i));
-    logSnapshot('pvq_done');
+    _assignReady = assignConditionRemote().then(a=>{
+      S.condition = a.condition;
+      S.assignment = {source:a.source, counts:a.counts||null, error:a.error||null,
+                      assigned_at:new Date().toISOString()};
+      logSnapshot('pvq_done');
+      return a;
+    });
     Screens.dilemmaIntro();  // Part 2 intro; profile revealed at END to avoid priming
   },
 
@@ -1206,7 +1225,7 @@ const Screens = {
         <p style="margin:0" class="muted"><b>Less like you:</b> ${bottom.map(v=>v.label).join(', ')}.</p>
       </div>
       <div class="btnrow">
-        <button class="btn" onclick="Screens.dilemmas()">See the situations</button>
+        <button class="btn" onclick="startDilemmas(this)">See the situations</button>
       </div>
       ${researcherStrip(true)}
     `);
