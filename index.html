@@ -123,6 +123,7 @@
   .ai .verdict{font-family:var(--agent-font)}
   .agentref{font-family:var(--agent-font);font-weight:600;color:var(--accent);white-space:nowrap}
   .msg.ai .answer{margin:0;line-height:1.6}
+  .msg.ai .answer .rec{font-weight:650}
   .gatehint{font-family:var(--sans, system-ui);font-size:13px;color:var(--soft,#565B64);
     margin:12px 0 0;opacity:.85}
   .gatehint b{font-variant-numeric:tabular-nums}
@@ -236,7 +237,7 @@
 // DEMO MODE: section buttons advance without requiring every field to be filled.
 // Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
 // A ?demo=1 session is automatically flagged is_test, so it never counts as data.
-const STUDY_VERSION = 'v2-delegation';
+const STUDY_VERSION = 'v2b-labelled-rec';
 const DEMO = new URLSearchParams(location.search).has('demo');
 
 /* ============================================================
@@ -887,7 +888,11 @@ function adviceParagraph(r){
   const v = String(r.verdict || '').trim();
   if(!v) return r.reason;
   const tail = v.charAt(0).toLowerCase() + v.slice(1);
-  return `${r.reason} So on balance, ${tail}`;
+  // Still one paragraph, so the recommendation cannot be reached without passing
+  // through the reasons. But it is named and set in bold, because in the previous
+  // wave it was a trailing clause and there is no evidence participants registered
+  // which option was being recommended at all.
+  return `${r.reason} <b class="rec">So my advice would be to ${tail}</b>`;
 }
 
 /* ============================================================
