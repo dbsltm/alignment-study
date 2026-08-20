@@ -275,6 +275,10 @@ const URLP = new URLSearchParams(location.search);
 // Anything logged while DEMO is on, or with ?test=1, is flagged so it can be
 // excluded from condition balancing and stripped from the sheet before fielding.
 const IS_TEST = DEMO || URLP.has('test');
+// The researcher panels expose the manipulation and a force-condition control. They
+// were rendering for everyone; no participant ever used the control (every non-test
+// row assigned server-side) but the description alone is a demand characteristic.
+const RESEARCHER = DEMO || URLP.has('researcher');
 
 const PARTICIPANT = (function(){
   const fresh = () => Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
@@ -1735,6 +1739,7 @@ function finishUptake(){
   }
 }
 function researcherUptakeStrip(){
+  if(!RESEARCHER) return '';
   return `<details class="rstrip"><summary>Researcher preview</summary>
     <p>Part 3 asks one binary question per situation: write the advice yourself, or let
     AdvisorBot draft a first version they could edit. Nothing AdvisorBot would say is
@@ -1947,6 +1952,7 @@ function restart(){
    RESEARCHER STRIP
    ============================================================ */
 function researcherStrip(showCond){
+  if(!RESEARCHER) return '';
   return `<details class="rstrip"><summary>Researcher preview</summary>
     <div class="row">
       <label>Force condition:</label>
