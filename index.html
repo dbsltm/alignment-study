@@ -298,11 +298,14 @@ function logSnapshot(phase, complete){
     participant: PARTICIPANT,
     phase, complete: !!complete,
     is_test: IS_TEST,
-    // v1 measured a choice shift in Part 3; v2 measures who writes the reply. The
-    // columns differ, so every row records which instrument produced it.
+    // v1 measured a choice shift in Part 3; v2 measures who writes the reply, and
+    // v2b labels the recommendation inside it. The columns for v2 and v2b are the
+    // same, so the version is the only thing separating those waves. It has to ride
+    // inside data: the backend flattens payload.data and nothing else, so a field at
+    // the root never reaches the sheet.
     study_version: STUDY_VERSION,
     client_ts: new Date().toISOString(),
-    data: collect(),
+    data: Object.assign({ study_version: STUDY_VERSION }, collect()),
   });
   _logQueue.push(payload);
   flushLog();
@@ -322,7 +325,7 @@ window.addEventListener('beforeunload', ()=>{
   if(!LOG_ENDPOINT) return;
   // last-ditch partial save for dropouts
   try{
-    const payload=JSON.stringify({participant:PARTICIPANT, phase:'unload_partial', complete:false, is_test:IS_TEST, client_ts:new Date().toISOString(), data:collect()});
+    const payload=JSON.stringify({participant:PARTICIPANT, phase:'unload_partial', complete:false, is_test:IS_TEST, study_version:STUDY_VERSION, client_ts:new Date().toISOString(), data:Object.assign({study_version:STUDY_VERSION}, collect())});
     navigator.sendBeacon(LOG_ENDPOINT, new Blob([payload], {type:'text/plain'}));
     _logQueue.forEach(q=>navigator.sendBeacon(LOG_ENDPOINT, new Blob([q], {type:'text/plain'})));
   }catch(e){}
