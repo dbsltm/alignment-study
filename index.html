@@ -128,7 +128,7 @@
     margin:12px 0 0;opacity:.85}
   .gatehint b{font-variant-numeric:tabular-nums}
   .forkbtn[disabled]{opacity:.45;cursor:default}
-  .forkbtn[disabled]:hover{border-color:var(--line)}
+  .forkbtn[disabled]:hover{border-color:var(--line);background:#fff}
   .dilemma.dim{opacity:.5;transition:opacity .25s}
   .sending{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:15.5px;
     color:var(--soft, #565B64)}
@@ -138,12 +138,22 @@
   .dots i:nth-child(2){animation-delay:.18s} .dots i:nth-child(3){animation-delay:.36s}
   @keyframes blip{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
   @media (prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.5}}
-  .forkrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  /* minmax(0,1fr) rather than 1fr: a bare 1fr track will not shrink below its
+     content's min-width, so the longer label widened its own column. */
+  .forkrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+    margin-top:16px;align-items:stretch}
   .forkbtn{font-family:inherit;font-size:15.5px;font-weight:600;line-height:1.35;padding:22px 18px;
     border-radius:9px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;
-    text-align:left}
-  .forkbtn:hover{border-color:var(--accent)}
+    text-align:left;width:100%;transition:border-color .12s,background .12s,transform .06s}
+  .forkbtn small{display:block;font-weight:400;font-size:12.5px;line-height:1.4;
+    color:var(--soft,#565B64);margin-top:7px}
+  /* The .bot rule used to sit after :hover at equal specificity and silently won,
+     so that button never responded to the cursor and read as disabled. */
   .forkbtn.bot{border-color:#D8C4B4}
+  .forkbtn:not([disabled]):hover{border-color:var(--accent);background:#F7F9FC}
+  .forkbtn.bot:not([disabled]):hover{border-color:var(--warm,#B5602F);background:#FBF6F2}
+  .forkbtn:not([disabled]):active{transform:translateY(1px)}
+  .forkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .freetext{width:100%;font-family:inherit;font-size:16px;line-height:1.55;padding:12px 13px;
     border:1px solid var(--line);border-radius:8px;margin-top:10px;resize:vertical}
   @media(max-width:560px){.forkrow{grid-template-columns:1fr}}
@@ -237,7 +247,7 @@
 // DEMO MODE: section buttons advance without requiring every field to be filled.
 // Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
 // A ?demo=1 session is automatically flagged is_test, so it never counts as data.
-const STUDY_VERSION = 'v2b-labelled-rec';
+const STUDY_VERSION = 'v2c-draft-framing';
 const DEMO = new URLSearchParams(location.search).has('demo');
 
 /* ============================================================
@@ -258,6 +268,7 @@ const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Scri
 // Demo mode: short, because you click straight through. A demo session is flagged is_test,
 // so falling back locally costs nothing.
 const ASSIGN_TIMEOUT_MS = DEMO ? 6000 : 90000;
+const DETAIL_CHECK_COUNT = 4;   // vignette-detail checks, of ten dilemmas
 const COMPLETION_CODE = 'CB3BUR1M'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
@@ -1069,7 +1080,7 @@ const Screens = {
       <p class="eyebrow">Research study · about 20 minutes</p>
       <h1>How you’d reason, and how an AI reasons it back.</h1>
       <p class="lead">${ADVISOR_EMOJI} <b>${ADVISOR_NAME}</b> is an AI assistant that gives advice on everyday decisions: disagreements with people close to you, family choices, how to spend your time and money.</p>
-      <p class="lead">First, you'll rate 21 short statements about what is important to you in life. Next, you'll read ${DILEMMAS.length} situations other people have posed to AdvisorBot, along with AdvisorBot's responses. After each situation and response, we'll ask a question or two to make sure you understood what was asked and what was replied, and then for your overall impressions of AdvisorBot. Finally, five friends will come to you for advice. For each one you'll say whether you would answer them yourself or hand it to AdvisorBot &mdash; you won't have to write any advice &mdash; and then which everyday tasks, if any, you'd let it handle on your behalf.</p>
+      <p class="lead">First, you'll rate 21 short statements about what is important to you in life. Next, you'll read ${DILEMMAS.length} situations other people have posed to AdvisorBot, along with AdvisorBot's responses. After each situation and response, we'll ask a question or two to make sure you understood what was asked and what was replied, and then for your overall impressions of AdvisorBot. Finally, five friends will come to you for advice. For each one you'll say whether you would write to them yourself or let AdvisorBot draft a first version you could edit &mdash; you won't have to write any advice &mdash; and then which everyday tasks, if any, you'd let it handle on your behalf.</p>
       <p class="lead">There are no right or wrong answers anywhere in this study. We want your honest reactions.</p>
       <div class="card">
         <h2 style="margin-top:0">A little about you</h2>
@@ -1265,7 +1276,15 @@ const Screens = {
     const d = DILEMMAS[S.order[S.di]];
     const total = S.order.length;
     const r = aiResponseFor(d);
-    if(S.p2seen[d.id]){ S.p2stage='shown'; }
+    // The vignette-detail check runs on a random four of the ten rather than all ten.
+    // Its job is to confirm the situation was read before any advice appears, and four
+    // unpredictable placements do that without asking twenty gated questions. The
+    // reasoning check still runs on every dilemma.
+    if(!S.detailOn){
+      S.detailOn = shuffle(DILEMMAS.map(x=>x.id)).slice(0, DETAIL_CHECK_COUNT);
+    }
+    const wantsDetail = S.detailOn.indexOf(d.id) >= 0;
+    if(S.p2seen[d.id] || !wantsDetail){ S.p2stage='shown'; }
     else if(!S.p2stage){ S.p2stage='detail'; }
     const stage = S.p2stage;
     const ask = '<br><br><i style="opacity:.85">What would you do?</i>';
@@ -1318,10 +1337,10 @@ const Screens = {
     render(`
       <p class="eyebrow">Part 3 · Giving advice of your own</p>
       <h1>Now it&rsquo;s your turn to advise</h1>
-      <p class="lead">You&rsquo;ve now seen how and why ${ADVISOR_EMOJI} AdvisorBot answers a range of situations. In this next part, friends of yours come to <i>you</i> for advice, and for each one you would decide whether to answer yourself or hand it to ${AGENT_INLINE} (you won&rsquo;t actually have to write advice). As before, there are no right or wrong answers.</p>
+      <p class="lead">You&rsquo;ve now seen how and why ${ADVISOR_EMOJI} AdvisorBot answers a range of situations. In this next part, friends of yours come to <i>you</i> for advice, and for each one you would decide whether to write it yourself or let ${AGENT_INLINE} draft a first version you could edit (you won&rsquo;t actually have to write advice). As before, there are no right or wrong answers.</p>
       <div class="card">
         <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
-          <span class="stepnum">1</span><p style="margin:0">Five <b>friends asking you for advice</b>. For each, you choose one thing: whether you <i>would</i> answer them yourself, or hand it to AdvisorBot. You never have to write the advice itself.</p></div>
+          <span class="stepnum">1</span><p style="margin:0">Five <b>friends asking you for advice</b>. For each, you choose one thing: whether you <i>would</i> write to them yourself, or let AdvisorBot draft a first version for you to work from. You never have to write the advice itself.</p></div>
         <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
           <span class="stepnum">2</span><p style="margin:0">You <b>won&rsquo;t see what AdvisorBot would say</b> before you choose, and you won&rsquo;t see it afterwards either. Go on what you already know about how it answers.</p></div>
         <div style="display:flex;gap:13px;align-items:flex-start">
@@ -1434,16 +1453,18 @@ const Screens = {
           <div class="sending">
             <span class="dots"><i></i><i></i><i></i></span>
             <span>Noted &mdash; ${u.mode==='bot'
-              ? ADVISOR_NAME+' would answer '+d.advisee
-              : 'you&rsquo;d answer '+d.advisee+' yourself'}.</span>
+              ? ADVISOR_NAME+' would draft it and you&rsquo;d take it from there'
+              : 'you&rsquo;d write to '+d.advisee+' yourself'}.</span>
           </div>
         </div>` : `
         <div class="card">
           <p class="dilemma">${d.advisePrompt}</p>
-          <p class="chatask" style="margin-top:18px">${d.advisee} is waiting on an answer. Who should write it?</p>
+          <p class="chatask" style="margin-top:18px">${d.advisee} is waiting on an answer. How would you start?</p>
           <div class="forkrow">
-            <button class="forkbtn" id="fk-own" disabled onclick="uptakePick('own')">I&rsquo;ll write it myself</button>
-            <button class="forkbtn bot" id="fk-bot" disabled onclick="uptakePick('bot')">Let ${ADVISOR_EMOJI} AdvisorBot write it</button>
+            <button class="forkbtn" id="fk-own" disabled onclick="uptakePick('own')">Write it myself
+              <small>Start from a blank page and put it in your own words.</small></button>
+            <button class="forkbtn bot" id="fk-bot" disabled onclick="uptakePick('bot')">Let ${ADVISOR_EMOJI} AdvisorBot draft a first version
+              <small>You&rsquo;d see the draft and could edit it before it goes.</small></button>
           </div>
           <p class="gatehint" id="gatehint">Take a moment with it &mdash; you can answer in <b id="gatesec"></b></p>
         </div>`;
@@ -1716,7 +1737,8 @@ function finishUptake(){
 function researcherUptakeStrip(){
   return `<details class="rstrip"><summary>Researcher preview</summary>
     <p>Part 3 asks one binary question per situation: write the advice yourself, or let
-    AdvisorBot write it. Nothing AdvisorBot would say is shown before or after the choice,
+    AdvisorBot draft a first version they could edit. Nothing AdvisorBot would say is
+    shown before or after the choice,
     so all five decisions run off the model of the advisor formed in Part 2 rather than a
     model that improves as the participant goes.</p>
     <p style="margin-top:10px">The advice it <i>would</i> have written is still computed and
@@ -1814,6 +1836,7 @@ function collect(){
         why_first_ok:c.why_first??null, detail_first_ok:c.detail_first??null,
         why_tries:c.why_tries||0, detail_tries:c.detail_tries||0,
         why_foil_errors:c.why_foil_errors||0, why_opposite_errors:c.why_opposite_errors||0,
+        detail_asked:(S.detailOn||[]).indexOf(d.id)>=0,
         why_final_ok:c.why?(c.why===r.reasonPole):null,
         detail_final_ok:c.detail!=null?(c.detail===0):null}];
     })),
@@ -1915,7 +1938,7 @@ function restart(){
     PARTICIPANT.local_id = fresh;
     PARTICIPANT.participant_key = fresh;
   }
-  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{},demog:{},ailit:{},poleDelta:{},poleScores:{},valueScoresRaw:{},pvqGrandMean:null,di:0,dStage:'decide',p2seen:{},p2stage:null,p2token:0,comp:{},delIdx:0,
+  Object.assign(S,{condition:null,assignment:null,pvq:{},valueScores:{},topValuesByAxis:{},order:[],decisions:{},reflect:{},interaction:{},delegation:{},mcheck:{},aiexp:{},demog:{},ailit:{},poleDelta:{},poleScores:{},valueScoresRaw:{},pvqGrandMean:null,di:0,dStage:'decide',p2seen:{},p2stage:null,detailOn:null,p2token:0,comp:{},delIdx:0,
     uptake:{intent:{}, stage:'intent', ui:0, runs:{}}});
   NAV=[];  Screens.welcome();
 }
