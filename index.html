@@ -247,7 +247,7 @@
 // DEMO MODE: section buttons advance without requiring every field to be filled.
 // Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
 // A ?demo=1 session is automatically flagged is_test, so it never counts as data.
-const STUDY_VERSION = 'v2c-draft-framing';
+const STUDY_VERSION = 'v3-full';   // full study, 60/arm; instrument unchanged from v2c
 const DEMO = new URLSearchParams(location.search).has('demo');
 
 /* ============================================================
@@ -269,7 +269,7 @@ const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Scri
 // so falling back locally costs nothing.
 const ASSIGN_TIMEOUT_MS = DEMO ? 6000 : 90000;
 const DETAIL_CHECK_COUNT = 4;   // vignette-detail checks, of ten dilemmas
-const COMPLETION_CODE = 'CB3BUR1M'; // Prolific completion code, shown on the final screen
+const COMPLETION_CODE = 'CR3NBV9W'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
 // Anything logged while DEMO is on, or with ?test=1, is flagged so it can be
