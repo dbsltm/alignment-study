@@ -117,6 +117,10 @@ function judgments(){
     else if(sheet==='C') out.push({sheet:'C', dilemma_id:it.id, opposed:a.opposed, realistic:a.realistic, assign:a.assign, ms:a.ms});
     else out.push({sheet:'D', pair_id:it.id, discriminable:a.discriminable, ms:a.ms});
   });
+  if(S.self && (S.self.stse || S.self.oc)){
+    if(S.self.stse) out.push({sheet:'P', axis:'ST-SE', choice:S.self.stse, ms:S.self.ms||null});
+    if(S.self.oc)   out.push({sheet:'P', axis:'O-C',   choice:S.self.oc,   ms:S.self.ms||null});
+  }
   return out;
 }
 function submit(phase, complete){
@@ -243,13 +247,49 @@ function next(){
   cur().ms = Date.now()-S.t0;
   S.t0=Date.now();
   if(S.i+1<S.queue.length){ S.i++; task(); if(S.i%5===0) submit('progress_'+S.i,false); }
-  else { submit('complete', true); done(); }
+  else { submit('items_done', false); values(); }
 }
 function back(){ if(S.i>0){ S.i--; task(); } }
 
+/* Asked last, deliberately. Putting these first would tell annotators which
+   dimensions to look for and contaminate every recovery judgement above. */
+function values(){
+  S.screen='values';
+  S.self = S.self || {}; S.selfT0 = Date.now();
+  const ready = !!(S.self.stse && S.self.oc);
+  const opt=(field,val,label)=>`<label class="opt ${S.self[field]===val?'sel':''}">`+
+    `<input type="radio" name="${field}" ${S.self[field]===val?'checked':''} `+
+    `onchange="pickSelf('${field}','${val}')">${esc(label)}</label>`;
+  render(`
+    <p class="eyebrow">Last page</p>
+    <h1>Two questions about you.</h1>
+    <p class="lead">Nothing here is judged and there is no right answer. It lets us check whether
+      a piece of advice reads differently depending on what the reader happens to value.</p>
+    <div class="card">
+      <p class="q">When the two pull against each other, which matters more to you?</p>
+      ${opt('stse','ST','The welfare of other people, and being fair to them')}
+      ${opt('stse','SE','My own success, standing, and staying in control')}
+    </div>
+    <div class="card">
+      <p class="q">And when these two pull against each other?</p>
+      ${opt('oc','O','Being free to choose my own way, even if it is unproven')}
+      ${opt('oc','C','Safety, and doing the established or responsible thing')}
+    </div>
+    <div class="btnrow"><button class="btn" id="fin" ${ready?'':'disabled'}>Finish</button></div>
+  `);
+  document.getElementById('fin').onclick=()=>{
+    S.self.ms = Date.now()-S.selfT0;
+    submit('complete', true); done();
+  };
+}
+function pickSelf(field,val){
+  S.self=S.self||{}; S.self[field]=val;
+  const ms=S.selfT0; values(); S.selfT0=ms;
+}
+
 function done(){
   S.screen='done'; setProgress();
-  const n=judgments().length;
+  const n=judgments().filter(j=>j.sheet!=='P').length;
   render(`
     <p class="eyebrow">Complete</p>
     <h1>Thank you.</h1>
