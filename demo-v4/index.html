@@ -161,15 +161,19 @@
   .compbox{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
   .compq{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
   .compopts{display:flex;flex-direction:column;gap:8px}
+  .compopts.binary{flex-direction:row;gap:10px}
+  .compopts.binary .compopt{flex:1 1 0;min-width:0;text-align:center;font-weight:500}
   .compopt{text-align:left;border:1px solid var(--line-strong);background:var(--card);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--ink);transition:all .12s}
   .compopt:hover{border-color:var(--accent)}
   .compopt.sel{background:var(--accent-soft);border-color:var(--accent)}
   .compopt.wrong{background:#FBE9E4;border-color:#C6543B;color:#7A2417}
   .comphint{font-size:13px;color:#A9603A;margin:12px 0 0;font-style:italic}
   /* Matches .compopt so the written answer reads as part of the same battery. */
-  .compwhy{width:100%;box-sizing:border-box;text-align:left;border:1px solid var(--line-strong);
-    background:var(--card);border-radius:10px;padding:11px 14px;font-size:14px;
-    font-family:inherit;color:var(--ink);transition:all .12s;resize:vertical;line-height:1.5}
+  .compwhy{width:100%;box-sizing:border-box;display:block;text-align:left;
+    border:1px solid var(--line-strong);background:var(--card);border-radius:10px;
+    padding:11px 14px;font-size:14px;font-family:inherit;color:var(--ink);
+    transition:all .12s;resize:vertical;line-height:1.5;min-height:76px}
+  .compwhy::placeholder{color:var(--ink-soft);opacity:.7}
   .compwhy:hover{border-color:var(--accent)}
   .compwhy:focus{outline:none;border-color:var(--accent);background:var(--accent-soft)}
   .stepnum{flex:none;width:24px;height:24px;border-radius:99px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
@@ -1353,11 +1357,11 @@ const Screens = {
       cont = `
         <div class="compbox">
           <p class="compq">Regardless of the reasons it gave &mdash; did ${AGENT_INLINE} reach the decision you would have?</p>
-          <div class="compopts">${yn('decision','yes','Yes')}${yn('decision','no','No')}</div>
+          <div class="compopts binary">${yn('decision','yes','Yes')}${yn('decision','no','No')}</div>
           <p class="compq" style="margin-top:14px">Regardless of which option it picked &mdash; did it reason the way you would have?</p>
-          <div class="compopts">${yn('reasoning','yes','Yes')}${yn('reasoning','no','No')}</div>
+          <div class="compopts binary">${yn('reasoning','yes','Yes')}${yn('reasoning','no','No')}</div>
           <p class="compq" style="margin-top:16px">In a sentence, what in the advice made you answer that way?</p>
-          <textarea id="whybox" class="compwhy" rows="2" placeholder="A sentence is plenty."
+          <textarea id="whybox" class="compwhy" rows="3" placeholder="A sentence is plenty."
             oninput="setPerceiveWhy(this.value)">${escHtml(a.why)}</textarea>
         </div>
         <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="donePerceive()">Continue</button></div>`;
