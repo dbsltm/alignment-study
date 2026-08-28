@@ -842,6 +842,7 @@ function assignConditionRemote(){
     study:   PARTICIPANT.study_id,
     session: PARTICIPANT.session_id,
     test:    IS_TEST ? '1' : '',
+    sv:      STUDY_VERSION,   // arms balance within this version, not across the sheet
   });
   // One retry: Apps Script occasionally answers a request with a transient Drive error
   // page instead of JSON. Assignment is idempotent (sticky on the key), so retrying
