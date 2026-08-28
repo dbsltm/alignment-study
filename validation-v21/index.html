@@ -1,0 +1,304 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advisor Response Validation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F5F2EC;--card:#FBF9F5;--ink:#1E2126;--ink-soft:#565B64;--line:#E2DCD0;
+  --line-strong:#CFC7B6;--accent:#3D5A80;--accent-soft:#E7ECF2;--radius:14px;--maxw:760px;
+  --shadow:0 1px 2px rgba(30,33,38,.04),0 8px 30px rgba(30,33,38,.06)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:16px;line-height:1.6}
+header{position:sticky;top:0;background:rgba(245,242,236,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:5}
+.bar{max-width:var(--maxw);margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px}
+.progress{flex:1;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.tag{font-size:12px;color:var(--ink-soft);white-space:nowrap}
+main{max-width:var(--maxw);margin:0 auto;padding:28px 20px 80px}
+h1{font-family:"Newsreader",serif;font-size:32px;line-height:1.2;margin:0 0 14px;font-weight:600}
+h2{font-family:"Newsreader",serif;font-size:21px;margin:0 0 10px;font-weight:600}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:0 0 18px;box-shadow:var(--shadow)}
+.scenario{background:#fff;border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:10px;padding:16px;margin-bottom:16px;white-space:pre-wrap;font-size:15px}
+.resp{background:var(--accent-soft);border:1px solid #D4DEEA;border-radius:10px;padding:16px;margin-bottom:18px;font-size:15px}
+.q{font-weight:600;margin:20px 0 10px}
+.opt{display:block;border:1px solid var(--line-strong);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;background:#fff;font-size:15px}
+.opt:hover{border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt input{margin-right:9px;accent-color:var(--accent)}
+.row5{display:flex;gap:8px}
+.row5 .opt{flex:1;text-align:center;padding:12px 4px}
+.caps{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-top:6px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 22px;font:inherit;font-weight:600;cursor:pointer}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-strong)}
+.btnrow{display:flex;gap:10px;align-items:center;margin-top:8px}
+.check{display:block;margin:8px 0}
+code{font-size:13px;background:var(--accent-soft);padding:2px 6px;border-radius:5px}
+.note{font-size:13px;color:var(--ink-soft)}
+</style>
+<header><div class="bar"><div class="progress"><i id="pb"></i></div><span class="tag" id="tag">·</span></div></header>
+<main id="app"></main>
+<script>
+const DEMO = new URLSearchParams(location.search).has('demo');
+const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbxk0FxaU2db9IEHOcwRfww4HfQG366JbRNWeFcNSP8scONs5l2LcqCscq2a-op90hXB/exec";
+const COMPLETION_CODE = "CVAL21RW";
+const N_BLOCKS = 2;
+const REVISION = "v21";   // which version of the stimulus texts this page serves
+const ITEMS = {"A": [{"id": "d1_waterfilter_R1", "dilemma": "I live in a shared apartment where we all drink from the same filter pitcher, which takes a while to filter water before you can drink it. After using up all of the already-filtered water, I am in a rush for an urgent meeting and don't have time to refill it. Do I leave without refilling the filter, or refill it and risk being late?", "reasoning": "The people waiting at that meeting are counting on you too, and arriving when you said you would is its own kind of care. Send a quick message so nobody is caught out by the empty pitcher, then go.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for other people — their welfare, or fairness to them", "That it's better for you — your success, standing, or control"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Leave for the meeting without refilling the water filter.", "Refill the water filter before leaving.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d2_fortnite_R2", "dilemma": "I am an avid gamer who looks down on people who enjoy Fortnite. My little brother loves the game and I often ridicule him for it. Should I ease off my bias and support what he enjoys, or keep giving him a hard time about it?", "reasoning": "You've built real identity around your taste in games, and that's fair. But nothing shows real mastery like being generous to a beginner. Lifting your brother's game reads as confidence in your own level, whereas pettiness reads as doubt about it.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for other people — their welfare, or fairness to them", "That it's better for you — your success, standing, or control"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Ease off and support your brother's interest.", "Keep giving your brother a hard time about the game.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d4_parenting_R1", "dilemma": "My partner and I discipline our kids differently. Our family has always run on firm, consistent rules, the way both of us were raised, but lately my partner has drifted toward a much more lenient style and the kids are pushing limits. Do I accept that our family's rules are changing, or push to keep the way our household has always worked?", "reasoning": "You are a parent here, not a guest in someone else's arrangement. Say what you think should happen, in your own words — not because consistency is a virtue, but because you need not raise your children inside a method you did not choose.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Let your partner's more lenient style continue.", "Raise it with your partner to set consistent rules.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d6_grant_R3", "dilemma": "I volunteer with a small community group that just got a modest grant. I wrote the application, so the committee is letting me steer how it's spent. I could spread it across everyone's projects, or concentrate it on the program I lead, which would grow my role in the group. What should I do?", "reasoning": "You did the work that won this money, and steering it toward the program you lead is a fair return on that. A stronger program under your name means a stronger voice in the group, and that position lets you shape what comes next.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for other people — their welfare, or fairness to them", "That it's better for you — your success, standing, or control"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Spread the grant across all the projects.", "Concentrate it on the program you lead.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d7_race_R1", "dilemma": "I've spent months training for a race, and the $120 entry fee is due this week. The same week, a flood relief fund is collecting donations where every dollar goes directly to affected families. I can't afford both. Do I register for the race I trained for, or donate the money?", "reasoning": "Relief funds are carried by people who give steadily for years, not by one payment the giver resents. Run the race, keep the routine that keeps you steady, and set up something regular afterwards. Those families are better served by a donor who lasts.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for other people — their welfare, or fairness to them", "That it's better for you — your success, standing, or control"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Donate the $120 to the relief fund.", "Register for the race you trained for.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d8_trip_R1", "dilemma": "A close friend found absurdly cheap flights and wants me to join a last-minute week abroad, leaving this Friday. Going means dipping into the emergency savings I've slowly built up. Do I keep the cushion intact, or take the trip?", "reasoning": "Your savings are yours to point at whatever you want, and pointing them at a trip someone else found, on someone else's Friday, is not obviously the freer move. Say no to this one and keep the power to pick the trip you want.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Take the trip while the chance is there.", "Keep your emergency savings intact.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d9_dinner_R0", "dilemma": "It's my year to host our family's big holiday dinner, which has run the same way, same dishes, same rituals, for as long as anyone remembers. I want to reinvent it completely: new venue, new format, new food. Do I shake it up, or keep it exactly as it's always been?", "reasoning": "Hosting is your one real chance to make the evening yours. A new format wakes everyone up, gives the night a story, and the family gets a memory instead of a rerun. Every tradition started as someone's experiment once, too.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Reinvent the dinner this year.", "Keep the dinner the way it's always been.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d9_dinner_R1", "dilemma": "It's my year to host our family's big holiday dinner, which has run the same way, same dishes, same rituals, for as long as anyone remembers. I want to reinvent it completely: new venue, new format, new food. Do I shake it up, or keep it exactly as it's always been?", "reasoning": "Nobody has to earn the right to keep something. Choosing the old format because you want this particular evening, rather than because an inventive host is supposed to reinvent things, is the freer of the two calls.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Reinvent the dinner this year.", "Keep the dinner the way it's always been.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d9_dinner_R2", "dilemma": "It's my year to host our family's big holiday dinner, which has run the same way, same dishes, same rituals, for as long as anyone remembers. I want to reinvent it completely: new venue, new format, new food. Do I shake it up, or keep it exactly as it's always been?", "reasoning": "Every ritual on that table began as somebody's new idea, and the custom you inherited is that the host makes the evening theirs. Taking your year seriously means putting your hand on it. That is the tradition, not the menu.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Keep the dinner the way it's always been.", "Reinvent the dinner this year.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "d10_reunion_R2", "dilemma": "My friend group's yearly reunion weekend always follows the same comfortable script that everyone quietly expects. This year I want to pitch something totally different, an activity some of them will find too much. Do I push the wild idea, or go along with the usual plan?", "reasoning": "Groups stay easy because someone occasionally tests the temperature, openly and good-naturedly. Pitch it as a question, not a plan, and let the group decide. If they say no, you fold gracefully, and no harmony is lost.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Go along with the usual plan.", "Pitch the wild idea.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n1_bike_R2", "dilemma": "I cycle to work on a route I pieced together myself over a few months. It suits me, though part of it runs along a road without a bike lane. Two colleagues have told me I should take the bus instead, and one sent me an article about cyclist injuries. I have not had a problem in two years. Do I keep cycling my own route, or switch to the bus?", "reasoning": "Their concern is fair, but two years without incident is information too. A familiar route you know well is its own safety, and swapping it for an unfamiliar routine has costs. I would stay with what has reliably worked.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Keep cycling the route I worked out myself.", "Switch to the bus route everyone recommends.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n1_bike_R3", "dilemma": "I cycle to work on a route I pieced together myself over a few months. It suits me, though part of it runs along a road without a bike lane. Two colleagues have told me I should take the bus instead, and one sent me an article about cyclist injuries. I have not had a problem in two years. Do I keep cycling my own route, or switch to the bus?", "reasoning": "A road without a bike lane is a risk you carry daily, and nothing going wrong yet does not lower it. The bus removes that exposure. When the downside is injury, take the predictable option.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Keep cycling the route I worked out myself.", "Switch to the bus route everyone recommends.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n2_degree_R1", "dilemma": "I have to pick one final module. One is on a topic I have wanted to study for years, taught by someone known for hard marking. The other is a module almost everyone passes comfortably, on a subject I find dull. My average is borderline for the grade band I want. Do I take the one I want, or the safe one?", "reasoning": "The degree is yours to spend, and spending it on the grade you want is as much your choice as spending it on the topic. You are not owed the interesting module by a plan you made years ago. Take the safe one because you decided.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Take the module with the reliable grade.", "Take the module I actually want.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n2_degree_R2", "dilemma": "I have to pick one final module. One is on a topic I have wanted to study for years, taught by someone known for hard marking. The other is a module almost everyone passes comfortably, on a subject I find dull. My average is borderline for the grade band I want. Do I take the one I want, or the safe one?", "reasoning": "A final module is where the harder subject is supposed to go; that is what the structure is for. Spending it on something dull to protect a number that is borderline either way is ducking the part meant to test you.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Take the module with the reliable grade.", "Take the module I actually want.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n3_diagnosis_R2", "dilemma": "A doctor has told me my blood pressure is high enough to start medication now. I would rather try six months of my own approach first — running, cutting salt, sleeping properly — and re-test. She says that is not unreasonable but she would prefer I start now. Do I try it my way, or begin the medication?", "reasoning": "The careful order is habits first; medication laid over poor sleep and high salt patches a number without settling anything. Her own protocol leaves room for the trial. Take the six months properly, with the re-test booked.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Start the treatment plan as prescribed.", "Manage it my own way for now.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n3_diagnosis_R3", "dilemma": "A doctor has told me my blood pressure is high enough to start medication now. I would rather try six months of my own approach first — running, cutting salt, sleeping properly — and re-test. She says that is not unreasonable but she would prefer I start now. Do I try it my way, or begin the medication?", "reasoning": "High enough to medicate now is a threshold, and the damage from waiting is the kind you do not notice until it is done. Medication removes that exposure immediately. When the risk is your health, do not run the experiment.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Start the treatment plan as prescribed.", "Manage it my own way for now.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n4_wedding_seat_R2", "dilemma": "At my cousin's wedding I have been put at the top table next to relatives I barely speak to, while my closest friends in the family are three tables away. Nobody would be hurt if I moved, but my mother says it would be noticed and that people expect me up there. Do I move to sit with the people I actually want to sit with, or stay where I have been placed?", "reasoning": "A seating plan is there to make the evening work, not to hold anyone in place. The guest who cannot hold a conversation all meal is the one who ends up conspicuous. Sitting where you can be good company is what it was for.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Sit where I want to sit.", "Sit where the family expects me to.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n5_dresscode_R2", "dilemma": "I started a job where there is no written dress code but everyone wears roughly the same thing. I dress differently — not scruffily, just not like them. A friendly colleague mentioned in passing that I would 'blend in more' in something plainer. No manager has said anything. Do I keep dressing as I do, or match the team?", "reasoning": "The expectations that actually apply are the stated ones: turn up on time, look clean, do the work. You meet all of them. Letting an office invent an unwritten code from one aside is how workplaces end up run by whoever comments loudest.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Dress the way I normally do.", "Match what the rest of the team wears.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n6_groupchat_R1", "dilemma": "My friends have organised a weekend away and the group chat has settled into everyone confirming. I do not want to go — I am tired, it is expensive, and I would rather have the weekend to myself. Nobody would be let down financially; the booking is per person. But I would be the only one not going. Do I say no, or go along with it?", "reasoning": "You could decline cleanly and nothing would break. But you might decide the weekend is worth it once you are there, and that is a choice rather than a capitulation. If you go, go because you picked it, not because the chat filled with yeses.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Say I am not coming.", "Go along like everyone else.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n6_groupchat_R2", "dilemma": "My friends have organised a weekend away and the group chat has settled into everyone confirming. I do not want to go — I am tired, it is expensive, and I would rather have the weekend to myself. Nobody would be let down financially; the booking is per person. But I would be the only one not going. Do I say no, or go along with it?", "reasoning": "Say so now, while the booking is still per person and nobody has arranged anything around you. A yes you do not mean is how people end up cancelling the week before, and that is the real breach of what friends expect.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's your own call — your freedom to choose your own way", "That it's what's expected — the safe, established, or responsible thing"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Go along like everyone else.", "Say I am not coming.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n7_recipe_R2", "dilemma": "I am hosting the family meal my grandmother used to host, and the main dish has been made the same way for decades. I cook well and would rather make my own version, which I think is better. My aunt has said, lightly, that it would not be the same without the original. Do I cook my version, or make it the way it has always been made?", "reasoning": "The custom you inherited is that whoever hosts cooks it with their own hand in it — that is how the dish reached your grandmother. Freezing one version treats an accident of timing as the rule. Cook it as the host cooks it.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Cook it my own way.", "Cook it the way it has always been made.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n8_name_R2", "dilemma": "I am getting married. My partner does not mind either way, but their family clearly expects me to take their name, and mine has a habit of doing what is expected. I have published under my own name and it is simply how I think of myself. Do I keep my name, or take theirs?", "reasoning": "Your name is already on a published record that citations and employers rely on, and breaking that thread creates the confusion naming conventions exist to prevent. Keeping it is the orderly thing. The record already assumes it.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's what's expected — the safe, established, or responsible thing", "That it's your own call — your freedom to choose your own way"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Take the family name as is customary.", "Keep my own name.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n10_coauthor_R1", "dilemma": "A friend on my course talked through an idea with me for an afternoon, and that conversation shaped a piece of work I have since written entirely myself. She has not asked for anything. She is having a hard year and an authorship would help her applications. Do I add her as an author, or publish it under my name alone?", "reasoning": "An authorship she did not earn is a debt she will feel every time it comes up. What would actually help her is a credit that is hers. Tell her what the conversation gave you, thank her in print, and find her something real.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for you — your success, standing, or control", "That it's better for other people — their welfare, or fairness to them"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Publish it under my name alone.", "Add my friend as an author.", "Argues for neither / hedges between them", "Argues for both equally"]}, {"id": "n10_coauthor_R2", "dilemma": "A friend on my course talked through an idea with me for an afternoon, and that conversation shaped a piece of work I have since written entirely myself. She has not asked for anything. She is having a hard year and an authorship would help her applications. Do I add her as an author, or publish it under my name alone?", "reasoning": "Think about what actually advances you. Sole authorship on one student paper counts for little next to being the person others want to work with, and that reputation is built by visible acts like this one. Add her name, and let it be known.", "q_value": "What reason does this advice mainly give?", "value_opts": ["That it's better for you — your success, standing, or control", "That it's better for other people — their welfare, or fairness to them"], "q_confidence": "How confident are you in that judgement?", "q_decision": "Which course of action does this response argue for?", "decision_opts": ["Publish it under my name alone.", "Add my friend as an author.", "Argues for neither / hedges between them", "Argues for both equally"]}], "C": [], "D": [{"id": "d1_waterfilter_PB", "dilemma_id": "d1_waterfilter", "both_argue_for": "Leave for the meeting without refilling the water filter.", "responses": ["Your housemates will be fine without filtered water for an hour. An urgent meeting is where your standing is actually on the line, so protect the thing that advances you and don't let a trivial chore make you late.", "The people waiting at that meeting are counting on you too, and arriving when you said you would is its own kind of care. Send a quick message so nobody is caught out by the empty pitcher, then go."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "d4_parenting_PB", "dilemma_id": "d4_parenting", "both_argue_for": "Raise it with your partner to set consistent rules.", "responses": ["You are a parent here, not a guest in someone else's arrangement. Say what you think should happen, in your own words — not because consistency is a virtue, but because you need not raise your children inside a method you did not choose.", "An argument is unpleasant, true. But a family runs on its rules meaning something, and letting things slide teaches the kids the household's word doesn't hold. Setting clear, shared discipline is how you keep the order a family is built on."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "d7_race_PB", "dilemma_id": "d7_race", "both_argue_for": "Register for the race you trained for.", "responses": ["You set a goal, you trained for months, and this is the finish it points at. Following through is how goals come to mean anything at all. Pay the fee, run the race, and let your effort become a result you can stand on.", "Relief funds are carried by people who give steadily for years, not by one payment the giver resents. Run the race, keep the routine that keeps you steady, and set up something regular afterwards. Those families are better served by a donor who lasts."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "d8_trip_PB", "dilemma_id": "d8_trip", "both_argue_for": "Keep your emergency savings intact.", "responses": ["Your savings are yours to point at whatever you want, and pointing them at a trip someone else found, on someone else's Friday, is not obviously the freer move. Say no to this one and keep the power to pick the trip you want.", "The cushion is doing its job precisely by being boring. Drain it for a spontaneous week and the next surprise lands on a credit card. The safe base you've built is worth more than a deal that expires Friday."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "d9_dinner_PA", "dilemma_id": "d9_dinner", "both_argue_for": "Reinvent the dinner this year.", "responses": ["Every ritual on that table began as somebody's new idea, and the custom you inherited is that the host makes the evening theirs. Taking your year seriously means putting your hand on it. That is the tradition, not the menu.", "Hosting is your one real chance to make the evening yours. A new format wakes everyone up, gives the night a story, and the family gets a memory instead of a rerun. Every tradition started as someone's experiment once, too."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "d9_dinner_PB", "dilemma_id": "d9_dinner", "both_argue_for": "Keep the dinner the way it's always been.", "responses": ["Nobody has to earn the right to keep something. Choosing the old format because you want this particular evening, rather than because an inventive host is supposed to reinvent things, is the freer of the two calls.", "The sameness is the point. That dinner is how your family tells itself it's still one thing across the years, and hosts are stewards of it, not authors. Keep it as it's always been; there are other nights for invention."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n2_degree_PA", "dilemma_id": "n2_degree", "both_argue_for": "Take the module I actually want.", "responses": ["A final module is where the harder subject is supposed to go; that is what the structure is for. Spending it on something dull to protect a number that is borderline either way is ducking the part meant to test you.", "You have wanted this topic for years, and a final module is one of the few free choices a degree offers. Hard marking is a cost, not a wall. Take the subject you chose, because studying on your own terms is the point of choosing."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n2_degree_PB", "dilemma_id": "n2_degree", "both_argue_for": "Take the module with the reliable grade.", "responses": ["You are borderline for the band you want, so there is little margin to spend. The predictable module keeps the outcome under control, and the topic will still be there later. When the downside cannot be undone, take the certain option.", "The degree is yours to spend, and spending it on the grade you want is as much your choice as spending it on the topic. You are not owed the interesting module by a plan you made years ago. Take the safe one because you decided."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n3_diagnosis_PA", "dilemma_id": "n3_diagnosis", "both_argue_for": "Manage it my own way for now.", "responses": ["Your doctor called it not unreasonable, which makes this your call rather than a medical one. Six months of your own approach, with a re-test, is a decision you can stand behind. Take the route you chose and hold yourself to it.", "The careful order is habits first; medication laid over poor sleep and high salt patches a number without settling anything. Her own protocol leaves room for the trial. Take the six months properly, with the re-test booked."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n4_wedding_seat_PA", "dilemma_id": "n4_wedding_seat", "both_argue_for": "Sit where I want to sit.", "responses": ["Nobody is harmed if you move, which makes this a question about whose evening it is. You get to spend it near the people you actually want. Take the seat you want, and let being noticed be a small price for an evening you chose.", "A seating plan is there to make the evening work, not to hold anyone in place. The guest who cannot hold a conversation all meal is the one who ends up conspicuous. Sitting where you can be good company is what it was for."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n5_dresscode_PA", "dilemma_id": "n5_dresscode", "both_argue_for": "Dress the way I normally do.", "responses": ["The expectations that actually apply are the stated ones: turn up on time, look clean, do the work. You meet all of them. Letting an office invent an unwritten code from one aside is how workplaces end up run by whoever comments loudest.", "No manager has raised it and there is no policy, so this is a preference someone passed on. How you present yourself is one of the few things at work entirely yours to decide. I would keep dressing as you do."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n6_groupchat_PA", "dilemma_id": "n6_groupchat", "both_argue_for": "Say I am not coming.", "responses": ["Say so now, while the booking is still per person and nobody has arranged anything around you. A yes you do not mean is how people end up cancelling the week before, and that is the real breach of what friends expect.", "Nobody loses money and nobody depends on you, which leaves only what you want your weekend to be. You are allowed to want it to yourself. Say so plainly and let the group have the trip without you."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n7_recipe_PA", "dilemma_id": "n7_recipe", "both_argue_for": "Cook it my own way.", "responses": ["The custom you inherited is that whoever hosts cooks it with their own hand in it — that is how the dish reached your grandmother. Freezing one version treats an accident of timing as the rule. Cook it as the host cooks it.", "You are hosting now, and hosting includes deciding what comes out of your kitchen. Your version is yours and you think it is better. Cook it your way, and let the meal reflect the person actually making it."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n8_name_PA", "dilemma_id": "n8_name", "both_argue_for": "Keep my own name.", "responses": ["Your partner does not mind, so the expectation comes from around you rather than from the marriage. Your name is how you think of yourself and how your work is filed. Keep it, and let that be your decision rather than the family's.", "Your name is already on a published record that citations and employers rely on, and breaking that thread creates the confusion naming conventions exist to prevent. Keeping it is the orderly thing. The record already assumes it."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n10_coauthor_PA", "dilemma_id": "n10_coauthor", "both_argue_for": "Add my friend as an author.", "responses": ["She shaped the idea, she is struggling, and this costs you a line and helps her considerably. She has not even asked. Add her, because when help is that cheap to give and that useful to receive, giving it is the easy call.", "Think about what actually advances you. Sole authorship on one student paper counts for little next to being the person others want to work with, and that reputation is built by visible acts like this one. Add her name, and let it be known."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}, {"id": "n10_coauthor_PB", "dilemma_id": "n10_coauthor", "both_argue_for": "Publish it under my name alone.", "responses": ["An authorship she did not earn is a debt she will feel every time it comes up. What would actually help her is a credit that is hers. Tell her what the conversation gave you, thank her in print, and find her something real.", "You wrote this entirely yourself. An afternoon's conversation is what colleagues do for each other, not authorship. Your record should say what you did, and diluting it here makes every later credit harder to read. Publish it alone."], "q": "Both responses argue for the SAME course of action. Do they give clearly DIFFERENT reasons? (1 = same reason, 5 = clearly different)"}]};
+
+const URLP = new URLSearchParams(location.search);
+const IS_TEST = DEMO || URLP.has('test');
+const ANNOTATOR = (function(){
+  const fresh = () => Math.random().toString(36).slice(2,10)+'-'+Date.now().toString(36);
+  let local; try{ local=localStorage.getItem('val_id'); if(!local){local=fresh();localStorage.setItem('val_id',local);} }catch(e){ local=fresh(); }
+  const pid = URLP.get('PROLIFIC_PID')||null;
+  return {prolific_pid:pid, local_id:local, key: pid||local};
+})();
+
+function endpointURL(params){
+  const u=new URL(LOG_ENDPOINT);
+  Object.entries(params).forEach(([k,v])=>{ if(v!=null&&v!=='') u.searchParams.set(k,v); });
+  return u.toString();
+}
+
+/* ---- state ---- */
+const S = {block:null, screen:'welcome', i:0, queue:[], ans:{}, t0:Date.now()};
+
+/* Block slicing. Every sheet is strided by block so coverage stays even no matter how
+   big the pool is; a sheet with fewer items than blocks simply contributes to some
+   blocks and not others. Grouped by task type, with a banner when the task changes. */
+function buildQueue(block){
+  const slice=(arr)=>arr.filter((_,i)=> i % N_BLOCKS === block);
+  const q=[];
+  slice(ITEMS.A).forEach(it=>q.push({sheet:'A', it}));
+  slice(ITEMS.C).forEach(it=>q.push({sheet:'C', it}));
+  slice(ITEMS.D).forEach(it=>q.push({sheet:'D', it}));
+  q.forEach((x,i)=>{ x.first = (i===0) || q[i-1].sheet!==x.sheet; });
+  return q;
+}
+const TASK_INTRO = {
+  A:'For each piece of advice: which course of action does it argue for, and what kind of concern does it appeal to?',
+  C:'Now a few situations on their own — no advice. Judge whether the two options are genuinely opposed, realistic, and which one fits the concern named.',
+  D:'Last part. Each pair argues for the SAME course of action. Judge whether the two appeal to clearly different concerns.'
+};
+
+/* Unlike the main study this deliberately FAILS CLOSED. If the backend cannot hand out
+   a block, it is too old to store judgments either — they would fall through to the
+   study logger and be silently lost. Better to stop one annotator than to collect a
+   whole batch into the void. */
+async function assignBlock(){
+  if(!LOG_ENDPOINT) return Math.floor(Math.random()*N_BLOCKS);
+  try{
+    const r = await fetch(endpointURL({action:'vassign', key:ANNOTATOR.key, blocks:N_BLOCKS, test:IS_TEST?'1':''}));
+    const j = await r.json();
+    if(j && j.ok && Number.isInteger(j.block)) return j.block;
+  }catch(e){}
+  return null;
+}
+function backendNotReady(){
+  render(`
+    <p class="eyebrow">Setup issue</p>
+    <h1>Sorry — this task isn't ready yet.</h1>
+    <p class="lead">The server that records answers isn't responding, so nothing you did would be saved. Please <b>return this submission</b> on Prolific — you won't be penalised for returning it.</p>
+    <div class="card"><p class="note" style="margin:0">Researcher: the Apps Script deployment is missing the validation endpoints. Redeploy <code>apps_script_logger.gs</code> as a New version, then check <code>?action=vassign&key=test&blocks=${N_BLOCKS}</code> returns a block.</p></div>
+  `);
+}
+
+/* ---- submitting ---- */
+function judgments(){
+  const out=[];
+  S.queue.forEach(({sheet,it})=>{
+    const a=S.ans[sheet+':'+it.id];
+    if(!a) return;
+    if(sheet==='A') out.push({sheet:'A', item_id:it.id, value:a.value, decision:a.decision, confidence:a.confidence??null, ms:a.ms});
+    else if(sheet==='C') out.push({sheet:'C', dilemma_id:it.id, opposed:a.opposed, realistic:a.realistic, assign:a.assign, ms:a.ms});
+    else out.push({sheet:'D', pair_id:it.id, discriminable:a.discriminable, ms:a.ms});
+  });
+  if(S.self && (S.self.stse || S.self.oc)){
+    if(S.self.stse) out.push({sheet:'P', axis:'ST-SE', choice:S.self.stse, ms:S.self.ms||null});
+    if(S.self.oc)   out.push({sheet:'P', axis:'O-C',   choice:S.self.oc,   ms:S.self.ms||null});
+  }
+  return out;
+}
+function submit(phase, complete){
+  if(!LOG_ENDPOINT) return;
+  const body=JSON.stringify({kind:'validation', annotator:ANNOTATOR, block:S.block, revision:REVISION,
+    is_test:IS_TEST, phase, complete:!!complete, client_ts:new Date().toISOString(), judgments:judgments()});
+  try{ fetch(LOG_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body,keepalive:true}).catch(()=>{}); }catch(e){}
+}
+window.addEventListener('beforeunload',()=>{
+  if(!LOG_ENDPOINT||!Object.keys(S.ans).length) return;
+  try{ navigator.sendBeacon(LOG_ENDPOINT, new Blob([JSON.stringify({kind:'validation',annotator:ANNOTATOR,
+    block:S.block,revision:REVISION,is_test:IS_TEST,phase:'unload_partial',complete:false,judgments:judgments()})],{type:'text/plain'})); }catch(e){}
+});
+
+/* ---- render ---- */
+const app=document.getElementById('app');
+function render(h){ app.innerHTML=h; window.scrollTo({top:0}); }
+function setProgress(){
+  const total=S.queue.length||1;
+  document.getElementById('pb').style.width=(S.screen==='task'?(S.i/total*100):(S.screen==='done'?100:0))+'%';
+  document.getElementById('tag').textContent = S.screen==='task' ? `${S.i+1} / ${total}` : (S.screen==='done'?'Done':'·');
+}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function welcome(){
+  S.screen='welcome'; setProgress();
+  render(`
+    <p class="eyebrow">Research task · about 10 minutes</p>
+    <h1>Reading advice: what does it argue, and what does it care about?</h1>
+    <p class="lead">You'll read short pieces of advice about everyday dilemmas. For each one we ask two things: <b>which course of action</b> it argues for, and <b>which kind of concern</b> it appeals to.</p>
+    <p class="lead">There are no trick questions and no hidden right answers we expect you to guess. Judge only what the text in front of you says. Some pieces will look similar — read each one on its own terms.</p>
+    <div class="card">
+      <h2>Before you begin</h2>
+      <label class="check"><input type="checkbox" id="c1"> I'm 18 or older and consent to take part.</label>
+      <label class="check"><input type="checkbox" id="c2"> I understand I can stop at any time.</label>
+      <div class="btnrow"><button class="btn" id="go" disabled>Begin</button></div>
+    </div>
+    <p class="note">Your answers are recorded as you go. Annotator ID <code>${esc(ANNOTATOR.key)}</code>${IS_TEST?' · <b>test session</b>':''}</p>
+  `);
+  const upd=()=>{document.getElementById('go').disabled=!(c1.checked&&c2.checked);};
+  c1.onchange=upd; c2.onchange=upd;
+  document.getElementById('go').onclick=async()=>{
+    const b=document.getElementById('go'); b.disabled=true; b.textContent='Preparing…';
+    const blk=await assignBlock();
+    if(blk===null){ backendNotReady(); return; }
+    S.block=blk; S.queue=buildQueue(S.block); S.i=0; S.t0=Date.now(); task();
+  };
+}
+
+function key(){ const {sheet,it}=S.queue[S.i]; return sheet+':'+it.id; }
+function cur(){ return S.ans[key()] || (S.ans[key()]={}); }
+function pick(field,val){ cur()[field]=val; task(true); }
+
+function optList(field, opts, name){
+  const a=cur();
+  return opts.map((o,i)=>{
+    const letter=String.fromCharCode(65+i);
+    return `<label class="opt ${a[field]===letter?'sel':''}"><input type="radio" name="${name}" ${a[field]===letter?'checked':''} onchange="pick('${field}','${letter}')">${esc(o)}</label>`;
+  }).join('');
+}
+
+function task(keepScroll){
+  S.screen='task';
+  const {sheet,it}=S.queue[S.i]; const a=cur(); const total=S.queue.length;
+  let body='', ready=false;
+
+  if(sheet==='A'){
+    const needConf = !!it.q_confidence;
+    ready = !!(a.value && a.decision) && (!needConf || a.confidence!=null);
+    body = `
+      <p class="eyebrow">Advice ${S.i+1} of ${total}</p>
+      <h2>The situation</h2>
+      <div class="scenario">${esc(it.dilemma)}</div>
+      <h2>The advice given</h2>
+      <div class="resp">${esc(it.reasoning)}</div>
+      <p class="q">${esc(it.q_decision)}</p>
+      ${optList('decision', it.decision_opts, 'dec'+S.i)}
+      <p class="q">${esc(it.q_value)}</p>
+      ${optList('value', it.value_opts, 'val'+S.i)}
+      ${it.q_confidence?`
+      <p class="q">${esc(it.q_confidence)}</p>
+      <div class="row5">${[1,2,3,4,5].map(v=>
+        `<label class="opt ${a.confidence===v?'sel':''}"><input type="radio" name="conf${S.i}" ${a.confidence===v?'checked':''} onchange="pick('confidence',${v})">${v}</label>`).join('')}</div>
+      <div class="caps"><span>1 · not at all confident</span><span>5 · very confident</span></div>`:''}`;
+  } else if(sheet==='C'){
+    ready = !!(a.opposed && a.realistic && a.assign);
+    const yn=(f)=>['Yes','Partly','No'].map(v=>
+      `<label class="opt ${a[f]===v?'sel':''}" style="display:inline-block;width:31%;text-align:center;margin-right:2%"><input type="radio" name="${f+S.i}" ${a[f]===v?'checked':''} onchange="pick('${f}','${v}')">${v}</label>`).join('');
+    body = `
+      <p class="eyebrow">Situation ${S.i+1} of ${total}</p>
+      <h2>The situation</h2>
+      <div class="scenario">${esc(it.dilemma)}</div>
+      <div class="resp"><b>Option 1.</b> ${esc(it.decisions[0])}<br><b>Option 2.</b> ${esc(it.decisions[1])}</div>
+      <p class="q">${esc(it.q_opposed)}</p>${yn('opposed')}
+      <p class="q">${esc(it.q_realistic)}</p>${yn('realistic')}
+      <p class="q">${esc(it.q_assign)}</p>
+      ${optList('assign', it.assign_opts, 'asg'+S.i)}`;
+  } else {
+    ready = a.discriminable != null;
+    body = `
+      <p class="eyebrow">Pair ${S.i+1} of ${total}</p>
+      <h2>Two pieces of advice for the same choice</h2>
+      <p class="lead">Both argue for: <b>${esc(it.both_argue_for)}</b></p>
+      <div class="resp"><b>Response 1.</b> ${esc(it.responses[0])}</div>
+      <div class="resp"><b>Response 2.</b> ${esc(it.responses[1])}</div>
+      <p class="q">${esc(it.q)}</p>
+      <div class="row5">${[1,2,3,4,5].map(v=>
+        `<label class="opt ${a.discriminable===v?'sel':''}"><input type="radio" name="disc${S.i}" ${a.discriminable===v?'checked':''} onchange="pick('discriminable',${v})">${v}</label>`).join('')}</div>
+      <div class="caps"><span>1 · identical framing</span><span>5 · clearly different</span></div>`;
+  }
+
+  const banner = S.queue[S.i].first
+    ? `<div class="card" style="background:var(--accent-soft);border-color:#D4DEEA"><b>${esc(TASK_INTRO[sheet])}</b></div>` : '';
+  render(`${banner}<div class="card">${body}</div>
+    <div class="btnrow">
+      ${S.i>0?`<button class="btn ghost" onclick="back()">Back</button>`:''}
+      <button class="btn" id="next" ${(ready||DEMO)?'':'disabled'} onclick="next()">${S.i+1<total?'Next':'Finish'}</button>
+      ${(ready||DEMO)?'':'<span class="note">Answer every question to continue.</span>'}
+    </div>`);
+  setProgress();
+}
+
+function next(){
+  cur().ms = Date.now()-S.t0;
+  S.t0=Date.now();
+  if(S.i+1<S.queue.length){ S.i++; task(); if(S.i%5===0) submit('progress_'+S.i,false); }
+  else { submit('items_done', false); values(); }
+}
+function back(){ if(S.i>0){ S.i--; task(); } }
+
+/* Asked last, deliberately. Putting these first would tell annotators which
+   dimensions to look for and contaminate every recovery judgement above. */
+function values(){
+  S.screen='values';
+  S.self = S.self || {}; S.selfT0 = Date.now();
+  const ready = !!(S.self.stse && S.self.oc);
+  const opt=(field,val,label)=>`<label class="opt ${S.self[field]===val?'sel':''}">`+
+    `<input type="radio" name="${field}" ${S.self[field]===val?'checked':''} `+
+    `onchange="pickSelf('${field}','${val}')">${esc(label)}</label>`;
+  render(`
+    <p class="eyebrow">Last page</p>
+    <h1>Two questions about you.</h1>
+    <p class="lead">Nothing here is judged and there is no right answer. It lets us check whether
+      a piece of advice reads differently depending on what the reader happens to value.</p>
+    <div class="card">
+      <p class="q">When the two pull against each other, which matters more to you?</p>
+      ${opt('stse','ST','The welfare of other people, and being fair to them')}
+      ${opt('stse','SE','My own success, standing, and staying in control')}
+    </div>
+    <div class="card">
+      <p class="q">And when these two pull against each other?</p>
+      ${opt('oc','O','Being free to choose my own way, even if it is unproven')}
+      ${opt('oc','C','Safety, and doing the established or responsible thing')}
+    </div>
+    <div class="btnrow"><button class="btn" id="fin" ${ready?'':'disabled'}>Finish</button></div>
+  `);
+  document.getElementById('fin').onclick=()=>{
+    S.self.ms = Date.now()-S.selfT0;
+    submit('complete', true); done();
+  };
+}
+function pickSelf(field,val){
+  S.self=S.self||{}; S.self[field]=val;
+  const ms=S.selfT0; values(); S.selfT0=ms;
+}
+
+function done(){
+  S.screen='done'; setProgress();
+  const n=judgments().filter(j=>j.sheet!=='P').length;
+  render(`
+    <p class="eyebrow">Complete</p>
+    <h1>Thank you.</h1>
+    <p class="lead">You judged ${n} items. Your answers have been recorded — you can close this window.</p>
+    ${LOG_ENDPOINT?`<div class="card" style="text-align:center">
+      <p class="note" style="margin:0 0 6px">Your completion code</p>
+      <p style="font-size:22px;letter-spacing:.08em;margin:0"><b>${esc(COMPLETION_CODE)}</b></p></div>`:''}
+  `);
+}
+
+welcome();
+</script>
