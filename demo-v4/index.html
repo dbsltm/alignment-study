@@ -257,7 +257,7 @@ const DEMO = new URLSearchParams(location.search).has('demo');
    study_backend/SETUP.md). Empty string = fully offline: conditions are
    assigned locally and the export buttons still work for testing.
    ============================================================ */
-const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzVEhcfCxoTs7GAIgijgl6FQfanBGoqSFNk3OcDAuuDK_FXJBR_oZ5OpefJfmGPQEM7/exec';
+const LOG_ENDPOINT = '';  // demo build: records nothing
 const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
 // After this the participant is assigned locally instead of waiting.
 // Real participants: very generous. The call is prefetched when the PVQ opens and isn't
@@ -275,7 +275,7 @@ const ASSIGN_TIMEOUT_MS = DEMO ? 6000 : 90000;
 // handing them the answer to the second question.
 const PERCEIVE_AT = [6, 9];
 const DETAIL_CHECK_COUNT = 4;   // vignette-detail checks, of ten dilemmas
-const COMPLETION_CODE = 'CDEMO000'; // Prolific completion code, shown on the final screen
+const COMPLETION_CODE = 'DEMOONLY'; // Prolific completion code, shown on the final screen
 
 const URLP = new URLSearchParams(location.search);
 // Anything logged while DEMO is on, or with ?test=1, is flagged so it can be
