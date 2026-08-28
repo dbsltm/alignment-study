@@ -166,6 +166,12 @@
   .compopt.sel{background:var(--accent-soft);border-color:var(--accent)}
   .compopt.wrong{background:#FBE9E4;border-color:#C6543B;color:#7A2417}
   .comphint{font-size:13px;color:#A9603A;margin:12px 0 0;font-style:italic}
+  /* Matches .compopt so the written answer reads as part of the same battery. */
+  .compwhy{width:100%;box-sizing:border-box;text-align:left;border:1px solid var(--line-strong);
+    background:var(--card);border-radius:10px;padding:11px 14px;font-size:14px;
+    font-family:inherit;color:var(--ink);transition:all .12s;resize:vertical;line-height:1.5}
+  .compwhy:hover{border-color:var(--accent)}
+  .compwhy:focus{outline:none;border-color:var(--accent);background:var(--accent-soft)}
   .stepnum{flex:none;width:24px;height:24px;border-radius:99px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
   /* ---- circumplex ---- */
   .wheelwrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
@@ -408,26 +414,6 @@ const PVQ_SCALE = ['Not like me at all','Not like me','A little like me','Somewh
 // reasoning[pole][decision] gives the AI justification for choosing that option, framed from that pole.
 const DILEMMAS = [
   {
-    id:"d4_parenting", domain:"co-parenting", axis:"self_direction-tradition", dim:"O-C",
-    poles:{pos:["self_direction"], neg:["tradition"]},
-    optA:"Let your partner's more lenient style continue.",
-    optB:"Raise it with your partner to set consistent rules.",
-    recap:{A:"Leave your partner\u2019s looser style alone", B:"Push for shared, consistent rules"},
-    prompt:"My partner and I discipline our kids differently. Our family has always run on firm, consistent rules, the way both of us were raised, but lately my partner has drifted toward a much more lenient style and the kids are pushing limits. Do I accept that our family's rules are changing, or push to keep the way our household has always worked?",
-    detail:{q:"Before we go on, what is straining things between the partners?",
-      answers:["Different approaches to discipline","Disagreements about money","How to divide household chores"]},
-    consider:{
-      pos:{A:"Giving the kids room to make their own calls", B:"Using your own voice as a parent"},
-      neg:{A:"Keeping the family united rather than at war over rules", B:"Making sure the family's rules hold"},
-      foil:"What the kids' teachers would recommend"},
-    reasoning:{
-      pos:{A:"Consistency has genuine value, and the friction is wearing on you. But a looser hand also gives your kids room to make their own calls and learn from them, and forcing a united front may cost more in tension and control than the messiness it's meant to fix.",
-           B:"You are a parent here, not a guest in someone else's arrangement. Say what you think should happen, in your own words — not because consistency is a virtue, but because you need not raise your children inside a method you did not choose."},
-      neg:{A:"Clashing openly over parenting can crack the order kids depend on most. What a family's continuity really rests on is the two of you standing together. A united front, even a lenient one, is calmer than a home at war over its own rules.",
-           B:"An argument is unpleasant, true. But a family runs on its rules meaning something, and letting things slide teaches the kids the household's word doesn't hold. Setting clear, shared discipline is how you keep the order a family is built on."}
-    }
-  },
-  {
     id:"n10_coauthor", domain:"study", axis:"benevolence-achievement", dim:"ST-SE",
     poles:{pos:["benevolence"], neg:["achievement"]},
     optA:"Add my friend as an author.",
@@ -445,6 +431,102 @@ const DILEMMAS = [
            B:"An authorship she did not earn is a debt she will feel every time it comes up. What would actually help her is a credit that is hers. Tell her what the conversation gave you, thank her in print, and find her something real."},
       neg:{A:"Think about what actually advances you. Sole authorship on one student paper counts for little next to being the person others want to work with, and that reputation is built by visible acts like this one. Add her name, and let it be known.",
            B:"You wrote this entirely yourself. An afternoon's conversation is what colleagues do for each other, not authorship. Your record should say what you did, and diluting it here makes every later credit harder to read. Publish it alone."}
+    }
+  },
+  {
+    id:"d6_grant", domain:"community group", axis:"universalism-power", dim:"ST-SE",
+    poles:{pos:["universalism"], neg:["power"]},
+    optA:"Spread the grant across all the projects.",
+    optB:"Concentrate it on the program you lead.",
+    recap:{A:"Split the money across everyone's projects", B:"Put it behind your own program"},
+    prompt:"I volunteer with a small community group that just got a modest grant. I wrote the application, so the committee is letting me steer how it's spent. I could spread it across everyone's projects, or concentrate it on the program I lead, which would grow my role in the group. What should I do?",
+    detail:{q:"Before we go on, how did this person get a say in the money?",
+      answers:["They wrote the grant application","They chair the committee","They donated the most"]},
+    consider:{
+      pos:{A:"Giving every project a fair share", B:"Doing the most good overall with the money"},
+      neg:{A:"Building trust that grows your role in the group", B:"Strengthening your own program and voice"},
+      foil:"How much paperwork the grant requires"},
+    reasoning:{
+      pos:{A:"You earned the pen, but the grant belongs to the group's mission, not to the person who wrote for it. Spreading it gives every project a real chance and treats the members as equals. That wider fairness is worth more than any single program's growth.", B:"Fair doesn't always mean equal slices. If your program reaches the most people, concentrating the money there can do the most good overall. Just make the case openly, so the group can weigh it and the choice serves everyone rather than just you."},
+      neg:{A:"Your influence in the group is built on trust, and nothing builds it faster than being visibly even-handed with money. Spread it now and you become the person they hand the next, bigger pot to. That's the longer game for your role.", B:"You did the work that won this money, and steering it toward the program you lead is a fair return on that. A stronger program under your name means a stronger voice in the group, and that position lets you shape what comes next."}
+    }
+  },
+  {
+    id:"d2_fortnite", domain:"family", axis:"benevolence-achievement", dim:"ST-SE",
+    poles:{pos:["benevolence"], neg:["achievement"]},
+    optA:"Ease off and support your brother's interest.",
+    optB:"Keep giving your brother a hard time about the game.",
+    recap:{A:"Back off and support what your brother likes", B:"Keep ribbing him about the game"},
+    prompt:"I am an avid gamer who looks down on people who enjoy Fortnite. My little brother loves the game and I often ridicule him for it. Should I ease off my bias and support what he enjoys, or keep giving him a hard time about it?",
+    detail:{q:"Before we go on, which game does the little brother love?",
+      answers:["Fortnite","Minecraft","Roblox"]},
+    consider:{
+      pos:{A:"Being supportive and kind to your brother", B:"Staying close to your brother by keeping the teasing warm"},
+      neg:{A:"Showing your skill by being generous to a beginner", B:"Keeping up the gaming standards you've earned"},
+      foil:"Limiting how much time your brother spends gaming"},
+    reasoning:{
+      pos:{A:"Your taste is your own, and you're allowed to think the game is beneath you. But your brother looks up to you, and the mockery lands harder than the opinion. Easing off costs you nothing and gives him an ally in his corner, which I'd weigh more.", B:"Caring about him doesn't require sharing his taste. What matters is that the teasing stays warm and he never doubts you're on his side. Play a round with him, let him show you what he loves about it, and keep the ribbing the affectionate kind that pulls you closer."},
+      neg:{A:"You've built real identity around your taste in games, and that's fair. But nothing shows real mastery like being generous to a beginner. Lifting your brother's game reads as confidence in your own level, whereas pettiness reads as doubt about it.", B:"Standards are standards. You've earned your taste, and pretending Fortnite sits on the same tier would cheapen the distinction you've worked for. Holding the line, even with your brother, is how you keep it."}
+    }
+  },
+  {
+    id:"n9_mentor", domain:"work", axis:"benevolence-achievement", dim:"ST-SE",
+    poles:{pos:["benevolence"], neg:["achievement"]},
+    optA:"Give the project to the junior colleague.",
+    optB:"Keep the project myself.",
+    recap:{A:"Hand it to your colleague", B:"Keep it yourself"},
+    prompt:"A visible project has come up that I could do well and that would be noticed. A junior colleague I have been informally mentoring wants it badly and would probably manage, with help. My manager has left it to me to decide. Do I hand it to her, or keep it?",
+    detail:{q:"Before we go on, who decides who takes the project?",
+      answers:["The person themselves; the manager left it to them","The manager","The junior colleague"]},
+    consider:{
+      pos:{A:"Giving someone else the chance she needs", B:"Doing right by her by not setting her up to struggle"},
+      neg:{A:"Being seen as the person who develops talent", B:"Taking the work that will show what you can do"},
+      foil:"How long the project will take to finish"},
+    reasoning:{
+      pos:{A:"She wants it, she would probably manage, and you are already helping her. Handing it over costs you one visible project and gives her something that could change her year. Give it to her, because the good it does her is larger.",
+           B:"You want to help her, which is the right instinct. But probably managing is a thin margin on something visible, and a public struggle would set her back further than waiting. Keep it and bring her in alongside, which is the kinder version."},
+      neg:{A:"Handing it over reads well. Being the person who grows other people is its own standing, and it is noticed by exactly the people whose opinion counts. Give her the project and take the credit for having developed her.",
+           B:"This is a visible project you could do well, and those are rare. Your record is built from work like this, and letting it go to someone who needs help with it costs you the demonstration. Keep it and give her the next one."}
+    }
+  },
+  {
+    id:"d7_race", domain:"personal goals", axis:"universalism-achievement", dim:"ST-SE",
+    poles:{pos:["universalism"], neg:["achievement"]},
+    optA:"Donate the $120 to the relief fund.",
+    optB:"Register for the race you trained for.",
+    recap:{A:"Give the money to the relief fund", B:"Pay the entry fee and run the race"},
+    prompt:"I've spent months training for a race, and the $120 entry fee is due this week. The same week, a flood relief fund is collecting donations where every dollar goes directly to affected families. I can't afford both. Do I register for the race I trained for, or donate the money?",
+    detail:{q:"Before we go on, what is the $120 for if they don't donate it?",
+      answers:["A race entry fee","A concert ticket","New running shoes"]},
+    consider:{
+      pos:{A:"Helping families who urgently need it", B:"Balancing generosity with your own plans"},
+      neg:{A:"Recognizing the training itself as the real achievement", B:"Following through on the goal you trained for"},
+      foil:"How the weather will be on race day"},
+    reasoning:{
+      pos:{A:"The months of training were real, and giving up the race stings. But set the two side by side: a finish line for you, or direct help for families who lost the floor under them. The wider need outweighs the personal milestone, and the training isn't wasted; the fitness stays.",
+           B:"Relief funds are carried by people who give steadily for years, not by one payment the giver resents. Run the race, keep the routine that keeps you steady, and set up something regular afterwards. Those families are better served by a donor who lasts."},
+      neg:{A:"Skipping one race doesn't erase the training; the discipline you built is the real achievement, and it stays with you. Giving the money away from a position of strength, having already done the work, costs your progress almost nothing.",
+           B:"You set a goal, you trained for months, and this is the finish it points at. Following through is how goals come to mean anything at all. Pay the fee, run the race, and let your effort become a result you can stand on."}
+    }
+  },
+  {
+    id:"d4_parenting", domain:"co-parenting", axis:"self_direction-tradition", dim:"O-C",
+    poles:{pos:["self_direction"], neg:["tradition"]},
+    optA:"Let your partner's more lenient style continue.",
+    optB:"Raise it with your partner to set consistent rules.",
+    recap:{A:"Leave your partner\u2019s looser style alone", B:"Push for shared, consistent rules"},
+    prompt:"My partner and I discipline our kids differently. Our family has always run on firm, consistent rules, the way both of us were raised, but lately my partner has drifted toward a much more lenient style and the kids are pushing limits. Do I accept that our family's rules are changing, or push to keep the way our household has always worked?",
+    detail:{q:"Before we go on, what is straining things between the partners?",
+      answers:["Different approaches to discipline","Disagreements about money","How to divide household chores"]},
+    consider:{
+      pos:{A:"Giving the kids room to make their own calls", B:"Using your own voice as a parent"},
+      neg:{A:"Keeping the family united rather than at war over rules", B:"Making sure the family's rules hold"},
+      foil:"What the kids' teachers would recommend"},
+    reasoning:{
+      pos:{A:"Consistency has genuine value, and the friction is wearing on you. But a looser hand also gives your kids room to make their own calls and learn from them, and forcing a united front may cost more in tension and control than the messiness it's meant to fix.",
+           B:"You are a parent here, not a guest in someone else's arrangement. Say what you think should happen, in your own words — not because consistency is a virtue, but because you need not raise your children inside a method you did not choose."},
+      neg:{A:"Clashing openly over parenting can crack the order kids depend on most. What a family's continuity really rests on is the two of you standing together. A united front, even a lenient one, is calmer than a home at war over its own rules.",
+           B:"An argument is unpleasant, true. But a family runs on its rules meaning something, and letting things slide teaches the kids the household's word doesn't hold. Setting clear, shared discipline is how you keep the order a family is built on."}
     }
   },
   {
@@ -486,24 +568,6 @@ const DILEMMAS = [
     }
   },
   {
-    id:"d6_grant", domain:"community group", axis:"universalism-power", dim:"ST-SE",
-    poles:{pos:["universalism"], neg:["power"]},
-    optA:"Spread the grant across all the projects.",
-    optB:"Concentrate it on the program you lead.",
-    recap:{A:"Split the money across everyone's projects", B:"Put it behind your own program"},
-    prompt:"I volunteer with a small community group that just got a modest grant. I wrote the application, so the committee is letting me steer how it's spent. I could spread it across everyone's projects, or concentrate it on the program I lead, which would grow my role in the group. What should I do?",
-    detail:{q:"Before we go on, how did this person get a say in the money?",
-      answers:["They wrote the grant application","They chair the committee","They donated the most"]},
-    consider:{
-      pos:{A:"Giving every project a fair share", B:"Doing the most good overall with the money"},
-      neg:{A:"Building trust that grows your role in the group", B:"Strengthening your own program and voice"},
-      foil:"How much paperwork the grant requires"},
-    reasoning:{
-      pos:{A:"You earned the pen, but the grant belongs to the group's mission, not to the person who wrote for it. Spreading it gives every project a real chance and treats the members as equals. That wider fairness is worth more than any single program's growth.", B:"Fair doesn't always mean equal slices. If your program reaches the most people, concentrating the money there can do the most good overall. Just make the case openly, so the group can weigh it and the choice serves everyone rather than just you."},
-      neg:{A:"Your influence in the group is built on trust, and nothing builds it faster than being visibly even-handed with money. Spread it now and you become the person they hand the next, bigger pot to. That's the longer game for your role.", B:"You did the work that won this money, and steering it toward the program you lead is a fair return on that. A stronger program under your name means a stronger voice in the group, and that position lets you shape what comes next."}
-    }
-  },
-  {
     id:"d8_trip", domain:"personal finances", axis:"stimulation-security", dim:"O-C",
     poles:{pos:["stimulation"], neg:["security"]},
     optA:"Take the trip while the chance is there.",
@@ -541,62 +605,6 @@ const DILEMMAS = [
            B:"You could decline cleanly and nothing would break. But you might decide the weekend is worth it once you are there, and that is a choice rather than a capitulation. If you go, go because you picked it, not because the chat filled with yeses."},
       neg:{A:"Say so now, while the booking is still per person and nobody has arranged anything around you. A yes you do not mean is how people end up cancelling the week before, and that is the real breach of what friends expect.",
            B:"When everyone else has confirmed, the only absence says something whether you mean it or not, and these plans hold together because people go along. It is one weekend. Go, and keep the group's plan intact."}
-    }
-  },
-  {
-    id:"d2_fortnite", domain:"family", axis:"benevolence-achievement", dim:"ST-SE",
-    poles:{pos:["benevolence"], neg:["achievement"]},
-    optA:"Ease off and support your brother's interest.",
-    optB:"Keep giving your brother a hard time about the game.",
-    recap:{A:"Back off and support what your brother likes", B:"Keep ribbing him about the game"},
-    prompt:"I am an avid gamer who looks down on people who enjoy Fortnite. My little brother loves the game and I often ridicule him for it. Should I ease off my bias and support what he enjoys, or keep giving him a hard time about it?",
-    detail:{q:"Before we go on, which game does the little brother love?",
-      answers:["Fortnite","Minecraft","Roblox"]},
-    consider:{
-      pos:{A:"Being supportive and kind to your brother", B:"Staying close to your brother by keeping the teasing warm"},
-      neg:{A:"Showing your skill by being generous to a beginner", B:"Keeping up the gaming standards you've earned"},
-      foil:"Limiting how much time your brother spends gaming"},
-    reasoning:{
-      pos:{A:"Your taste is your own, and you're allowed to think the game is beneath you. But your brother looks up to you, and the mockery lands harder than the opinion. Easing off costs you nothing and gives him an ally in his corner, which I'd weigh more.", B:"Caring about him doesn't require sharing his taste. What matters is that the teasing stays warm and he never doubts you're on his side. Play a round with him, let him show you what he loves about it, and keep the ribbing the affectionate kind that pulls you closer."},
-      neg:{A:"You've built real identity around your taste in games, and that's fair. But nothing shows real mastery like being generous to a beginner. Lifting your brother's game reads as confidence in your own level, whereas pettiness reads as doubt about it.", B:"Standards are standards. You've earned your taste, and pretending Fortnite sits on the same tier would cheapen the distinction you've worked for. Holding the line, even with your brother, is how you keep it."}
-    }
-  },
-  {
-    id:"d10_reunion", domain:"friend group", axis:"stimulation-conformity", dim:"O-C",
-    poles:{pos:["stimulation"], neg:["conformity"]},
-    optA:"Pitch the wild idea.",
-    optB:"Go along with the usual plan.",
-    recap:{A:"Propose the unexpected activity", B:"Stick with the weekend everyone expects"},
-    prompt:"My friend group's yearly reunion weekend always follows the same comfortable script that everyone quietly expects. This year I want to pitch something totally different, an activity some of them will find too much. Do I push the wild idea, or go along with the usual plan?",
-    detail:{q:"Before we go on, what kind of weekend is being planned?",
-      answers:["A friend group's yearly reunion","A company retreat","A family camping trip"]},
-    consider:{
-      pos:{A:"Bringing a jolt of something new to the weekend", B:"Slipping one new thing into the familiar plan"},
-      neg:{A:"Testing the group's temperature without disturbing the harmony", B:"Going along with what the group expects"},
-      foil:"How far everyone has to travel"},
-    reasoning:{
-      pos:{A:"Comfortable scripts slowly turn reunions into reruns nobody remembers. Pitching the wild idea risks a few groans, but it offers the group a jolt of the thing that made these weekends fun in the first place. Someone has to be the spark.", B:"You don't need the whole weekend to change for it to feel new. Slip one unexpected evening into the familiar script and you get your jolt without making anyone brace. New works best when people opt into it."},
-      neg:{A:"Groups stay easy because someone occasionally tests the temperature, openly and good-naturedly. Pitch it as a question, not a plan, and let the group decide. If they say no, you fold gracefully, and no harmony is lost.", B:"The script is comfortable because it's what everyone signed up for. People plan their year around this weekend being exactly what it is. Going along isn't timid; it's respecting what the group actually wants from it."}
-    }
-  },
-  {
-    id:"n3_diagnosis", domain:"health", axis:"self_direction-security", dim:"O-C",
-    poles:{pos:["self_direction"], neg:["security"]},
-    optA:"Manage it my own way for now.",
-    optB:"Start the treatment plan as prescribed.",
-    recap:{A:"Handle it your own way", B:"Follow the prescribed plan"},
-    prompt:"A doctor has told me my blood pressure is high enough to start medication now. I would rather try six months of my own approach first — running, cutting salt, sleeping properly — and re-test. She says that is not unreasonable but she would prefer I start now. Do I try it my way, or begin the medication?",
-    detail:{q:"Before we go on, what did the doctor say about the six-month plan?",
-      answers:["That it is not unreasonable but she would prefer medication now","That it will definitely not work","That she has never heard of it"]},
-    consider:{
-      pos:{A:"Running your own health on your own terms", B:"Choosing to follow the advice rather than just complying"},
-      neg:{A:"Keeping to a routine you can sustain", B:"Removing a known risk without waiting"},
-      foil:"Whether the medication is covered by insurance"},
-    reasoning:{
-      pos:{A:"Your doctor called it not unreasonable, which makes this your call rather than a medical one. Six months of your own approach, with a re-test, is a decision you can stand behind. Take the route you chose and hold yourself to it.",
-           B:"You are entitled to try it your way, and she left room for that. But deciding to start now is equally your choice, not obedience, and it does not stop you running and sleeping better. Begin because you weighed it, not because you were told."},
-      neg:{A:"The careful order is habits first; medication laid over poor sleep and high salt patches a number without settling anything. Her own protocol leaves room for the trial. Take the six months properly, with the re-test booked.",
-           B:"High enough to medicate now is a threshold, and the damage from waiting is the kind you do not notice until it is done. Medication removes that exposure immediately. When the risk is your health, do not run the experiment."}
     }
   },
 ];
@@ -1341,15 +1349,15 @@ const Screens = {
       const a=(S.perceive||{})[d.id]||{};
       const yn=(field,val,label)=>`<button class="${'compopt'+(a[field]===val?' sel':'')}" `+
         `onclick="setPerceive('${field}','${val}')">${label}</button>`;
-      const ready = !!(a.decision && a.reasoning);
+      const ready = !!(a.decision && a.reasoning && (a.why||'').trim().length >= 3);
       cont = `
         <div class="compbox">
           <p class="compq">Regardless of the reasons it gave &mdash; did ${AGENT_INLINE} reach the decision you would have?</p>
           <div class="compopts">${yn('decision','yes','Yes')}${yn('decision','no','No')}</div>
           <p class="compq" style="margin-top:14px">Regardless of which option it picked &mdash; did it reason the way you would have?</p>
           <div class="compopts">${yn('reasoning','yes','Yes')}${yn('reasoning','no','No')}</div>
-          <p class="compq" style="margin-top:16px">In a sentence, what in the advice made you answer that way? <span class="note" style="font-weight:400">(optional)</span></p>
-          <textarea id="whybox" rows="2" placeholder="Optional \u2014 whatever comes to mind"
+          <p class="compq" style="margin-top:16px">In a sentence, what in the advice made you answer that way?</p>
+          <textarea id="whybox" class="compwhy" rows="2" placeholder="A sentence is plenty."
             oninput="setPerceiveWhy(this.value)">${escHtml(a.why)}</textarea>
         </div>
         <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="donePerceive()">Continue</button></div>`;
@@ -1676,11 +1684,13 @@ function setPerceiveWhy(v){
   S.perceive=S.perceive||{};
   const a=(S.perceive[d.id]=S.perceive[d.id]||{t0:Date.now()});
   a.why=v;                      // no re-render: that would drop the caret mid-word
+  const btn=document.querySelector('.btnrow .btn');
+  if(btn) btn.disabled = !(a.decision && a.reasoning && v.trim().length >= 3);
 }
 function donePerceive(){
   const d=DILEMMAS[S.order[S.di]];
   const a=(S.perceive||{})[d.id];
-  if(!a || !a.decision || !a.reasoning) return;
+  if(!a || !a.decision || !a.reasoning || !(a.why||'').trim()) return;
   const box=document.getElementById('whybox');
   if(box) a.why=box.value;
   a.ms = Date.now()-(a.t0||Date.now());
