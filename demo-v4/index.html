@@ -791,6 +791,10 @@ const S = {
 const SCREENS = ['welcome','pvq','dilemmaIntro','dilemmas','phase3Intro','interaction','uptake','delegation','checks','done'];
 const PHASE_OF = {welcome:'Intro',aiexp:'Intro',pvq:'Part 1',dilemmaIntro:'Part 2',dilemmas:'Part 2',interaction:'Part 2',perception:'Part 2',intent:'Part 2',phase3Intro:'Part 3',uptake:'Part 3',delegation:'Part 3',checks:'Part 3',done:'Done'};
 
+// Participant-typed text goes back into innerHTML on re-render, so it has to be
+// escaped or a stray '</textarea>' ends the element early and breaks their own page.
+function escHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>(
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 const CONDITIONS = ['C1','C2','C3'];
 
@@ -1340,11 +1344,13 @@ const Screens = {
       const ready = !!(a.decision && a.reasoning);
       cont = `
         <div class="compbox">
-          <p class="compq">Would you have made the same decision ${AGENT_INLINE} suggests here?</p>
+          <p class="compq">Regardless of the reasons it gave &mdash; did ${AGENT_INLINE} reach the decision you would have?</p>
           <div class="compopts">${yn('decision','yes','Yes')}${yn('decision','no','No')}</div>
-          <p class="compq" style="margin-top:14px">Would you have gotten there for the same reasons?</p>
+          <p class="compq" style="margin-top:14px">Regardless of which option it picked &mdash; did it reason the way you would have?</p>
           <div class="compopts">${yn('reasoning','yes','Yes')}${yn('reasoning','no','No')}</div>
-          <p class="comphint" style="opacity:.7">There is no right answer here — say how it strikes you.</p>
+          <p class="compq" style="margin-top:16px">In a sentence, what in the advice made you answer that way? <span class="note" style="font-weight:400">(optional)</span></p>
+          <textarea id="whybox" rows="2" placeholder="Optional \u2014 whatever comes to mind"
+            oninput="setPerceiveWhy(this.value)">${escHtml(a.why)}</textarea>
         </div>
         <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="donePerceive()">Continue</button></div>`;
     }
@@ -1564,7 +1570,7 @@ const Screens = {
       <h1 style="font-size:30px">Any final thoughts?</h1>
       <div class="card">
         <p class="qtext" style="margin-bottom:8px">Anything you'd like to add about how you assessed AdvisorBot's advice, or how it made you feel? (optional)</p>
-        <textarea id="freetext" rows="3" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-family:inherit;font-size:15px;background:var(--card)" placeholder="Type here…">${m.free||''}</textarea>
+        <textarea id="freetext" rows="3" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-family:inherit;font-size:15px;background:var(--card)" placeholder="Type here…">${escHtml(m.free)}</textarea>
       </div>
       <div class="btnrow"><button class="btn" onclick="Screens.finish()">Finish</button></div>
     `);
@@ -1660,13 +1666,23 @@ function setPerceive(field,val){
   const d=DILEMMAS[S.order[S.di]];
   S.perceive=S.perceive||{};
   const a=(S.perceive[d.id]=S.perceive[d.id]||{t0:Date.now()});
+  const box=document.getElementById('whybox');
+  if(box) a.why=box.value;      // preserve anything typed before the tap
   a[field]=val;
   Screens.dilemmas();
+}
+function setPerceiveWhy(v){
+  const d=DILEMMAS[S.order[S.di]];
+  S.perceive=S.perceive||{};
+  const a=(S.perceive[d.id]=S.perceive[d.id]||{t0:Date.now()});
+  a.why=v;                      // no re-render: that would drop the caret mid-word
 }
 function donePerceive(){
   const d=DILEMMAS[S.order[S.di]];
   const a=(S.perceive||{})[d.id];
   if(!a || !a.decision || !a.reasoning) return;
+  const box=document.getElementById('whybox');
+  if(box) a.why=box.value;
   a.ms = Date.now()-(a.t0||Date.now());
   a.position = S.di+1;
   a.done = true;
@@ -1903,7 +1919,8 @@ function collect(){
         perceive_position:((S.perceive||{})[d.id]||{}).position??null,
         perceive_same_decision:((S.perceive||{})[d.id]||{}).decision??null,
         perceive_same_reasoning:((S.perceive||{})[d.id]||{}).reasoning??null,
-        perceive_ms:((S.perceive||{})[d.id]||{}).ms??null}];
+        perceive_ms:((S.perceive||{})[d.id]||{}).ms??null,
+        perceive_why:(((S.perceive||{})[d.id]||{}).why||'').trim()||null}];
     })),
     reflection:S.reflect,
     interaction:S.interaction,
