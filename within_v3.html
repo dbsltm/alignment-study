@@ -406,6 +406,8 @@ function endpointURL(params){
 
 let _logQueue = [];
 const _inFlight = new Set();
+let _inFlightBytes = 0, _retryTimer = null;
+const KEEPALIVE_BUDGET = 56000;   // browsers refuse keepalive bodies beyond 64 KB in flight in total
 function logSnapshot(phase, complete){
   if(!LOG_ENDPOINT) return;
   const payload = JSON.stringify({
@@ -424,16 +426,28 @@ function logSnapshot(phase, complete){
   _logQueue.push(payload);
   flushLog();
 }
+/* One request at a time, oldest first, retried every 3 s until it goes. Firing every
+   queued snapshot at once overran the browser's 64 KB cap on keepalive bodies in
+   flight when snapshots came close together (end of Part 3); the refused ones were
+   only retried at the next snapshot, so the last few, including 'complete', were lost. */
+/* Oldest first, as many at once as fit under the keepalive budget, and anything
+   refused is retried every 3 s while the page is open. Before this, snapshots that
+   came close together (the end of Part 3) overran the 64 KB cap; the refused ones
+   were retried only at the next snapshot, so the last few, 'complete' included, were
+   lost. The backend takes several seconds per request, so one-at-a-time falls behind. */
 function flushLog(){
-  if(!LOG_ENDPOINT || !_logQueue.length) return;
-  _logQueue.slice().forEach(payload=>{
-    if(_inFlight.has(payload)) return;
-    _inFlight.add(payload);
+  if(!LOG_ENDPOINT) return;
+  for(const payload of _logQueue.slice()){
+    if(_inFlight.has(payload)) continue;
+    if(_inFlight.size && _inFlightBytes + payload.length > KEEPALIVE_BUDGET) break;
+    _inFlight.add(payload); _inFlightBytes += payload.length;
     // text/plain + no-cors avoids the CORS preflight that Apps Script can't answer
     fetch(LOG_ENDPOINT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload, keepalive:true})
-      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==payload); _inFlight.delete(payload); })
-      .catch(()=>{ _inFlight.delete(payload); /* stays queued; retried on next snapshot or unload */ });
-  });
+      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==payload); settle(); flushLog(); })
+      // a refused send waits for the timer, so a dead connection cannot spin
+      .catch(()=>{ settle(); if(!_retryTimer) _retryTimer=setTimeout(()=>{ _retryTimer=null; flushLog(); }, 3000); });
+    function settle(){ _inFlight.delete(payload); _inFlightBytes -= payload.length; }
+  }
 }
 window.addEventListener('beforeunload', ()=>{
   if(!LOG_ENDPOINT) return;
