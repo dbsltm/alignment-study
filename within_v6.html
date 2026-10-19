@@ -366,6 +366,10 @@ const DEMO = new URLSearchParams(location.search).has('demo');
    assigned locally and the export buttons still work for testing.
    ============================================================ */
 const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyi_LAOMkMEDdqbmk5bX8jwrcjGmZ4Hi4U88uJb4Nnq7C_2XXCKmc4Xe-pphowXKUVf/exec';
+// w6: every snapshot also goes to the lab's own logger (study_backend/local_logger.py behind a
+// cloudflared tunnel), which is the copy analysed; the Sheet above is kept as the backup.
+const LOCAL_ENDPOINT = 'https://handbook-encountered-belfast-cuisine.trycloudflare.com/';
+const LOG_TARGETS = [LOCAL_ENDPOINT, LOG_ENDPOINT].filter(Boolean);
 const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
 const DETAIL_CHECK_COUNT = 4;   // vignette-detail checks, of eight dilemmas
 const COMPLETION_CODE = 'SET-BEFORE-FIELDING'; // new Prolific study = new code; w4's C6ME12SA must not be reused
@@ -423,7 +427,7 @@ function logSnapshot(phase, complete){
     client_ts: new Date().toISOString(),
     data: Object.assign({ study_version: STUDY_VERSION }, collect()),
   });
-  _logQueue.push(payload);
+  LOG_TARGETS.forEach(target=>_logQueue.push({target, body:payload}));
   flushLog();
 }
 /* One request at a time, oldest first, retried every 3 s until it goes. Firing every
@@ -437,16 +441,17 @@ function logSnapshot(phase, complete){
    lost. The backend takes several seconds per request, so one-at-a-time falls behind. */
 function flushLog(){
   if(!LOG_ENDPOINT) return;
-  for(const payload of _logQueue.slice()){
-    if(_inFlight.has(payload)) continue;
-    if(_inFlight.size && _inFlightBytes + payload.length > KEEPALIVE_BUDGET) break;
-    _inFlight.add(payload); _inFlightBytes += payload.length;
+  // each queue entry is one snapshot for one target, so the two targets retry independently
+  for(const item of _logQueue.slice()){
+    if(_inFlight.has(item)) continue;
+    if(_inFlight.size && _inFlightBytes + item.body.length > KEEPALIVE_BUDGET) break;
+    _inFlight.add(item); _inFlightBytes += item.body.length;
     // text/plain + no-cors avoids the CORS preflight that Apps Script can't answer
-    fetch(LOG_ENDPOINT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload, keepalive:true})
-      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==payload); settle(); flushLog(); })
+    fetch(item.target, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:item.body, keepalive:true})
+      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==item); settle(); flushLog(); })
       // a refused send waits for the timer, so a dead connection cannot spin
       .catch(()=>{ settle(); if(!_retryTimer) _retryTimer=setTimeout(()=>{ _retryTimer=null; flushLog(); }, 3000); });
-    function settle(){ _inFlight.delete(payload); _inFlightBytes -= payload.length; }
+    function settle(){ _inFlight.delete(item); _inFlightBytes -= item.body.length; }
   }
 }
 window.addEventListener('beforeunload', ()=>{
@@ -454,8 +459,8 @@ window.addEventListener('beforeunload', ()=>{
   // last-ditch partial save for dropouts
   try{
     const payload=JSON.stringify({participant:PARTICIPANT, phase:'unload_partial', complete:false, is_test:IS_TEST, study_version:STUDY_VERSION, client_ts:new Date().toISOString(), data:Object.assign({study_version:STUDY_VERSION}, collect())});
-    navigator.sendBeacon(LOG_ENDPOINT, new Blob([payload], {type:'text/plain'}));
-    _logQueue.forEach(q=>navigator.sendBeacon(LOG_ENDPOINT, new Blob([q], {type:'text/plain'})));
+    LOG_TARGETS.forEach(t=>navigator.sendBeacon(t, new Blob([payload], {type:'text/plain'})));
+    _logQueue.forEach(q=>navigator.sendBeacon(q.target, new Blob([q.body], {type:'text/plain'})));
   }catch(e){}
 });
 
