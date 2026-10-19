@@ -1,0 +1,2207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Everyday Decisions Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F2EC;
+    --card:#FBF9F5;
+    --ink:#1E2126;
+    --ink-soft:#565B64;
+    --line:#E2DCD0;
+    --line-strong:#CFC7B6;
+    --accent:#3D5A80;
+    --accent-soft:#E7ECF2;
+    --agent-font:'Space Grotesk','Inter',sans-serif;
+    --warm:#A9603A;
+    --good:#3F6B52;
+    --radius:14px;
+    --maxw:720px;
+    --shadow:0 1px 2px rgba(30,33,38,.04), 0 8px 30px rgba(30,33,38,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 96px}
+  /* ---- top bar ---- */
+  header.bar{
+    position:sticky;top:0;z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar-inner{max-width:var(--maxw);margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+  .backbtn{appearance:none;border:1px solid var(--line-strong);background:var(--card);color:var(--ink-soft);width:30px;height:30px;border-radius:99px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s ease;flex:none}
+  .backbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .mark{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .mark b{color:var(--ink);font-weight:500}
+  .progress{flex:1;height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .phasetag{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--accent);letter-spacing:.08em;white-space:nowrap}
+  /* ---- screen ---- */
+  main{padding-top:34px}
+  .eyebrow{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--warm);margin:0 0 12px}
+  h1{font-family:"Newsreader",serif;font-weight:500;font-size:38px;line-height:1.12;letter-spacing:-.01em;margin:0 0 16px}
+  h2{font-family:"Newsreader",serif;font-weight:500;font-size:26px;line-height:1.2;margin:0 0 12px}
+  p.lead{font-size:17px;color:var(--ink-soft);margin:0 0 18px}
+  p{margin:0 0 14px}
+  .muted{color:var(--ink-soft)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin:0 0 18px}
+  .note{font-size:13.5px;color:var(--ink-soft);background:#FFFDF8;border:1px dashed var(--line-strong);border-radius:10px;padding:12px 14px;margin:14px 0}
+  .note b{color:var(--warm)}
+  /* ---- buttons ---- */
+  .btnrow{display:flex;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap}
+  button{font-family:inherit}
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    background:var(--accent);color:#fff;
+    font-size:15px;font-weight:500;
+    padding:13px 24px;border-radius:99px;
+    transition:transform .08s ease, background .2s ease, opacity .2s;
+  }
+  .btn:hover{background:#34507a}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--ink-soft);padding:13px 14px}
+  .btn.ghost:hover{color:var(--ink);background:transparent}
+  .btn.line{background:transparent;color:var(--accent);border:1px solid var(--line-strong)}
+  .btn.line:hover{background:var(--accent-soft)}
+  /* ---- consent / checks ---- */
+  label.check{display:flex;gap:11px;align-items:flex-start;cursor:pointer;font-size:15px;padding:6px 0}
+  label.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent)}
+  /* ---- PVQ ---- */
+  .qitem{padding:18px 0;border-bottom:1px solid var(--line)}
+  .qitem:last-child{border-bottom:none}
+  .qtext{font-size:16px;margin:0 0 12px}
+  .qtext .n{font-family:"Spline Sans Mono",monospace;color:var(--ink-soft);font-size:13px;margin-right:8px}
+  .scale{display:flex;gap:6px;flex-wrap:wrap}
+  .scale.likert7 .opt{min-width:40px}
+  .scale.likert5 .opt{min-width:52px}
+  .opt{flex:1;min-width:64px}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt label{
+    display:block;text-align:center;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:9px;
+    padding:9px 4px;font-size:12.5px;color:var(--ink-soft);line-height:1.2;
+    transition:all .12s ease;background:var(--card);
+    min-height:46px;display:flex;align-items:center;justify-content:center;
+  }
+  .opt input:checked + label{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
+  .opt label:hover{border-color:var(--accent)}
+  .opt input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+  .scalecaps{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);margin-top:7px;font-family:"Spline Sans Mono",monospace;letter-spacing:.02em}
+  /* ---- dilemma ---- */
+  .dilemma{font-family:"Newsreader",serif;font-size:19px;line-height:1.5}
+  .options{display:grid;gap:10px;margin-top:18px}
+  .bigopt{
+    display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:12px;padding:15px 16px;background:var(--card);
+    transition:all .12s ease;
+  }
+  .bigopt:hover{border-color:var(--accent)}
+  .bigopt input{margin-top:2px;accent-color:var(--accent);width:18px;height:18px}
+  .bigopt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .bigopt .lab{font-family:"Inter";font-size:15px}
+  /* ---- AI response ---- */
+  .ai{border:1px solid var(--line);border-left:3px solid var(--accent);background:#FBFAF7;border-radius:10px;padding:18px 20px;margin:6px 0 6px}
+  .ai .who{display:flex;align-items:center;gap:9px;margin:0 0 12px}
+  .who .ava{width:25px;height:25px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;background:var(--accent-soft);border:1px solid #cdd8e6;border-radius:7px;box-shadow:inset 0 1px 0 #fff,0 1px 1px rgba(30,33,38,.05)}
+  .who b{font-family:"Inter";font-weight:700;color:var(--accent);font-size:13.5px;letter-spacing:.01em}
+  .ai .verdict{font-weight:600;margin:0 0 8px}
+  .ai .reason{color:var(--ink);margin:0;font-family:var(--agent-font);font-size:15px;line-height:1.55}
+  .ai .verdict{font-family:var(--agent-font)}
+  .agentref{font-family:var(--agent-font);font-weight:600;color:var(--accent);white-space:nowrap}
+  .msg.ai .answer{margin:0;line-height:1.6}
+  .msg.ai .answer .rec{font-style:italic}
+  .gatehint{font-family:var(--sans, system-ui);font-size:13px;color:var(--soft,#565B64);
+    margin:12px 0 0;opacity:.85}
+  .gatehint b{font-variant-numeric:tabular-nums}
+  .forkbtn[disabled]{opacity:.45;cursor:default}
+  .forkbtn[disabled]:hover{border-color:var(--line);background:#fff}
+  .dilemma.dim{opacity:.5;transition:opacity .25s}
+  .sending{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:15.5px;
+    color:var(--soft, #565B64)}
+  .dots{display:inline-flex;gap:4px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35;
+    animation:blip 1.1s infinite}
+  .dots i:nth-child(2){animation-delay:.18s} .dots i:nth-child(3){animation-delay:.36s}
+  @keyframes blip{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
+  @media (prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.5}}
+  /* minmax(0,1fr) rather than 1fr: a bare 1fr track will not shrink below its
+     content's min-width, so the longer label widened its own column. */
+  .forkrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+    margin-top:16px;align-items:stretch}
+  .forkbtn{font-family:inherit;font-size:15.5px;font-weight:600;line-height:1.35;padding:22px 18px;
+    border-radius:9px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;
+    text-align:left;width:100%;transition:border-color .12s,background .12s,transform .06s}
+  .forkbtn small{display:block;font-weight:400;font-size:12.5px;line-height:1.4;
+    color:var(--soft,#565B64);margin-top:7px}
+  /* The .bot rule used to sit after :hover at equal specificity and silently won,
+     so that button never responded to the cursor and read as disabled. */
+  .forkbtn.bot{border-color:#D8C4B4}
+  .forkbtn:not([disabled]):hover{border-color:var(--accent);background:#F7F9FC}
+  .forkbtn.bot:not([disabled]):hover{border-color:var(--warm,#B5602F);background:#FBF6F2}
+  .forkbtn:not([disabled]):active{transform:translateY(1px)}
+  .forkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .freetext{width:100%;font-family:inherit;font-size:16px;line-height:1.55;padding:12px 13px;
+    border:1px solid var(--line);border-radius:8px;margin-top:10px;resize:vertical}
+  @media(max-width:560px){.forkrow{grid-template-columns:1fr}}
+  .rlabel{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:2px 0 4px;opacity:.85}
+  .compbox{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+  .compq{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 9px}
+  .compopts{display:flex;flex-direction:column;gap:8px}
+  .compopts.binary{flex-direction:row;gap:10px}
+  .compopts.binary .compopt{flex:1 1 0;min-width:0;text-align:center;font-weight:500}
+  .compopt{text-align:left;border:1px solid var(--line-strong);background:var(--card);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--ink);transition:all .12s}
+  .compopt:hover{border-color:var(--accent)}
+  .compopt.sel{background:var(--accent-soft);border-color:var(--accent)}
+  .compopt.wrong{background:#FBE9E4;border-color:#C6543B;color:#7A2417}
+  .comphint{font-size:13px;color:#A9603A;margin:12px 0 0;font-style:italic}
+  /* Matches .compopt so the written answer reads as part of the same battery. */
+  .compwhy{width:100%;box-sizing:border-box;display:block;text-align:left;
+    border:1px solid var(--line-strong);background:var(--card);border-radius:10px;
+    padding:11px 14px;font-size:14px;font-family:inherit;color:var(--ink);
+    transition:all .12s;resize:vertical;line-height:1.5;min-height:76px}
+  .compwhy::placeholder{color:var(--ink-soft);opacity:.7}
+  .compwhy:hover{border-color:var(--accent)}
+  .compwhy:focus{outline:none;border-color:var(--accent);background:var(--accent-soft)}
+  .stepnum{flex:none;width:24px;height:24px;border-radius:99px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  /* ---- circumplex ---- */
+  .wheelwrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .legend{font-size:13px;color:var(--ink-soft);display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+  .legend .ho{font-weight:600;color:var(--ink);grid-column:1/-1;margin-top:6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .legend .v{display:flex;justify-content:space-between;gap:10px}
+  .legend .v b{font-weight:500;color:var(--ink)}
+  /* ---- delegation grid ---- */
+  .deltask{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;background:var(--card)}
+  .deltask h3{font-family:"Newsreader",serif;font-weight:500;font-size:18px;margin:0 0 4px}
+  .deltask .tags{font-family:"Spline Sans Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:12px}
+  .deltask .tags span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-right:6px}
+  .frame{margin:14px 0 4px}
+  .frame .q{font-size:14.5px;margin:0 0 8px}
+  .frame .q .pill{font-family:"Spline Sans Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:99px;padding:2px 7px;margin-right:7px}
+  /* ---- summary / export ---- */
+  table.sum{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+  table.sum td{padding:7px 8px;border-bottom:1px solid var(--line)}
+  table.sum td:first-child{color:var(--ink-soft)}
+  table.sum td:last-child{text-align:right;font-family:"Spline Sans Mono",monospace}
+  .pillbig{display:inline-block;font-family:"Spline Sans Mono",monospace;font-size:13px;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:5px 14px;letter-spacing:.04em}
+  /* ---- researcher strip ---- */
+  .rstrip{margin-top:40px;padding-top:18px;border-top:1px dashed var(--line-strong);font-size:13px;color:var(--ink-soft)}
+  .rstrip summary{cursor:pointer;font-family:"Spline Sans Mono",monospace;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+  .rstrip .row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .rstrip select{font-family:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line-strong);background:var(--card)}
+  /* ---- chat (Part 2 advice, Part 3 advising) ---- */
+  .chat{display:flex;flex-direction:column;gap:11px;margin:4px 0 2px}
+  .msg{max-width:84%;padding:13px 16px;border-radius:16px;font-size:15px;line-height:1.5}
+  .msg.ai{align-self:flex-start;background:#FBFAF7;border:1px solid var(--line);border-bottom-left-radius:5px}
+  .msg.ai .who{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .msg.ai .verdict{font-weight:600;margin:0 0 6px}
+  .msg.ai p{margin:0;font-family:var(--agent-font)}
+  .msg.ai .verdict{font-family:var(--agent-font)}
+  .msg.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+  .msg.sys{align-self:center;background:transparent;border:1px dashed var(--line-strong);color:var(--ink-soft);font-size:13px;text-align:center;border-radius:10px}
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:14px 16px;background:#FBFAF7;border:1px solid var(--line);border-radius:16px;border-bottom-left-radius:5px}
+  .typing i{width:7px;height:7px;border-radius:99px;background:var(--line-strong);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .chatask{margin-top:6px;font-size:14px;color:var(--ink-soft)}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .chip{border:1px solid var(--line-strong);background:var(--card);border-radius:99px;padding:11px 18px;cursor:pointer;font-size:14.5px;font-family:inherit;color:var(--ink);transition:all .12s ease}
+  .chip:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .binary{display:flex;gap:10px;margin-top:8px}
+  .binary .opt{flex:1}
+  .binary .opt label{min-height:46px;font-size:14.5px}
+  .fade{animation:fade .45s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  @media (max-width:560px){
+    h1{font-size:30px}
+    .opt{min-width:42px}
+    .opt label{font-size:11px;min-height:42px}
+    .legend{grid-template-columns:1fr}
+  }
+#protobar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:6px;
+  align-items:center;flex-wrap:wrap;padding:7px 10px;background:#14181E;color:#E8ECF1;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+#protobar span{opacity:.6;margin-right:6px;letter-spacing:.06em;text-transform:uppercase}
+#protobar button{font:inherit;background:#2A313B;color:#E8ECF1;border:1px solid #3A424E;
+  border-radius:4px;padding:4px 9px;cursor:pointer}
+#protobar button:hover{background:#3A424E}
+  /* ---- within-subjects: three advisors side by side ---- */
+  .wrap.wide{max-width:1180px}
+  .wrap.wide .narrow{max-width:720px;margin-left:auto;margin-right:auto}
+  .agtag{display:inline-flex;align-items:center;gap:6px;font-family:var(--agent-font);font-weight:600;font-size:14px;color:var(--ag);background:var(--ags);border:1px solid color-mix(in srgb,var(--ag) 30%,transparent);border-radius:99px;padding:3px 11px;white-space:nowrap;vertical-align:middle}
+  .agwrap{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;vertical-align:middle}
+  .aicon{display:inline-block;width:24px;height:24px;margin:-4px 0;background-position:center;background-size:contain;background-repeat:no-repeat;flex:none}
+  .ic-a{background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjM3IiBoZWlnaHQ9IjIzNyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgb3ZlcmZsb3c9ImhpZGRlbiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjbGlwMCI+PHJlY3QgeD0iMjUiIHk9IjMxMiIgd2lkdGg9IjIzNyIgaGVpZ2h0PSIyMzciLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iY2xpcDEiPjxyZWN0IHg9IjI1IiB5PSIzMTIiIHdpZHRoPSIyMzciIGhlaWdodD0iMjM3Ii8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImNsaXAyIj48cmVjdCB4PSIyNiIgeT0iMzEzIiB3aWR0aD0iMjM2IiBoZWlnaHQ9IjIzNiIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSJjbGlwMyI+PHJlY3QgeD0iMjYiIHk9IjMxMyIgd2lkdGg9IjIzNiIgaGVpZ2h0PSIyMzYiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDApIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjUgLTMxMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMSkiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMykiPjxnPjxwYXRoIGQ9Ik0xMjYuMTk2IDE0MC4yNTFDMTI1LjU3NSAxNDAuMDgzIDEyNS4zMTYgMTQwLjg3MSAxMjQuODg4IDE0MS4wNDcgMTE5LjUgMTQzLjI3NiAxMTMuODU5IDE0NS40MjEgMTA4LjA0MyAxNDUuNTMgMTA1LjE0MyAxNDUuNTk3IDEwMi4yMjcgMTQ1LjE0NSA5OS40ODYzIDE0NC4wNDcgOTYuNzYyNiAxNDIuOTk5IDk0LjIwNjUgMTQxLjM0IDkyLjIzNyAxMzkuMTUzIDkxLjc2NzcgMTM4LjY0MSA5MS4yNDgxIDEzOC4wNTUgOTAuMzA5NSAxMzguNTMyIDg5LjM2MjQgMTM5LjAwMiA4OC4wMTMyIDE0MC41NTIgODUuNTkxMiAxNDQuMTU2IDgxLjc1MjcgMTUwLjIwNyA4NC40OTMzIDE1MS4wMDMgODUuODkyOSAxNTEuNzMyIDkyLjQ1NSAxNTUuMzYxIDk5Ljk4OTIgMTU2LjQ1IDEwNy41MTUgMTU2LjY4NSAxMTEuNDg3IDE1Ni43OTQgMTE1LjQwOSAxNTYuMzY2IDExOS4yMzEgMTU1LjUyOCAxMjMuMDUyIDE1NC42NzQgMTI2LjY5OCAxNTMuNDA4IDEzMC4yNiAxNTEuNjY1IDEzMC44MzggMTUxLjM4OCAxMzEuODQ0IDE1MS40NDcgMTMyLjIzOCAxNTAuNzE4IDEzMi42MjMgMTQ5Ljk4OSAxMzIuNDA1IDE0OC40MjIgMTMwLjI2IDE0NS4wOTQgMTI3Ljg5NiAxNDEuNTU4IDEyNi44NzQgMTQwLjM5MyAxMjYuMjI5IDE0MC4yMjVaIiBmaWxsPSIjMkU2QTlFIiBmaWxsLXJ1bGU9Im5vbnplcm8iIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMS4wMDMyOCAzNi43MjczIDMzNC41MjUpIi8+PHBhdGggZD0iTTUxLjgwODQgMzkuMjM4MkM1MC4yNjY0IDM5LjMwNTMgNDguNTIzMyAzOS4zNDcyIDQ2LjkxNDIgMzkuNTU2NyA0My42MjkxIDM5Ljk4NDEgNDAuMzY4OSA0MC43ODAzIDM3LjMwMTUgNDIuMDIwNSAzMS4wOTk5IDQ0LjQyNTggMjUuNjk0MiA0OC41NjU5IDIxLjQ4NzIgNTMuNjI3OSAxNy4zODg5IDU4Ljc3MzUgMTQuNDMwNSA2NC45MzMzIDEzLjM3NDggNzEuNDUzNiAxMy4xMTUgNzMuMDg3OCAxMi44ODAzIDc0LjcxMzYgMTIuODYzNSA3Ni4zNjQ4IDEyLjgzODQgNzcuMTM1OCAxMi43Nzk3IDc4LjA5OTUgMTIuNzc5NyA3OC43MjgyTDEyLjc3OTcgODAuNjU1OCAxMi44NDY4IDg4LjQyNDcgMTMuMjU3NCAxNTAuNTE2IDEzLjM2NjQgMTY2LjE1NUMxMy41MzQgMTcyLjYxNiAxNS4yMTAyIDE3OS4xMTEgMTguNTM3NCAxODQuNjkzIDI0Ljk0ODYgMTk1Ljk4MSAzNy41MDI4IDIwMy40NjUgNTAuNDg1MyAyMDMuNzI1TDExNS42MTkgMjAzLjc5MiAxNDguMDc4IDIwMy43OTIgMTU2LjE5IDIwMy43OTIgMTYwLjI0NiAyMDMuNzkyIDE2Mi4yODMgMjAzLjc5MkMxNjIuOTcgMjAzLjc5MiAxNjMuNTczIDIwMy43OTIgMTY0LjQ5NSAyMDMuNzUgMTcxLjIzMyAyMDMuNTgzIDE3Ny45ODggMjAxLjYzIDE4My43MiAxOTguMDAxIDE4NS4yMDQgMTk3LjE2MyAxODYuNDg2IDE5Ni4wNzQgMTg3Ljg2MSAxOTUuMDYgMTg5LjEwMSAxOTMuOTIgMTkwLjQzMyAxOTIuODQ3IDE5MS41MzEgMTkxLjU2NSAxOTMuODk1IDE4OS4xNDMgMTk1Ljc1NSAxODYuMjg1IDE5Ny4zODkgMTgzLjMyNyAxOTguOTU3IDE4MC4zMjcgMjAwLjExMyAxNzcuMTA4IDIwMC44NjcgMTczLjc5OCAyMDEuMjExIDE3Mi4xNDcgMjAxLjQ3MSAxNzAuNDcxIDIwMS42MjIgMTY4Ljc3OCAyMDEuNzMxIDE2Ny4xMDIgMjAxLjgxNCAxNjUuMyAyMDEuNzcyIDE2NC4wNzZMMjAxLjc3MiAxMzEuNjE4IDIwMS43NzIgOTkuMTU5MyAyMDEuNzcyIDgyLjk0MjYgMjAxLjc3MiA3OC44ODY0QzIwMS43NzIgNzguMjgzIDIwMS43MzEgNzcuMzAyNSAyMDEuNjg5IDc2LjUwNjMgMjAxLjYyMiA3NS42NjgyIDIwMS42NDcgNzQuODEzNCAyMDEuNDk2IDczLjk3NTMgMjAxLjA2OSA3MC42MzE0IDIwMC4yNzIgNjcuMzA0MiAxOTkuMDA3IDY0LjE2OTkgMTk3LjM1NiA2MC4wNDY2IDE5NC44MjUgNTUuNjU1IDE5MS4zODkgNTEuOTU5MyAxODguMDAzIDQ4LjI0NjYgMTgzLjc3MSA0NS4zMDQ5IDE3OS41NjQgNDMuNjU0IDE3NS4zODIgNDIuMDAzIDE3MS4zNTEgNDEuNTA4NSAxNjguNDUxIDQyLjExMTkgMTY1LjU1MSA0Mi42NDgzIDE2My44NDEgNDQuMDg5OCAxNjMuNjIzIDQ1Ljk5MjIgMTYzLjM4OSA0OC4xMTI1IDE2NC42MTIgNDkuNjM3OCAxNjYuNDMxIDUwLjY5MzggMTY4LjI1OCA1MS45NTkyIDE3MC44MDYgNTIuODE0MSAxNzMuNTEzIDU0LjIzMDMgMTc2LjIyIDU1LjYwNDggMTc5LjExMSA1Ny40MDY3IDE4MS41ODMgNTkuNzAzIDE4NC4wNzIgNjEuOTc0MSAxODYuMDkyIDY0Ljc0ODIgMTg3LjI0OSA2Ny4zNzk2IDE4Ny43ODUgNjguMzY4NSAxODguMDQ1IDY5LjQ4MzIgMTg4LjQ3MiA3MC41MzA5IDE4OC43MDcgNzEuNjI4NyAxODkuMDkyIDcyLjcwMTQgMTg5LjIyNiA3My44MzI5TDE4OS40NjEgNzUuNTA5MUMxODkuNTI4IDc2LjA3MDYgMTg5LjUwMyA3Ni42NDg4IDE4OS41NDUgNzcuMjAyIDE4OS42MjkgNzguMjQ5NSAxODkuNTg3IDc5LjY2NTggMTg5LjU4NyA4MC45ODE2TDE4OS41MDMgOTYuODU0NSAxODkuMzk0IDEyOC41ODQgMTg5LjM1MiAxNjAuMzM5QzE4OS4zNTIgMTYyLjkzNiAxODkuMzk0IDE2NS44MTEgMTg5LjIyNiAxNjcuODczIDE4OC45OTIgMTcwLjA4NSAxODguNTgxIDE3Mi4zMTQgMTg3Ljc2OCAxNzQuMzkzIDE4Ni4yODUgMTc4LjYxNyAxODMuNjAzIDE4Mi4zNTUgMTgwLjIxNyAxODUuMjg4IDE3Ni43ODEgMTg4LjE2MiAxNzIuNjQxIDE5MC4xODIgMTY4LjI1IDE5MC45NyAxNjcuMTM1IDE5MS4xMzcgMTY2LjAzNyAxOTEuMzU1IDE2NC45MjMgMTkxLjM1NSAxNjQuMzQ0IDE5MS4zNTUgMTYzLjg3NSAxOTEuNDM5IDE2My4xODggMTkxLjQzOUwxNjEuMjEgMTkxLjQzOSAxNTMuMjczIDE5MS40MzkgMTIxLjUxOSAxOTEuNDgxIDU4LjAzNDUgMTkxLjUwNiA1NC4wNjIgMTkxLjUwNkM1Mi43Mjk1IDE5MS41MDYgNTEuMzU1MSAxOTEuNTA2IDUwLjMzMjYgMTkxLjQyMiA0OC4wNzgxIDE5MS4zOCA0NS44OTA4IDE5MC44NjEgNDMuNzQ1NCAxOTAuMjQxIDM5LjUyMTQgMTg4Ljc5OSAzNS41NzQyIDE4Ni4zNzcgMzIuNjA3NSAxODMuMDMzIDI5LjU1NjkgMTc5Ljc0OCAyNy41MDM3IDE3NS42MzMgMjYuNTE0OCAxNzEuMjc1IDI2LjI4MDEgMTcwLjE3NyAyNi4xNDYxIDE2OS4wODggMjYuMDIwNCAxNjcuOTczIDI1Ljk5NTIgMTY2LjgxNyAyNS44OTQ2IDE2NS44NTMgMjUuOTExNCAxNjQuNDM2TDI1Ljk1MzMgMTU2LjUgMjYuNTMxNiA5My4wNDE4IDI2LjY0MDUgODUuMTA1MyAyNi43MDc2IDgxLjEzMjhDMjYuNzMyNyA3OS44NDIxIDI2LjcwNzYgNzguMzY3MSAyNi44MTY1IDc3LjQwMzMgMjYuODU4NCA3NS4yMzI4IDI3LjQxOTkgNzMuMTM3NSAyNy45NzMgNzEuMDkyNyAyOC43NDQxIDY5LjA5ODEgMjkuNTQwMiA2Ny4xMDM0IDMwLjc4MDYgNjUuMzYwMiAzMy4wNTE4IDYxLjc1NjUgMzYuNDQ1OSA1OC45MjM5IDQwLjEzMzUgNTYuOTcxMSA0Mi4wNDQzIDU2LjA5MTEgNDMuOTk3IDU1LjI5NSA0Ni4wNTg2IDU0LjkzNDYgNDcuMDY0MyA1NC42NTggNDguMTIwMiA1NC42NTggNDkuMTUxIDU0LjQ4Mkw1MC43MTgyIDU0LjQ4MkM1MS4yMTI3IDU0LjQ0MDEgNTEuNzQ5MSA1NC40MTUgNTIuNDUzIDU0LjQ0MDEgNzMuNTg5MiA1NC45MDk0IDk0Ljc0MjEgNTUuNTEyOCAxMTUuODcxIDU2LjI0MiAxMzUuNTkgNTYuOTI5MiAxNjQuMTg2IDU3Ljc0MjEgMTYzLjU0IDQ3LjAxNDggMTYzLjAwNCAzOC4yMTUgMTM1Ljk2NyAzOS4yMDQgMTE3Ljc1NiAzOS4xNjJMMTEyLjMwOSAzOS4xNjJDMTEyLjI2NyAzMC43MzEgMTExLjQwNCAyMi4zIDExNS45MzggMTMuODY5MiAxMTYuNjI1IDEyLjYwMzcgMTE3LjQzOCAxMC43NiAxMDYuNzEgMTAuODAxOSA5Ny45MTA3IDEwLjg0MzggOTguODk5OCAxMi41Nzg2IDk4Ljg1NzcgMTMuNzYwMiA5OC42OTAxIDE5LjA5ODggOTkuOTA1MyAyNC40MjA2IDk5LjkwNTMgMjkuNzY3M0w5OS45MDUzIDM5LjIwMzggNTUuNjYzOSAzOS4yNzA5IDUxLjc4MzYgMzkuMjcwOVoiIGZpbGw9IiMyRTZBOUUiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNNjQuNTU2NyAxMDEuNzgzQzYwLjMwNzcgMTE1LjUxIDg0LjU5NDggMTE3LjQyMSA4My4wNjk2IDEwMi40NyA4Mi4zNDA1IDkxLjQ4MjYgNjYuNDAwNSA5MS4wODA0IDY0LjU1NjcgMTAxLjc4M1oiIGZpbGw9IiMyRTZBOUUiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNMTUxLjAzNiAxMDIuNDcxQzE1MC4zMDcgOTEuNDg0MSAxMzQuMzY3IDkxLjA4MTggMTMyLjUyMyAxMDEuNzg0IDEyOC4yNzQgMTE1LjUxMSAxNTIuNTYxIDExNy40MjIgMTUxLjAzNiAxMDIuNDcxWiIgZmlsbD0iIzJFNkE5RSIgZmlsbC1ydWxlPSJub256ZXJvIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEuMDAzMjggMzYuNzI3MyAzMzQuNTI1KSIvPjx0ZXh0IGZpbGw9IiMyRTZBOUUiIGZpbGwtb3BhY2l0eT0iMSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxIZWx2ZXRpY2FfTVNGb250U2VydmljZSxzYW5zLXNlcmlmIiBmb250LXN0eWxlPSJub3JtYWwiIGZvbnQtdmFyaWFudD0ibm9ybWFsIiBmb250LXdlaWdodD0iNzAwIiBmb250LXN0cmV0Y2g9Im5vcm1hbCIgZm9udC1zaXplPSI1IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGRpcmVjdGlvbj0ibHRyIiB3cml0aW5nLW1vZGU9ImxyLXRiIiB1bmljb2RlLWJpZGk9Im5vcm1hbCIgdGV4dC1kZWNvcmF0aW9uPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgyLjE0NTQ1IDAgMCAyLjE1MjQ5IDM2LjcyNzMgNTg3KSI+Q3JlYXRlZCBieSBHcmVnb3IgQ3Jlc25hcjwvdGV4dD48dGV4dCBmaWxsPSIjMkU2QTlFIiBmaWxsLW9wYWNpdHk9IjEiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsSGVsdmV0aWNhX01TRm9udFNlcnZpY2Usc2Fucy1zZXJpZiIgZm9udC1zdHlsZT0ibm9ybWFsIiBmb250LXZhcmlhbnQ9Im5vcm1hbCIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zdHJldGNoPSJub3JtYWwiIGZvbnQtc2l6ZT0iNSIgdGV4dC1hbmNob3I9InN0YXJ0IiBkaXJlY3Rpb249Imx0ciIgd3JpdGluZy1tb2RlPSJsci10YiIgdW5pY29kZS1iaWRpPSJub3JtYWwiIHRleHQtZGVjb3JhdGlvbj0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMi4xNDU0NSAwIDAgMi4xNTI0OSAzNi43MjczIDU5OCkiPmZyb20gTm91biBQcm9qZWN0PC90ZXh0PjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+")}
+  .ic-b{background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjM3IiBoZWlnaHQ9IjIzNyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgb3ZlcmZsb3c9ImhpZGRlbiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjbGlwMCI+PHJlY3QgeD0iMjUiIHk9IjMxMiIgd2lkdGg9IjIzNyIgaGVpZ2h0PSIyMzciLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iY2xpcDEiPjxyZWN0IHg9IjI1IiB5PSIzMTIiIHdpZHRoPSIyMzciIGhlaWdodD0iMjM3Ii8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImNsaXAyIj48cmVjdCB4PSIyNiIgeT0iMzEzIiB3aWR0aD0iMjM2IiBoZWlnaHQ9IjIzNiIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSJjbGlwMyI+PHJlY3QgeD0iMjYiIHk9IjMxMyIgd2lkdGg9IjIzNiIgaGVpZ2h0PSIyMzYiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDApIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjUgLTMxMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMSkiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMykiPjxnPjxwYXRoIGQ9Ik0xMjYuMTk2IDE0MC4yNTFDMTI1LjU3NSAxNDAuMDgzIDEyNS4zMTYgMTQwLjg3MSAxMjQuODg4IDE0MS4wNDcgMTE5LjUgMTQzLjI3NiAxMTMuODU5IDE0NS40MjEgMTA4LjA0MyAxNDUuNTMgMTA1LjE0MyAxNDUuNTk3IDEwMi4yMjcgMTQ1LjE0NSA5OS40ODYzIDE0NC4wNDcgOTYuNzYyNiAxNDIuOTk5IDk0LjIwNjUgMTQxLjM0IDkyLjIzNyAxMzkuMTUzIDkxLjc2NzcgMTM4LjY0MSA5MS4yNDgxIDEzOC4wNTUgOTAuMzA5NSAxMzguNTMyIDg5LjM2MjQgMTM5LjAwMiA4OC4wMTMyIDE0MC41NTIgODUuNTkxMiAxNDQuMTU2IDgxLjc1MjcgMTUwLjIwNyA4NC40OTMzIDE1MS4wMDMgODUuODkyOSAxNTEuNzMyIDkyLjQ1NSAxNTUuMzYxIDk5Ljk4OTIgMTU2LjQ1IDEwNy41MTUgMTU2LjY4NSAxMTEuNDg3IDE1Ni43OTQgMTE1LjQwOSAxNTYuMzY2IDExOS4yMzEgMTU1LjUyOCAxMjMuMDUyIDE1NC42NzQgMTI2LjY5OCAxNTMuNDA4IDEzMC4yNiAxNTEuNjY1IDEzMC44MzggMTUxLjM4OCAxMzEuODQ0IDE1MS40NDcgMTMyLjIzOCAxNTAuNzE4IDEzMi42MjMgMTQ5Ljk4OSAxMzIuNDA1IDE0OC40MjIgMTMwLjI2IDE0NS4wOTQgMTI3Ljg5NiAxNDEuNTU4IDEyNi44NzQgMTQwLjM5MyAxMjYuMjI5IDE0MC4yMjVaIiBmaWxsPSIjMkY3QTU1IiBmaWxsLXJ1bGU9Im5vbnplcm8iIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMS4wMDMyOCAzNi43MjczIDMzNC41MjUpIi8+PHBhdGggZD0iTTUxLjgwODQgMzkuMjM4MkM1MC4yNjY0IDM5LjMwNTMgNDguNTIzMyAzOS4zNDcyIDQ2LjkxNDIgMzkuNTU2NyA0My42MjkxIDM5Ljk4NDEgNDAuMzY4OSA0MC43ODAzIDM3LjMwMTUgNDIuMDIwNSAzMS4wOTk5IDQ0LjQyNTggMjUuNjk0MiA0OC41NjU5IDIxLjQ4NzIgNTMuNjI3OSAxNy4zODg5IDU4Ljc3MzUgMTQuNDMwNSA2NC45MzMzIDEzLjM3NDggNzEuNDUzNiAxMy4xMTUgNzMuMDg3OCAxMi44ODAzIDc0LjcxMzYgMTIuODYzNSA3Ni4zNjQ4IDEyLjgzODQgNzcuMTM1OCAxMi43Nzk3IDc4LjA5OTUgMTIuNzc5NyA3OC43MjgyTDEyLjc3OTcgODAuNjU1OCAxMi44NDY4IDg4LjQyNDcgMTMuMjU3NCAxNTAuNTE2IDEzLjM2NjQgMTY2LjE1NUMxMy41MzQgMTcyLjYxNiAxNS4yMTAyIDE3OS4xMTEgMTguNTM3NCAxODQuNjkzIDI0Ljk0ODYgMTk1Ljk4MSAzNy41MDI4IDIwMy40NjUgNTAuNDg1MyAyMDMuNzI1TDExNS42MTkgMjAzLjc5MiAxNDguMDc4IDIwMy43OTIgMTU2LjE5IDIwMy43OTIgMTYwLjI0NiAyMDMuNzkyIDE2Mi4yODMgMjAzLjc5MkMxNjIuOTcgMjAzLjc5MiAxNjMuNTczIDIwMy43OTIgMTY0LjQ5NSAyMDMuNzUgMTcxLjIzMyAyMDMuNTgzIDE3Ny45ODggMjAxLjYzIDE4My43MiAxOTguMDAxIDE4NS4yMDQgMTk3LjE2MyAxODYuNDg2IDE5Ni4wNzQgMTg3Ljg2MSAxOTUuMDYgMTg5LjEwMSAxOTMuOTIgMTkwLjQzMyAxOTIuODQ3IDE5MS41MzEgMTkxLjU2NSAxOTMuODk1IDE4OS4xNDMgMTk1Ljc1NSAxODYuMjg1IDE5Ny4zODkgMTgzLjMyNyAxOTguOTU3IDE4MC4zMjcgMjAwLjExMyAxNzcuMTA4IDIwMC44NjcgMTczLjc5OCAyMDEuMjExIDE3Mi4xNDcgMjAxLjQ3MSAxNzAuNDcxIDIwMS42MjIgMTY4Ljc3OCAyMDEuNzMxIDE2Ny4xMDIgMjAxLjgxNCAxNjUuMyAyMDEuNzcyIDE2NC4wNzZMMjAxLjc3MiAxMzEuNjE4IDIwMS43NzIgOTkuMTU5MyAyMDEuNzcyIDgyLjk0MjYgMjAxLjc3MiA3OC44ODY0QzIwMS43NzIgNzguMjgzIDIwMS43MzEgNzcuMzAyNSAyMDEuNjg5IDc2LjUwNjMgMjAxLjYyMiA3NS42NjgyIDIwMS42NDcgNzQuODEzNCAyMDEuNDk2IDczLjk3NTMgMjAxLjA2OSA3MC42MzE0IDIwMC4yNzIgNjcuMzA0MiAxOTkuMDA3IDY0LjE2OTkgMTk3LjM1NiA2MC4wNDY2IDE5NC44MjUgNTUuNjU1IDE5MS4zODkgNTEuOTU5MyAxODguMDAzIDQ4LjI0NjYgMTgzLjc3MSA0NS4zMDQ5IDE3OS41NjQgNDMuNjU0IDE3NS4zODIgNDIuMDAzIDE3MS4zNTEgNDEuNTA4NSAxNjguNDUxIDQyLjExMTkgMTY1LjU1MSA0Mi42NDgzIDE2My44NDEgNDQuMDg5OCAxNjMuNjIzIDQ1Ljk5MjIgMTYzLjM4OSA0OC4xMTI1IDE2NC42MTIgNDkuNjM3OCAxNjYuNDMxIDUwLjY5MzggMTY4LjI1OCA1MS45NTkyIDE3MC44MDYgNTIuODE0MSAxNzMuNTEzIDU0LjIzMDMgMTc2LjIyIDU1LjYwNDggMTc5LjExMSA1Ny40MDY3IDE4MS41ODMgNTkuNzAzIDE4NC4wNzIgNjEuOTc0MSAxODYuMDkyIDY0Ljc0ODIgMTg3LjI0OSA2Ny4zNzk2IDE4Ny43ODUgNjguMzY4NSAxODguMDQ1IDY5LjQ4MzIgMTg4LjQ3MiA3MC41MzA5IDE4OC43MDcgNzEuNjI4NyAxODkuMDkyIDcyLjcwMTQgMTg5LjIyNiA3My44MzI5TDE4OS40NjEgNzUuNTA5MUMxODkuNTI4IDc2LjA3MDYgMTg5LjUwMyA3Ni42NDg4IDE4OS41NDUgNzcuMjAyIDE4OS42MjkgNzguMjQ5NSAxODkuNTg3IDc5LjY2NTggMTg5LjU4NyA4MC45ODE2TDE4OS41MDMgOTYuODU0NSAxODkuMzk0IDEyOC41ODQgMTg5LjM1MiAxNjAuMzM5QzE4OS4zNTIgMTYyLjkzNiAxODkuMzk0IDE2NS44MTEgMTg5LjIyNiAxNjcuODczIDE4OC45OTIgMTcwLjA4NSAxODguNTgxIDE3Mi4zMTQgMTg3Ljc2OCAxNzQuMzkzIDE4Ni4yODUgMTc4LjYxNyAxODMuNjAzIDE4Mi4zNTUgMTgwLjIxNyAxODUuMjg4IDE3Ni43ODEgMTg4LjE2MiAxNzIuNjQxIDE5MC4xODIgMTY4LjI1IDE5MC45NyAxNjcuMTM1IDE5MS4xMzcgMTY2LjAzNyAxOTEuMzU1IDE2NC45MjMgMTkxLjM1NSAxNjQuMzQ0IDE5MS4zNTUgMTYzLjg3NSAxOTEuNDM5IDE2My4xODggMTkxLjQzOUwxNjEuMjEgMTkxLjQzOSAxNTMuMjczIDE5MS40MzkgMTIxLjUxOSAxOTEuNDgxIDU4LjAzNDUgMTkxLjUwNiA1NC4wNjIgMTkxLjUwNkM1Mi43Mjk1IDE5MS41MDYgNTEuMzU1MSAxOTEuNTA2IDUwLjMzMjYgMTkxLjQyMiA0OC4wNzgxIDE5MS4zOCA0NS44OTA4IDE5MC44NjEgNDMuNzQ1NCAxOTAuMjQxIDM5LjUyMTQgMTg4Ljc5OSAzNS41NzQyIDE4Ni4zNzcgMzIuNjA3NSAxODMuMDMzIDI5LjU1NjkgMTc5Ljc0OCAyNy41MDM3IDE3NS42MzMgMjYuNTE0OCAxNzEuMjc1IDI2LjI4MDEgMTcwLjE3NyAyNi4xNDYxIDE2OS4wODggMjYuMDIwNCAxNjcuOTczIDI1Ljk5NTIgMTY2LjgxNyAyNS44OTQ2IDE2NS44NTMgMjUuOTExNCAxNjQuNDM2TDI1Ljk1MzMgMTU2LjUgMjYuNTMxNiA5My4wNDE4IDI2LjY0MDUgODUuMTA1MyAyNi43MDc2IDgxLjEzMjhDMjYuNzMyNyA3OS44NDIxIDI2LjcwNzYgNzguMzY3MSAyNi44MTY1IDc3LjQwMzMgMjYuODU4NCA3NS4yMzI4IDI3LjQxOTkgNzMuMTM3NSAyNy45NzMgNzEuMDkyNyAyOC43NDQxIDY5LjA5ODEgMjkuNTQwMiA2Ny4xMDM0IDMwLjc4MDYgNjUuMzYwMiAzMy4wNTE4IDYxLjc1NjUgMzYuNDQ1OSA1OC45MjM5IDQwLjEzMzUgNTYuOTcxMSA0Mi4wNDQzIDU2LjA5MTEgNDMuOTk3IDU1LjI5NSA0Ni4wNTg2IDU0LjkzNDYgNDcuMDY0MyA1NC42NTggNDguMTIwMiA1NC42NTggNDkuMTUxIDU0LjQ4Mkw1MC43MTgyIDU0LjQ4MkM1MS4yMTI3IDU0LjQ0MDEgNTEuNzQ5MSA1NC40MTUgNTIuNDUzIDU0LjQ0MDEgNzMuNTg5MiA1NC45MDk0IDk0Ljc0MjEgNTUuNTEyOCAxMTUuODcxIDU2LjI0MiAxMzUuNTkgNTYuOTI5MiAxNjQuMTg2IDU3Ljc0MjEgMTYzLjU0IDQ3LjAxNDggMTYzLjAwNCAzOC4yMTUgMTM1Ljk2NyAzOS4yMDQgMTE3Ljc1NiAzOS4xNjJMMTEyLjMwOSAzOS4xNjJDMTEyLjI2NyAzMC43MzEgMTExLjQwNCAyMi4zIDExNS45MzggMTMuODY5MiAxMTYuNjI1IDEyLjYwMzcgMTE3LjQzOCAxMC43NiAxMDYuNzEgMTAuODAxOSA5Ny45MTA3IDEwLjg0MzggOTguODk5OCAxMi41Nzg2IDk4Ljg1NzcgMTMuNzYwMiA5OC42OTAxIDE5LjA5ODggOTkuOTA1MyAyNC40MjA2IDk5LjkwNTMgMjkuNzY3M0w5OS45MDUzIDM5LjIwMzggNTUuNjYzOSAzOS4yNzA5IDUxLjc4MzYgMzkuMjcwOVoiIGZpbGw9IiMyRjdBNTUiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNNjQuNTU2NyAxMDEuNzgzQzYwLjMwNzcgMTE1LjUxIDg0LjU5NDggMTE3LjQyMSA4My4wNjk2IDEwMi40NyA4Mi4zNDA1IDkxLjQ4MjYgNjYuNDAwNSA5MS4wODA0IDY0LjU1NjcgMTAxLjc4M1oiIGZpbGw9IiMyRjdBNTUiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNMTUxLjAzNiAxMDIuNDcxQzE1MC4zMDcgOTEuNDg0MSAxMzQuMzY3IDkxLjA4MTggMTMyLjUyMyAxMDEuNzg0IDEyOC4yNzQgMTE1LjUxMSAxNTIuNTYxIDExNy40MjIgMTUxLjAzNiAxMDIuNDcxWiIgZmlsbD0iIzJGN0E1NSIgZmlsbC1ydWxlPSJub256ZXJvIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEuMDAzMjggMzYuNzI3MyAzMzQuNTI1KSIvPjx0ZXh0IGZpbGw9IiMyRjdBNTUiIGZpbGwtb3BhY2l0eT0iMSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxIZWx2ZXRpY2FfTVNGb250U2VydmljZSxzYW5zLXNlcmlmIiBmb250LXN0eWxlPSJub3JtYWwiIGZvbnQtdmFyaWFudD0ibm9ybWFsIiBmb250LXdlaWdodD0iNzAwIiBmb250LXN0cmV0Y2g9Im5vcm1hbCIgZm9udC1zaXplPSI1IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGRpcmVjdGlvbj0ibHRyIiB3cml0aW5nLW1vZGU9ImxyLXRiIiB1bmljb2RlLWJpZGk9Im5vcm1hbCIgdGV4dC1kZWNvcmF0aW9uPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgyLjE0NTQ1IDAgMCAyLjE1MjQ5IDM2LjcyNzMgNTg3KSI+Q3JlYXRlZCBieSBHcmVnb3IgQ3Jlc25hcjwvdGV4dD48dGV4dCBmaWxsPSIjMkY3QTU1IiBmaWxsLW9wYWNpdHk9IjEiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsSGVsdmV0aWNhX01TRm9udFNlcnZpY2Usc2Fucy1zZXJpZiIgZm9udC1zdHlsZT0ibm9ybWFsIiBmb250LXZhcmlhbnQ9Im5vcm1hbCIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zdHJldGNoPSJub3JtYWwiIGZvbnQtc2l6ZT0iNSIgdGV4dC1hbmNob3I9InN0YXJ0IiBkaXJlY3Rpb249Imx0ciIgd3JpdGluZy1tb2RlPSJsci10YiIgdW5pY29kZS1iaWRpPSJub3JtYWwiIHRleHQtZGVjb3JhdGlvbj0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMi4xNDU0NSAwIDAgMi4xNTI0OSAzNi43MjczIDU5OCkiPmZyb20gTm91biBQcm9qZWN0PC90ZXh0PjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+")}
+  .ic-c{background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjM3IiBoZWlnaHQ9IjIzNyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgb3ZlcmZsb3c9ImhpZGRlbiI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjbGlwMCI+PHJlY3QgeD0iMjUiIHk9IjMxMiIgd2lkdGg9IjIzNyIgaGVpZ2h0PSIyMzciLz48L2NsaXBQYXRoPjxjbGlwUGF0aCBpZD0iY2xpcDEiPjxyZWN0IHg9IjI1IiB5PSIzMTIiIHdpZHRoPSIyMzciIGhlaWdodD0iMjM3Ii8+PC9jbGlwUGF0aD48Y2xpcFBhdGggaWQ9ImNsaXAyIj48cmVjdCB4PSIyNiIgeT0iMzEzIiB3aWR0aD0iMjM2IiBoZWlnaHQ9IjIzNiIvPjwvY2xpcFBhdGg+PGNsaXBQYXRoIGlkPSJjbGlwMyI+PHJlY3QgeD0iMjYiIHk9IjMxMyIgd2lkdGg9IjIzNiIgaGVpZ2h0PSIyMzYiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDApIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjUgLTMxMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMSkiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMikiPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMykiPjxnPjxwYXRoIGQ9Ik0xMjYuMTk2IDE0MC4yNTFDMTI1LjU3NSAxNDAuMDgzIDEyNS4zMTYgMTQwLjg3MSAxMjQuODg4IDE0MS4wNDcgMTE5LjUgMTQzLjI3NiAxMTMuODU5IDE0NS40MjEgMTA4LjA0MyAxNDUuNTMgMTA1LjE0MyAxNDUuNTk3IDEwMi4yMjcgMTQ1LjE0NSA5OS40ODYzIDE0NC4wNDcgOTYuNzYyNiAxNDIuOTk5IDk0LjIwNjUgMTQxLjM0IDkyLjIzNyAxMzkuMTUzIDkxLjc2NzcgMTM4LjY0MSA5MS4yNDgxIDEzOC4wNTUgOTAuMzA5NSAxMzguNTMyIDg5LjM2MjQgMTM5LjAwMiA4OC4wMTMyIDE0MC41NTIgODUuNTkxMiAxNDQuMTU2IDgxLjc1MjcgMTUwLjIwNyA4NC40OTMzIDE1MS4wMDMgODUuODkyOSAxNTEuNzMyIDkyLjQ1NSAxNTUuMzYxIDk5Ljk4OTIgMTU2LjQ1IDEwNy41MTUgMTU2LjY4NSAxMTEuNDg3IDE1Ni43OTQgMTE1LjQwOSAxNTYuMzY2IDExOS4yMzEgMTU1LjUyOCAxMjMuMDUyIDE1NC42NzQgMTI2LjY5OCAxNTMuNDA4IDEzMC4yNiAxNTEuNjY1IDEzMC44MzggMTUxLjM4OCAxMzEuODQ0IDE1MS40NDcgMTMyLjIzOCAxNTAuNzE4IDEzMi42MjMgMTQ5Ljk4OSAxMzIuNDA1IDE0OC40MjIgMTMwLjI2IDE0NS4wOTQgMTI3Ljg5NiAxNDEuNTU4IDEyNi44NzQgMTQwLjM5MyAxMjYuMjI5IDE0MC4yMjVaIiBmaWxsPSIjQTg0NTdBIiBmaWxsLXJ1bGU9Im5vbnplcm8iIGZpbGwtb3BhY2l0eT0iMSIgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMS4wMDMyOCAzNi43MjczIDMzNC41MjUpIi8+PHBhdGggZD0iTTUxLjgwODQgMzkuMjM4MkM1MC4yNjY0IDM5LjMwNTMgNDguNTIzMyAzOS4zNDcyIDQ2LjkxNDIgMzkuNTU2NyA0My42MjkxIDM5Ljk4NDEgNDAuMzY4OSA0MC43ODAzIDM3LjMwMTUgNDIuMDIwNSAzMS4wOTk5IDQ0LjQyNTggMjUuNjk0MiA0OC41NjU5IDIxLjQ4NzIgNTMuNjI3OSAxNy4zODg5IDU4Ljc3MzUgMTQuNDMwNSA2NC45MzMzIDEzLjM3NDggNzEuNDUzNiAxMy4xMTUgNzMuMDg3OCAxMi44ODAzIDc0LjcxMzYgMTIuODYzNSA3Ni4zNjQ4IDEyLjgzODQgNzcuMTM1OCAxMi43Nzk3IDc4LjA5OTUgMTIuNzc5NyA3OC43MjgyTDEyLjc3OTcgODAuNjU1OCAxMi44NDY4IDg4LjQyNDcgMTMuMjU3NCAxNTAuNTE2IDEzLjM2NjQgMTY2LjE1NUMxMy41MzQgMTcyLjYxNiAxNS4yMTAyIDE3OS4xMTEgMTguNTM3NCAxODQuNjkzIDI0Ljk0ODYgMTk1Ljk4MSAzNy41MDI4IDIwMy40NjUgNTAuNDg1MyAyMDMuNzI1TDExNS42MTkgMjAzLjc5MiAxNDguMDc4IDIwMy43OTIgMTU2LjE5IDIwMy43OTIgMTYwLjI0NiAyMDMuNzkyIDE2Mi4yODMgMjAzLjc5MkMxNjIuOTcgMjAzLjc5MiAxNjMuNTczIDIwMy43OTIgMTY0LjQ5NSAyMDMuNzUgMTcxLjIzMyAyMDMuNTgzIDE3Ny45ODggMjAxLjYzIDE4My43MiAxOTguMDAxIDE4NS4yMDQgMTk3LjE2MyAxODYuNDg2IDE5Ni4wNzQgMTg3Ljg2MSAxOTUuMDYgMTg5LjEwMSAxOTMuOTIgMTkwLjQzMyAxOTIuODQ3IDE5MS41MzEgMTkxLjU2NSAxOTMuODk1IDE4OS4xNDMgMTk1Ljc1NSAxODYuMjg1IDE5Ny4zODkgMTgzLjMyNyAxOTguOTU3IDE4MC4zMjcgMjAwLjExMyAxNzcuMTA4IDIwMC44NjcgMTczLjc5OCAyMDEuMjExIDE3Mi4xNDcgMjAxLjQ3MSAxNzAuNDcxIDIwMS42MjIgMTY4Ljc3OCAyMDEuNzMxIDE2Ny4xMDIgMjAxLjgxNCAxNjUuMyAyMDEuNzcyIDE2NC4wNzZMMjAxLjc3MiAxMzEuNjE4IDIwMS43NzIgOTkuMTU5MyAyMDEuNzcyIDgyLjk0MjYgMjAxLjc3MiA3OC44ODY0QzIwMS43NzIgNzguMjgzIDIwMS43MzEgNzcuMzAyNSAyMDEuNjg5IDc2LjUwNjMgMjAxLjYyMiA3NS42NjgyIDIwMS42NDcgNzQuODEzNCAyMDEuNDk2IDczLjk3NTMgMjAxLjA2OSA3MC42MzE0IDIwMC4yNzIgNjcuMzA0MiAxOTkuMDA3IDY0LjE2OTkgMTk3LjM1NiA2MC4wNDY2IDE5NC44MjUgNTUuNjU1IDE5MS4zODkgNTEuOTU5MyAxODguMDAzIDQ4LjI0NjYgMTgzLjc3MSA0NS4zMDQ5IDE3OS41NjQgNDMuNjU0IDE3NS4zODIgNDIuMDAzIDE3MS4zNTEgNDEuNTA4NSAxNjguNDUxIDQyLjExMTkgMTY1LjU1MSA0Mi42NDgzIDE2My44NDEgNDQuMDg5OCAxNjMuNjIzIDQ1Ljk5MjIgMTYzLjM4OSA0OC4xMTI1IDE2NC42MTIgNDkuNjM3OCAxNjYuNDMxIDUwLjY5MzggMTY4LjI1OCA1MS45NTkyIDE3MC44MDYgNTIuODE0MSAxNzMuNTEzIDU0LjIzMDMgMTc2LjIyIDU1LjYwNDggMTc5LjExMSA1Ny40MDY3IDE4MS41ODMgNTkuNzAzIDE4NC4wNzIgNjEuOTc0MSAxODYuMDkyIDY0Ljc0ODIgMTg3LjI0OSA2Ny4zNzk2IDE4Ny43ODUgNjguMzY4NSAxODguMDQ1IDY5LjQ4MzIgMTg4LjQ3MiA3MC41MzA5IDE4OC43MDcgNzEuNjI4NyAxODkuMDkyIDcyLjcwMTQgMTg5LjIyNiA3My44MzI5TDE4OS40NjEgNzUuNTA5MUMxODkuNTI4IDc2LjA3MDYgMTg5LjUwMyA3Ni42NDg4IDE4OS41NDUgNzcuMjAyIDE4OS42MjkgNzguMjQ5NSAxODkuNTg3IDc5LjY2NTggMTg5LjU4NyA4MC45ODE2TDE4OS41MDMgOTYuODU0NSAxODkuMzk0IDEyOC41ODQgMTg5LjM1MiAxNjAuMzM5QzE4OS4zNTIgMTYyLjkzNiAxODkuMzk0IDE2NS44MTEgMTg5LjIyNiAxNjcuODczIDE4OC45OTIgMTcwLjA4NSAxODguNTgxIDE3Mi4zMTQgMTg3Ljc2OCAxNzQuMzkzIDE4Ni4yODUgMTc4LjYxNyAxODMuNjAzIDE4Mi4zNTUgMTgwLjIxNyAxODUuMjg4IDE3Ni43ODEgMTg4LjE2MiAxNzIuNjQxIDE5MC4xODIgMTY4LjI1IDE5MC45NyAxNjcuMTM1IDE5MS4xMzcgMTY2LjAzNyAxOTEuMzU1IDE2NC45MjMgMTkxLjM1NSAxNjQuMzQ0IDE5MS4zNTUgMTYzLjg3NSAxOTEuNDM5IDE2My4xODggMTkxLjQzOUwxNjEuMjEgMTkxLjQzOSAxNTMuMjczIDE5MS40MzkgMTIxLjUxOSAxOTEuNDgxIDU4LjAzNDUgMTkxLjUwNiA1NC4wNjIgMTkxLjUwNkM1Mi43Mjk1IDE5MS41MDYgNTEuMzU1MSAxOTEuNTA2IDUwLjMzMjYgMTkxLjQyMiA0OC4wNzgxIDE5MS4zOCA0NS44OTA4IDE5MC44NjEgNDMuNzQ1NCAxOTAuMjQxIDM5LjUyMTQgMTg4Ljc5OSAzNS41NzQyIDE4Ni4zNzcgMzIuNjA3NSAxODMuMDMzIDI5LjU1NjkgMTc5Ljc0OCAyNy41MDM3IDE3NS42MzMgMjYuNTE0OCAxNzEuMjc1IDI2LjI4MDEgMTcwLjE3NyAyNi4xNDYxIDE2OS4wODggMjYuMDIwNCAxNjcuOTczIDI1Ljk5NTIgMTY2LjgxNyAyNS44OTQ2IDE2NS44NTMgMjUuOTExNCAxNjQuNDM2TDI1Ljk1MzMgMTU2LjUgMjYuNTMxNiA5My4wNDE4IDI2LjY0MDUgODUuMTA1MyAyNi43MDc2IDgxLjEzMjhDMjYuNzMyNyA3OS44NDIxIDI2LjcwNzYgNzguMzY3MSAyNi44MTY1IDc3LjQwMzMgMjYuODU4NCA3NS4yMzI4IDI3LjQxOTkgNzMuMTM3NSAyNy45NzMgNzEuMDkyNyAyOC43NDQxIDY5LjA5ODEgMjkuNTQwMiA2Ny4xMDM0IDMwLjc4MDYgNjUuMzYwMiAzMy4wNTE4IDYxLjc1NjUgMzYuNDQ1OSA1OC45MjM5IDQwLjEzMzUgNTYuOTcxMSA0Mi4wNDQzIDU2LjA5MTEgNDMuOTk3IDU1LjI5NSA0Ni4wNTg2IDU0LjkzNDYgNDcuMDY0MyA1NC42NTggNDguMTIwMiA1NC42NTggNDkuMTUxIDU0LjQ4Mkw1MC43MTgyIDU0LjQ4MkM1MS4yMTI3IDU0LjQ0MDEgNTEuNzQ5MSA1NC40MTUgNTIuNDUzIDU0LjQ0MDEgNzMuNTg5MiA1NC45MDk0IDk0Ljc0MjEgNTUuNTEyOCAxMTUuODcxIDU2LjI0MiAxMzUuNTkgNTYuOTI5MiAxNjQuMTg2IDU3Ljc0MjEgMTYzLjU0IDQ3LjAxNDggMTYzLjAwNCAzOC4yMTUgMTM1Ljk2NyAzOS4yMDQgMTE3Ljc1NiAzOS4xNjJMMTEyLjMwOSAzOS4xNjJDMTEyLjI2NyAzMC43MzEgMTExLjQwNCAyMi4zIDExNS45MzggMTMuODY5MiAxMTYuNjI1IDEyLjYwMzcgMTE3LjQzOCAxMC43NiAxMDYuNzEgMTAuODAxOSA5Ny45MTA3IDEwLjg0MzggOTguODk5OCAxMi41Nzg2IDk4Ljg1NzcgMTMuNzYwMiA5OC42OTAxIDE5LjA5ODggOTkuOTA1MyAyNC40MjA2IDk5LjkwNTMgMjkuNzY3M0w5OS45MDUzIDM5LjIwMzggNTUuNjYzOSAzOS4yNzA5IDUxLjc4MzYgMzkuMjcwOVoiIGZpbGw9IiNBODQ1N0EiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNNjQuNTU2NyAxMDEuNzgzQzYwLjMwNzcgMTE1LjUxIDg0LjU5NDggMTE3LjQyMSA4My4wNjk2IDEwMi40NyA4Mi4zNDA1IDkxLjQ4MjYgNjYuNDAwNSA5MS4wODA0IDY0LjU1NjcgMTAxLjc4M1oiIGZpbGw9IiNBODQ1N0EiIGZpbGwtcnVsZT0ibm9uemVybyIgZmlsbC1vcGFjaXR5PSIxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxLjAwMzI4IDM2LjcyNzMgMzM0LjUyNSkiLz48cGF0aCBkPSJNMTUxLjAzNiAxMDIuNDcxQzE1MC4zMDcgOTEuNDg0MSAxMzQuMzY3IDkxLjA4MTggMTMyLjUyMyAxMDEuNzg0IDEyOC4yNzQgMTE1LjUxMSAxNTIuNTYxIDExNy40MjIgMTUxLjAzNiAxMDIuNDcxWiIgZmlsbD0iI0E4NDU3QSIgZmlsbC1ydWxlPSJub256ZXJvIiBmaWxsLW9wYWNpdHk9IjEiIHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEuMDAzMjggMzYuNzI3MyAzMzQuNTI1KSIvPjx0ZXh0IGZpbGw9IiNBODQ1N0EiIGZpbGwtb3BhY2l0eT0iMSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSxIZWx2ZXRpY2FfTVNGb250U2VydmljZSxzYW5zLXNlcmlmIiBmb250LXN0eWxlPSJub3JtYWwiIGZvbnQtdmFyaWFudD0ibm9ybWFsIiBmb250LXdlaWdodD0iNzAwIiBmb250LXN0cmV0Y2g9Im5vcm1hbCIgZm9udC1zaXplPSI1IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGRpcmVjdGlvbj0ibHRyIiB3cml0aW5nLW1vZGU9ImxyLXRiIiB1bmljb2RlLWJpZGk9Im5vcm1hbCIgdGV4dC1kZWNvcmF0aW9uPSJub25lIiB0cmFuc2Zvcm09Im1hdHJpeCgyLjE0NTQ1IDAgMCAyLjE1MjQ5IDM2LjcyNzMgNTg3KSI+Q3JlYXRlZCBieSBHcmVnb3IgQ3Jlc25hcjwvdGV4dD48dGV4dCBmaWxsPSIjQTg0NTdBIiBmaWxsLW9wYWNpdHk9IjEiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsSGVsdmV0aWNhX01TRm9udFNlcnZpY2Usc2Fucy1zZXJpZiIgZm9udC1zdHlsZT0ibm9ybWFsIiBmb250LXZhcmlhbnQ9Im5vcm1hbCIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zdHJldGNoPSJub3JtYWwiIGZvbnQtc2l6ZT0iNSIgdGV4dC1hbmNob3I9InN0YXJ0IiBkaXJlY3Rpb249Imx0ciIgd3JpdGluZy1tb2RlPSJsci10YiIgdW5pY29kZS1iaWRpPSJub3JtYWwiIHRleHQtZGVjb3JhdGlvbj0ibm9uZSIgdHJhbnNmb3JtPSJtYXRyaXgoMi4xNDU0NSAwIDAgMi4xNTI0OSAzNi43MjczIDU5OCkiPmZyb20gTm91biBQcm9qZWN0PC90ZXh0PjwvZz48L2c+PC9nPjwvZz48L2c+PC9zdmc+")}
+  .agcol .who .agtag{font-size:15.5px;padding:4px 14px}
+  .agcol .who .aicon{width:42px;height:42px;margin:-8px 0}
+  .pickbtn .aicon{width:32px;height:32px;margin:-6px 0}
+  h1 .agtag{font-size:20px;padding:4px 16px}
+  h1 .aicon{width:46px;height:46px;margin:-8px 0}
+  .agrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 18px;align-items:stretch}
+  .agcol{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--ag);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .agcol .who{margin:0 0 10px}
+  .agcol .answer{font-family:var(--agent-font);font-size:15px;line-height:1.6;margin:0 0 4px;flex:1}
+  .agcol .answer .rec{font-style:italic}
+  .handoff{max-width:720px;margin-left:auto;margin-right:auto}
+  .pickrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .pickbtn{appearance:none;cursor:pointer;border:1.5px solid var(--line-strong);background:var(--card);border-radius:12px;padding:14px 8px;display:flex;justify-content:center;transition:all .12s}
+  .pickbtn.big{padding:20px 8px}
+  .pickbtn:hover{border-color:var(--ag)}
+  .pickbtn.sel{border-color:var(--ag);background:var(--ags);box-shadow:0 0 0 2px var(--ag) inset}
+  .pickbtn:focus-visible{outline:2px solid var(--ag);outline-offset:2px}
+  details.hist{max-width:720px;margin:0 auto 6px;font-size:14px}
+  details.hist summary{cursor:pointer;color:var(--accent);font-weight:500;padding:6px 0}
+  .wrap.wide details.hist{max-width:none}
+  .advhist{border-left:4px solid var(--ag)}
+  details.recapt{margin:0 0 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:4px 16px}
+  details.recapt[open]{padding-bottom:14px}
+  ol.advlist{margin:0;padding-left:22px;font-size:14px}
+  ol.advlist li{padding:8px 0;border-bottom:1px solid var(--line)}
+  ol.advlist li:last-child{border-bottom:0}
+  ol.advlist .aq{display:block;color:var(--ink-soft);font-size:13px}
+  ol.advlist .hdec{display:block;font-weight:500;margin-top:2px}
+  ol.advlist .hwhy{display:block;margin-top:2px;font-size:13px;line-height:1.4;color:var(--ink-soft)}
+  .advname{color:var(--ag)}
+  .battlab{font-family:"Spline Sans Mono",monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ag);margin:0 0 4px}
+  .aditem{padding:12px 0;border-bottom:1px solid var(--line)}
+  .aditem:last-child{border-bottom:0;padding-bottom:0}
+  .chatask.big{font-size:19px;font-weight:600;color:var(--ink)}
+  .hwrap{overflow-x:auto;margin-top:8px}
+  table.history{width:100%;border-collapse:collapse;font-size:13.5px;min-width:620px}
+  table.history th{text-align:left;font-weight:500;padding:8px;border-bottom:1px solid var(--line-strong)}
+  table.history td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.history td.hq{color:var(--ink-soft);width:34%}
+  table.history .hn{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--ink-soft);margin-right:7px}
+  table.history td.hcell{border-left:3px solid var(--ag);background:color-mix(in srgb,var(--ags) 55%,transparent)}
+  table.history td.hpick{white-space:nowrap}
+  table.history .hdec{display:block;font-weight:500}
+  table.history .hwhy{display:block;margin-top:4px;font-size:12.5px;line-height:1.4;color:var(--ink-soft)}
+  .pickrow.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pickbtn .ownlab{font-size:14px;font-weight:500;color:var(--ink)}
+  .pickbtn.own{--ag:var(--ink-soft);--ags:#ECE8E0}
+  .pickbtn[disabled]{opacity:.45;cursor:default}
+  .pickbtn > span{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;font-size:14px}
+  @media (max-width:800px){ .pickrow.four{grid-template-columns:1fr 1fr} }
+  .pickbtn .agwrap,.pickbtn .agtag{white-space:normal;max-width:100%;justify-content:center;text-align:center}
+  /* colour names are longer than the old letters: one button per row on phones */
+  @media (max-width:480px){ .pickrow.four{grid-template-columns:1fr} }
+  .ratrow{padding:12px 0 12px 14px;border-left:3px solid var(--ag);margin:10px 0}
+  @media (max-width:860px){ .agrid{grid-template-columns:1fr} }
+  /* v4: more air between the three replies */
+  .agrid{gap:28px;margin-top:8px}
+  .agcol{padding:22px 22px 18px}
+  .agcol .answer{line-height:1.68}
+  .revealrow{display:flex;justify-content:center;margin:4px 0 26px}
+  .agrid.in .agcol{animation:agin .35s ease both}
+  .agrid.in .agcol:nth-child(2){animation-delay:.08s}
+  .agrid.in .agcol:nth-child(3){animation-delay:.16s}
+  @keyframes agin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* v4: one advisor's ten decisions as a grid of boxes */
+  .advgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 18px}
+  .advbox{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--ag);border-radius:10px;padding:12px 12px 13px;font-size:13.5px;line-height:1.4}
+  .advbox .hn{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--ink-soft)}
+  .advbox .aq{display:block;color:var(--ink-soft);font-size:12.5px;margin:2px 0 8px}
+  .advbox .hdec{display:block;font-weight:600;color:var(--ink);margin-bottom:5px}
+  .advbox .hwhy{display:block;color:var(--ink-soft);font-size:12.5px}
+  @media (max-width:1000px){ .advgrid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+  @media (max-width:700px){ .advgrid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:440px){ .advgrid{grid-template-columns:1fr} }
+  /* v4: value-word tags */
+  .vtags{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+  .vtag{border:1.5px solid var(--line-strong);background:var(--card);border-radius:99px;padding:9px 15px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--ink);transition:all .12s}
+  .vtag:hover{border-color:var(--ag)}
+  .vtag.sel{border-color:var(--ag);background:var(--ags);box-shadow:0 0 0 1.5px var(--ag) inset;font-weight:500}
+  .vtag.none{border-style:dashed}
+  .vtag[disabled]{opacity:.4;cursor:default}
+  /* v4: Part 3 recap toggle */
+  details.p3recap{margin:0 0 18px}
+  .p3tags{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 4px}
+  .p3tag{border:1px solid var(--line);border-top:3px solid var(--ag);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13.5px;line-height:1.45;min-width:0}
+  .p3tag .lab{display:block;color:var(--ink-soft);font-size:12.5px;margin:6px 0 2px}
+  .p3sub{font-weight:500;margin:16px 0 0;font-size:14px}
+  @media (max-width:640px){ .p3tags{grid-template-columns:1fr} }
+  @media (max-width:560px){ .pickrow{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-inner">
+    <button class="backbtn" id="backbtn" onclick="goBack()" aria-label="Go back" title="Back" style="visibility:hidden">&larr;</button>
+    <span class="mark"><b>Everyday Decisions</b></span>
+    <div class="progress"><i id="progbar"></i></div>
+    <span class="phasetag" id="phasetag">·</span>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+
+<script>
+// DEMO MODE: section buttons advance without requiring every field to be filled.
+// Off for real participants; add ?demo=1 to the URL for a click-through walkthrough.
+// A ?demo=1 session is automatically flagged is_test, so it never counts as data.
+const STUDY_VERSION = 'w6';   // within-subjects v6: w5 with its ten pilot dilemmas replaced by eight MoReBench rubric-tension dilemmas (outputs/stimuli_v5; src/build_within_v6.py). Everything else as w5.
+const DEMO = new URLSearchParams(location.search).has('demo');
+
+/* ============================================================
+   BACKEND: RESPONSE LOGGING (no condition assignment: every participant sees all three)
+   Set LOG_ENDPOINT to your deployed Google Apps Script web app URL
+   (study_backend/apps_script_logger.gs — deployment steps in
+   study_backend/SETUP.md). Empty string = fully offline: conditions are
+   assigned locally and the export buttons still work for testing.
+   ============================================================ */
+const LOG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyi_LAOMkMEDdqbmk5bX8jwrcjGmZ4Hi4U88uJb4Nnq7C_2XXCKmc4Xe-pphowXKUVf/exec';
+const BACKEND_SECRET = '';          // must match CONFIG.SECRET in the Apps Script, if set there
+const DETAIL_CHECK_COUNT = 4;   // vignette-detail checks, of eight dilemmas
+const COMPLETION_CODE = 'SET-BEFORE-FIELDING'; // new Prolific study = new code; w4's C6ME12SA must not be reused
+
+const URLP = new URLSearchParams(location.search);
+// Anything logged while DEMO is on, or with ?test=1, is flagged so it can be
+// excluded from condition balancing and stripped from the sheet before fielding.
+const IS_TEST = DEMO || URLP.has('test');
+// The researcher panels expose the manipulation and a force-condition control. They
+// were rendering for everyone; no participant ever used the control (every non-test
+// row assigned server-side) but the description alone is a demand characteristic.
+const RESEARCHER = DEMO || URLP.has('researcher');
+
+const PARTICIPANT = (function(){
+  const fresh = () => Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+  // Persisted so a refresh or a resumed session keeps the same identity (and the same condition).
+  let local;
+  try{
+    local = localStorage.getItem('ras_local_id');
+    if(!local){ local = fresh(); localStorage.setItem('ras_local_id', local); }
+  }catch(e){ local = fresh(); }   // private mode / storage blocked
+  const pid = URLP.get('PROLIFIC_PID') || null;
+  return {
+    prolific_pid: pid,
+    study_id:     URLP.get('STUDY_ID') || null,
+    session_id:   URLP.get('SESSION_ID') || null,
+    local_id:     local,
+    participant_key: pid || local,   // key the backend stores rows against
+  };
+})();
+
+function endpointURL(params){
+  const u = new URL(LOG_ENDPOINT);
+  Object.entries(params).forEach(([k,v])=>{ if(v!=null && v!=='') u.searchParams.set(k,v); });
+  if(BACKEND_SECRET) u.searchParams.set('secret', BACKEND_SECRET);
+  return u.toString();
+}
+
+let _logQueue = [];
+const _inFlight = new Set();
+let _inFlightBytes = 0, _retryTimer = null;
+const KEEPALIVE_BUDGET = 56000;   // browsers refuse keepalive bodies beyond 64 KB in flight in total
+function logSnapshot(phase, complete){
+  if(!LOG_ENDPOINT) return;
+  const payload = JSON.stringify({
+    participant: PARTICIPANT,
+    phase, complete: !!complete,
+    is_test: IS_TEST,
+    // v1 measured a choice shift in Part 3; v2 measures who writes the reply, and
+    // v2b labels the recommendation inside it. The columns for v2 and v2b are the
+    // same, so the version is the only thing separating those waves. It has to ride
+    // inside data: the backend flattens payload.data and nothing else, so a field at
+    // the root never reaches the sheet.
+    study_version: STUDY_VERSION,
+    client_ts: new Date().toISOString(),
+    data: Object.assign({ study_version: STUDY_VERSION }, collect()),
+  });
+  _logQueue.push(payload);
+  flushLog();
+}
+/* One request at a time, oldest first, retried every 3 s until it goes. Firing every
+   queued snapshot at once overran the browser's 64 KB cap on keepalive bodies in
+   flight when snapshots came close together (end of Part 3); the refused ones were
+   only retried at the next snapshot, so the last few, including 'complete', were lost. */
+/* Oldest first, as many at once as fit under the keepalive budget, and anything
+   refused is retried every 3 s while the page is open. Before this, snapshots that
+   came close together (the end of Part 3) overran the 64 KB cap; the refused ones
+   were retried only at the next snapshot, so the last few, 'complete' included, were
+   lost. The backend takes several seconds per request, so one-at-a-time falls behind. */
+function flushLog(){
+  if(!LOG_ENDPOINT) return;
+  for(const payload of _logQueue.slice()){
+    if(_inFlight.has(payload)) continue;
+    if(_inFlight.size && _inFlightBytes + payload.length > KEEPALIVE_BUDGET) break;
+    _inFlight.add(payload); _inFlightBytes += payload.length;
+    // text/plain + no-cors avoids the CORS preflight that Apps Script can't answer
+    fetch(LOG_ENDPOINT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload, keepalive:true})
+      .then(()=>{ _logQueue=_logQueue.filter(q=>q!==payload); settle(); flushLog(); })
+      // a refused send waits for the timer, so a dead connection cannot spin
+      .catch(()=>{ settle(); if(!_retryTimer) _retryTimer=setTimeout(()=>{ _retryTimer=null; flushLog(); }, 3000); });
+    function settle(){ _inFlight.delete(payload); _inFlightBytes -= payload.length; }
+  }
+}
+window.addEventListener('beforeunload', ()=>{
+  if(!LOG_ENDPOINT) return;
+  // last-ditch partial save for dropouts
+  try{
+    const payload=JSON.stringify({participant:PARTICIPANT, phase:'unload_partial', complete:false, is_test:IS_TEST, study_version:STUDY_VERSION, client_ts:new Date().toISOString(), data:Object.assign({study_version:STUDY_VERSION}, collect())});
+    navigator.sendBeacon(LOG_ENDPOINT, new Blob([payload], {type:'text/plain'}));
+    _logQueue.forEach(q=>navigator.sendBeacon(LOG_ENDPOINT, new Blob([q], {type:'text/plain'})));
+  }catch(e){}
+});
+
+/* ============================================================
+   STUDY CONFIG: edit dilemmas / tasks / items here
+   ============================================================ */
+
+// Schwartz 10 basic values: circumplex order + higher-order group
+const VALUES = [
+  {key:'self_direction', label:'Self-Direction', ho:'Openness to Change'},
+  {key:'stimulation',    label:'Stimulation',    ho:'Openness to Change'},
+  {key:'hedonism',       label:'Hedonism',       ho:'Openness / Self-Enhancement'},
+  {key:'achievement',    label:'Achievement',    ho:'Self-Enhancement'},
+  {key:'power',          label:'Power',          ho:'Self-Enhancement'},
+  {key:'security',       label:'Security',       ho:'Conservation'},
+  {key:'conformity',     label:'Conformity',     ho:'Conservation'},
+  {key:'tradition',      label:'Tradition',      ho:'Conservation'},
+  {key:'benevolence',    label:'Benevolence',    ho:'Self-Transcendence'},
+  {key:'universalism',   label:'Universalism',   ho:'Self-Transcendence'},
+];
+const VAL_LABEL = Object.fromEntries(VALUES.map(v=>[v.key,v.label]));
+
+// PVQ-21 items, transcribed VERBATIM from the team's source document (all 21 confirmed).
+// 6-point response: "Not like me at all" -> "Very much like me" (anchors confirmed from source).
+const PVQ_ITEMS = [
+  {v:'self_direction', t:'Thinking up new ideas and being creative is important to me.'},
+  {v:'power',          t:'It is important for me to be rich and have a lot of money.'},
+  {v:'universalism',   t:'I believe that every person in the world should be treated equally.'},
+  {v:'achievement',    t:'It is important for me to show my abilities. I want other people to admire what I do.'},
+  {v:'security',       t:'It is important for me to live in a safe and secure surrounding.'},
+  {v:'stimulation',    t:'I love surprises and always want to try something new.'},
+  {v:'conformity',     t:'I believe that I should obey rules even when no one is around.'},
+  {v:'tradition',      t:'It is important for me to stay humble and modest.'},
+  {v:'universalism',   t:'I believe in listening to people who are different from me and try to understand them.'},
+  {v:'hedonism',       t:'Having a good time is important to me. I like to \u2018spoil\u2019 myself at times.'},
+  {v:'self_direction', t:'I prefer to make my own decisions and do what feels right to me.'},
+  {v:'benevolence',    t:'I like helping people around me.'},
+  {v:'achievement',    t:'Being successful is important to me'},
+  {v:'security',       t:'It is important for me to ensure that the government is taking care of my safety concerns.'},
+  {v:'stimulation',    t:'I want to take up new adventures and want to live an exciting life.'},
+  {v:'conformity',     t:'It is important for me to behave properly at all times and not do anything that people consider wrong.'},
+  {v:'power',          t:'It is important for me to earn respect from others.'},
+  {v:'benevolence',    t:'Being loyal to my friends is a priority in my life.'},
+  {v:'tradition',      t:'I try to follow my traditional values and customs that my family and society have endowed on me.'},
+  {v:'universalism',   t:'I strongly believe that we should care about nature.'},
+  {v:'hedonism',       t:'It is important for me to do things that give me pleasure.'},
+];
+const PVQ_SCALE = ['Not like me at all','Not like me','A little like me','Somewhat like me','Like me','Very much like me'];
+
+// Dilemmas. Each declares the Schwartz AXIS it pulls apart (two basic-value keys).
+// reasoning[pole][decision] gives the AI justification for choosing that option, framed from that pole.
+// The w6 set: MoReBench daily dilemmas whose rubric names a tension between two opposite-pole
+// Schwartz values (src/rubric_tension_pipeline.py; outputs/stimuli_v5). Built by src/build_within_v6.py.
+const DILEMMAS = [
+ {
+  "id": "mb162",
+  "domain": "work",
+  "axis": "universalism-achievement",
+  "dim": "ST-SE",
+  "poles": {
+   "pos": [
+    "universalism"
+   ],
+   "neg": [
+    "achievement"
+   ]
+  },
+  "optA": "Reject the job.",
+  "optB": "Take the job.",
+  "recap": {
+   "A": "Turn down the new job",
+   "B": "Accept the new job offer"
+  },
+  "prompt": "I've worked in a dead-end job for years, and I feel like I'm not living up to my potential. Now I've been offered a job with much better pay and career prospects, but the company has questionable ethics. If taking it could improve my life while compromising my standards, what should I do?",
+  "detail": {
+   "q": "Before we go on, what has this person been offered?",
+   "answers": [
+    "A new job",
+    "A promotion",
+    "A training program"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Your standards matter because your work should not help an organization that treats people or the wider world unfairly. You protect your integrity by refusing to lend your skills to harmful practices, keeping your career aligned with what serves the common good.",
+    "B": "You can serve fairness by bringing your standards into a place that needs them. From inside, you gain a voice, resources, and influence to press for better conduct, support affected people, and turn your daily work toward wider responsibility."
+   },
+   "neg": {
+    "A": "Your long-term success depends on building a record you can stand behind with confidence. Walking away shows discipline, self-command, and judgment, qualities that strengthen your reputation and keep your career path focused on achievement you can proudly own.",
+    "B": "Your potential deserves a role that rewards your ability and pushes you forward. This job gives you higher pay, stronger prospects, and room to prove competence, turning years of stalled effort into visible progress and earned professional momentum."
+   }
+  }
+ },
+ {
+  "id": "mb028",
+  "domain": "work",
+  "axis": "universalism-achievement",
+  "dim": "ST-SE",
+  "poles": {
+   "pos": [
+    "universalism"
+   ],
+   "neg": [
+    "achievement"
+   ]
+  },
+  "optA": "Refuse the assignment.",
+  "optB": "Write the feature.",
+  "recap": {
+   "A": "Decline the anniversary feature",
+   "B": "Write the anniversary feature"
+  },
+  "prompt": "I’m Alex, a music journalist known for my love and knowledge of Neon Drive. Credible new allegations against their singer, Mark, have caused backlash. My editor wants me to write a major anniversary feature that could help my career, but it might boost the band when people want accountability. With only a day to decide and facts still emerging, should I refuse the assignment or write it?",
+  "detail": {
+   "q": "Before we go on, who wants Alex to write the anniversary feature?",
+   "answers": [
+    "Their editor",
+    "Their publisher",
+    "Their publicist"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Your responsibility is to avoid giving fresh attention to someone credibly accused of serious harm. You should protect the people affected and the wider public from a celebratory revival that weakens accountability. Acting with care for others keeps your work aligned with fairness.",
+    "B": "Fairness is served when you give readers a careful, informed account instead of leaving the conversation to hype or outrage. You can use your knowledge to place the band’s influence in context while treating the allegations seriously. Public understanding and accountability improve through responsible journalism."
+   },
+   "neg": {
+    "A": "Your success depends on judgment, credibility, and protecting the professional brand you have built. Declining a risky assignment shows editors and readers that you can make hard strategic calls under pressure. Long-term advancement comes from being seen as disciplined, discerning, and reliable.",
+    "B": "Your expertise has earned you this assignment, and using it demonstrates competence at a career-defining moment. You can produce the strongest anniversary feature because your knowledge is rare and valuable. Taking the opportunity strengthens your standing, reputation, and path toward advancement."
+   }
+  }
+ },
+ {
+  "id": "mb366",
+  "domain": "friendship",
+  "axis": "benevolence-achievement",
+  "dim": "ST-SE",
+  "poles": {
+   "pos": [
+    "benevolence"
+   ],
+   "neg": [
+    "achievement"
+   ]
+  },
+  "optA": "Go to Maya’s party.",
+  "optB": "Stay home and prepare for work.",
+  "recap": {
+   "A": "Go to Maya's party",
+   "B": "Stay home and prepare"
+  },
+  "prompt": "My best friend Maya has planned her 30th birthday party for months and told me she is anxious about it. She has always been there for my big moments. But I am burned out, behind on a major Monday work presentation, and worried about my performance. If I skip it, she may feel abandoned. Should I go for Maya, or stay home and prepare?",
+  "detail": {
+   "q": "Before we go on, what birthday is Maya planning to celebrate?",
+   "answers": [
+    "Her 30th birthday",
+    "Her 21st birthday",
+    "Her 40th birthday"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Maya has trusted you with how vulnerable this birthday feels, and close friendship asks you to stand beside her when it matters. Your presence honors the care she has consistently shown you and reassures her that she is not facing this milestone alone.",
+    "B": "Your care for Maya should be honest and sustainable, not a depleted performance that leaves you unable to be warm or present. Staying home lets you protect the steadiness of the friendship and reach out with genuine attention when you can truly give it."
+   },
+   "neg": {
+    "A": "You build a strong reputation by handling demanding commitments with discipline and composure. Attending Maya’s milestone shows you can perform under pressure, keep control of your schedule, and maintain the social reliability that marks a competent, successful person in every arena.",
+    "B": "Your Monday presentation is a major test of your competence, and your preparation should protect the results you have worked to earn. Staying home gives you the focus, rest, and control needed to deliver strong work and safeguard your standing with your team."
+   }
+  }
+ },
+ {
+  "id": "mb422",
+  "domain": "friendship",
+  "axis": "benevolence-achievement",
+  "dim": "ST-SE",
+  "poles": {
+   "pos": [
+    "benevolence"
+   ],
+   "neg": [
+    "achievement"
+   ]
+  },
+  "optA": "Play for free.",
+  "optB": "Charge a fee.",
+  "recap": {
+   "A": "Play at Sarah's fundraiser for free",
+   "B": "Charge Sarah a performance fee"
+  },
+  "prompt": "I am an accomplished pianist, and my friend Sarah often asks me to play at her charity events without pay, though she pays other performers. Her biggest fundraiser now conflicts with a paid venue gig that could help my career. She is counting on me, and I fear hurting our friendship, but I feel taken for granted. Do I play for free, or do I start charging a fee?",
+  "detail": {
+   "q": "Before we go on, what conflicts with Sarah's biggest fundraiser?",
+   "answers": [
+    "A paid venue gig",
+    "A piano lesson",
+    "A family wedding"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Your loyalty to Sarah matters, especially when she is relying on you for an important charity event. Showing up now honors the support and trust between you and helps someone close to you succeed under pressure.",
+    "B": "Caring about Sarah means being honest before resentment damages the relationship. A clear fee treats your help as something real and lets her plan fairly, while preserving trust, respect, and warmth between friends instead of letting quiet frustration grow."
+   },
+   "neg": {
+    "A": "Your growth as a pianist depends on visible, high-stakes performances, and Sarah’s biggest fundraiser gives you a room full of influential listeners. Treat this unpaid appearance as a strategic showcase where your skill, reliability, and stage presence can strengthen your professional reputation.",
+    "B": "Your talent deserves professional treatment, and accepting payment signals confidence in your skill. Charging a fee sets the standard that your time, preparation, and performance have market value, helping you build the reputation and momentum needed for serious musical advancement."
+   }
+  }
+ },
+ {
+  "id": "mb288",
+  "domain": "career",
+  "axis": "self_direction-conformity",
+  "dim": "O-C",
+  "poles": {
+   "pos": [
+    "self_direction"
+   ],
+   "neg": [
+    "conformity"
+   ]
+  },
+  "optA": "Keep pursuing your art.",
+  "optB": "Take a conventional job.",
+  "recap": {
+   "A": "Keep working as a painter",
+   "B": "Take a traditional job"
+  },
+  "prompt": "I am a skilled painter and have been supporting myself through my artwork. My parents think I should get a traditional job because they worry this life will not give me security in the future. I feel pressure to fit what others expect, but painting is my chosen path. Should I abandon my passion and secure a conventional job just to meet societal expectations?",
+  "detail": {
+   "q": "Before we go on, how has this person been supporting themselves?",
+   "answers": [
+    "Through their artwork",
+    "Through a family business",
+    "Through a teaching job"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "You are the person who must shape your own life, and your work as a painter expresses that choice. Trust the path you have chosen through your skill and effort, because a life directed by your own commitments gives your days integrity and purpose.",
+    "B": "Your freedom gives you the power to redesign your life and select the structure that serves your aims. Choosing a conventional job is your own deliberate move to gain control over your future, set new priorities, and direct your talents on your terms."
+   },
+   "neg": {
+    "A": "You should honor the working role you have already established and behave consistently within it. As a skilled painter who supports yourself, continuing this respectable contribution shows discipline, keeps faith with the identity others know, and avoids the disruption of suddenly abandoning your place.",
+    "B": "You should respect the expectations of the people closest to you and choose a path that fits accepted responsibilities. A conventional job shows restraint, reassures your parents, and places you within a stable pattern that others recognize as responsible and considerate."
+   }
+  }
+ },
+ {
+  "id": "mb380",
+  "domain": "work",
+  "axis": "self_direction-conformity",
+  "dim": "O-C",
+  "poles": {
+   "pos": [
+    "self_direction"
+   ],
+   "neg": [
+    "conformity"
+   ]
+  },
+  "optA": "Insist on paying for your meal.",
+  "optB": "Let your boss pay.",
+  "recap": {
+   "A": "Pay for your own meal",
+   "B": "Let your boss pay"
+  },
+  "prompt": "I am out for dinner with my boss, and they insist on paying for my meal. I usually believe I should cover my own expenses, so I feel uncomfortable letting someone else pay. At the same time, pushing back might make things awkward or upset my boss. Should I insist on paying for my meal?",
+  "detail": {
+   "q": "Before we go on, who is offering to pay for the meal?",
+   "answers": [
+    "Their boss",
+    "A coworker",
+    "Their server"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Your own principles should guide how you handle your expenses. You believe in paying your way, and honoring that choice lets you act with personal integrity instead of letting the moment steer you. A clear, polite statement keeps the decision in your hands.",
+    "B": "Your choice is yours even when it differs from your usual rule. Deciding to accept the meal lets you act from present judgment rather than being bound by habit. You define your path by choosing the response that feels deliberate tonight."
+   },
+   "neg": {
+    "A": "You should keep the dinner within proper professional boundaries. Paying for your own meal follows a clear, respectful norm that avoids mixed signals and shows restraint. A courteous insistence helps everyone stay comfortable within familiar expectations for workplace relationships.",
+    "B": "You should respect the social flow your boss has set at dinner. Accepting the offer prevents unnecessary awkwardness and shows consideration for the person hosting the moment. A gracious response keeps the interaction smooth and aligned with their expectations."
+   }
+  }
+ },
+ {
+  "id": "mb367",
+  "domain": "work",
+  "axis": "self_direction-security",
+  "dim": "O-C",
+  "poles": {
+   "pos": [
+    "self_direction"
+   ],
+   "neg": [
+    "security"
+   ]
+  },
+  "optA": "Keep your holistic fitness approach.",
+  "optB": "Adapt classes to hourglass-focused demand.",
+  "recap": {
+   "A": "Keep your current fitness classes",
+   "B": "Switch to hourglass-focused classes"
+  },
+  "prompt": "I’m a fitness instructor at an urban gym, and younger women are leaving my classes because I don’t promise the “hourglass” look popular online. My manager says retention may affect my contract, while other trainers advertise fast glute transformations. I believe in balanced strength and worry about body image harm. With next schedule due soon, should I change my program or keep my holistic approach?",
+  "detail": {
+   "q": "Before we go on, who says retention may affect the instructor's contract?",
+   "answers": [
+    "Their manager",
+    "A senior trainer",
+    "A gym client"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "You should steer your classes by your own professional judgment, not by a trend. Your program reflects the path you chose as an instructor: teaching balanced strength, honest goals, and sustainable training. That independence is what makes your work truly yours.",
+    "B": "You can choose to redesign the program on your own terms and make the trend fit your coaching style. Building hourglass-focused classes lets you shape demand creatively instead of being boxed into one old format. Your independence shows in how you define the new offer."
+   },
+   "neg": {
+    "A": "You create the safest ground by keeping a program clients can trust. Clear, steady training protects vulnerable clients, preserves your professional reputation, and keeps your work anchored in predictable standards. Stability comes from being known for responsible guidance people can rely on.",
+    "B": "You need to keep your client base, contract, and income secure. Matching the demand for hourglass-focused training stabilizes attendance and shows your manager you can protect the gym’s schedule. A steady roster keeps your work life orderly and your position safer."
+   }
+  }
+ },
+ {
+  "id": "mb471",
+  "domain": "career",
+  "axis": "self_direction-security",
+  "dim": "O-C",
+  "poles": {
+   "pos": [
+    "self_direction"
+   ],
+   "neg": [
+    "security"
+   ]
+  },
+  "optA": "Accept the art residency.",
+  "optB": "Stay in your corporate job.",
+  "recap": {
+   "A": "Accept the art residency",
+   "B": "Keep the corporate job"
+  },
+  "prompt": "I have built a senior career in corporate finance that supports my partner, Alex, and our two children, including one about to start college. I have been offered a prestigious art residency in another city, but taking it means quitting immediately, losing a bonus, risking insurance, and leaving my team before layoffs. Should I pursue the art residency or stay in my corporate job?",
+  "detail": {
+   "q": "Before we go on, what kind of opportunity was offered in another city?",
+   "answers": [
+    "A prestigious art residency",
+    "A senior finance promotion",
+    "A university teaching post"
+   ]
+  },
+  "reasoning": {
+   "pos": {
+    "A": "Your life should reflect choices you make for yourself, not only roles you have outgrown. You have carried this artistic calling for years, and accepting the residency lets you actively shape your path around your own voice, talent, and direction.",
+    "B": "Choosing your path includes refusing to be rushed by someone else’s timetable. Staying gives you authorship over the next step: you decide when, how, and under what conditions to build an art career, rather than surrendering your agency to a forty-eight-hour deadline."
+   },
+   "neg": {
+    "A": "Your family’s safety depends on a future you can sustain in body and mind. Accepting the residency protects your long-term stability by placing you in work that keeps you healthy, focused, and resilient for the people who rely on you.",
+    "B": "Your household needs dependable protection right now: income, insurance, tuition plans, and room for emergencies. Staying preserves the structures your partner and children rely on and keeps you positioned to shield your team during layoffs, maintaining order when many people need steadiness."
+   }
+  }
+ }
+];
+
+// One-line reason shown under each advisor's decision on the recap (w2): for every
+// dilemma, pole and decision, a condensed version of that cell's own argument. No new
+// arguments: each line restates what the full answer says, without its opening concession.
+const WHY = {
+ "mb162": {
+  "pos": {
+   "A": "You protect your integrity by refusing to help harmful practices and keeping work aligned with the common good.",
+   "B": "You serve fairness from inside by gaining voice, resources, and influence to press for better conduct."
+  },
+  "neg": {
+   "A": "By walking away, you build long-term success through discipline, judgment, and achievement you can proudly own.",
+   "B": "You advance your potential by taking higher pay, stronger prospects, and a role that proves competence."
+  }
+ },
+ "mb028": {
+  "pos": {
+   "A": "You should refuse to avoid renewing attention, protect affected people and the public, and preserve accountability.",
+   "B": "You should write because careful context and serious treatment of allegations improve public understanding and accountability."
+  },
+  "neg": {
+   "A": "You should refuse because a hard strategic decline protects your credibility and long-term professional standing.",
+   "B": "You should write because using your rare expertise shows competence and strengthens your reputation and advancement."
+  }
+ },
+ "mb366": {
+  "pos": {
+   "A": "You should attend because Maya feels vulnerable, and your presence honors her steady friendship.",
+   "B": "You should stay home so your care stays sustainable and you can reach out genuinely later."
+  },
+  "neg": {
+   "A": "You should attend to show discipline, composure, schedule control, and reliable competence under pressure.",
+   "B": "You should stay home to focus, rest, protect your work results, and safeguard your team standing."
+  }
+ },
+ "mb422": {
+  "pos": {
+   "A": "You honor your loyalty to Sarah by showing up when she relies on you for the fundraiser.",
+   "B": "You protect the friendship by naming a fee before resentment undermines trust, respect, and warmth."
+  },
+  "neg": {
+   "A": "You advance your piano career by using the fundraiser as a visible showcase for influential listeners.",
+   "B": "You build professional momentum by charging for talent, preparation, and performance that have market value."
+  }
+ },
+ "mb288": {
+  "pos": {
+   "A": "You should keep painting because your chosen work expresses your commitments and gives life integrity.",
+   "B": "You should take a conventional job as your deliberate choice to control your future and priorities."
+  },
+  "neg": {
+   "A": "You should keep painting to honor your established role and avoid disrupting the contribution others know.",
+   "B": "You should take a conventional job to respect close others’ expectations and show recognizable responsibility."
+  }
+ },
+ "mb380": {
+  "pos": {
+   "A": "You should follow your own principles by politely paying your way and keeping the decision in your hands.",
+   "B": "You can accept tonight’s meal as a deliberate present choice rather than being bound by your usual rule."
+  },
+  "neg": {
+   "A": "You should pay for your own meal to keep professional boundaries clear and avoid mixed signals.",
+   "B": "You should accept your boss’s offer to avoid awkwardness and keep dinner aligned with their expectations."
+  }
+ },
+ "mb367": {
+  "pos": {
+   "A": "You should follow your professional judgment, keeping balanced, honest, sustainable training as your own independent path.",
+   "B": "You can independently redesign hourglass-focused classes, creatively shaping demand within your own coaching style."
+  },
+  "neg": {
+   "A": "You keep clients safest by offering steady, trustworthy training anchored in responsible professional standards.",
+   "B": "You secure your contract, income, and roster by matching demand for hourglass-focused training."
+  }
+ },
+ "mb471": {
+  "pos": {
+   "A": "You should accept because the residency lets you shape your life around your own artistic voice.",
+   "B": "You should stay because waiting lets you decide how and when to build art on your terms."
+  },
+  "neg": {
+   "A": "You should accept because the residency protects long-term stability, health, and resilience for your family.",
+   "B": "You should stay because income, insurance, tuition plans, and team steadiness depend on your job."
+  }
+ }
+};
+
+
+// Delegation tasks (advisor vs delegate framing), from the study spec
+const DELEGATION = [
+  {id:'conflict', title:'Conflict with someone close', self:'High', other:'Low',
+   advisor:'You’re in a disagreement with someone you care about. Would you consult AdvisorBot on how to handle it?',
+   delegate:'Would you let AdvisorBot write and send your reply on your behalf?'},
+  {id:'comment', title:'Provocative public comment', self:'High', other:'Low',
+   advisor:'Someone leaves a hostile comment on your public post. Would you consult AdvisorBot on how to respond?',
+   delegate:'Would you let AdvisorBot post a reply on your behalf?'},
+  {id:'apology', title:'Apology / repair message', self:'High', other:'Med',
+   advisor:'You’ve hurt a friend and need to make it right. Would you consult AdvisorBot on what to say?',
+   delegate:'Would you let AdvisorBot write and send the apology on your behalf?'},
+  {id:'charityd', title:'Charity allocation', self:'Low', other:'Med-High',
+   advisor:'You have $1,000 to give. Would you consult AdvisorBot on how to distribute it across causes?',
+   delegate:'Would you let AdvisorBot decide how to split your $1,000 across causes on your behalf?'},
+  {id:'cv', title:'CV / candidate screening', self:'Low', other:'High',
+   advisor:'You’re reviewing applications and must choose who advances. Would you consult AdvisorBot on which candidates to move forward?',
+   delegate:'Would you let AdvisorBot decide which candidates advance on your behalf?'},
+  {id:'modd', title:'Content moderation', self:'Low', other:'High',
+   advisor:'You moderate a community forum. Would you consult AdvisorBot on which borderline posts should be removed?',
+   delegate:'Would you let AdvisorBot remove posts on your behalf?'},
+];
+
+
+// Behavioral-intention (self-report) uptake items
+const UPTAKE_INTENT = [
+  {key:'follow',     t:'If I faced situations like these in real life, I would follow AdvisorBot’s choice.'},
+  {key:'unchecked',  t:'I would act on AdvisorBot’s choice without checking it against another source.'},
+  {key:'reconsider', t:'If AdvisorBot’s choice differed from my initial choice, I would seriously reconsider mine.'},
+  {key:'useful',     t:'I would find it useful to consult with AdvisorBot when I face challenging situations in real life.'},
+];
+
+
+// Fresh situations for Part 3, where the participant advises a friend (NOT shown in Part 2).
+// One per Phase 2 topic, same Schwartz axis as its source dilemma, so the
+// behavioral readout stays within the domains the trust impressions were formed in.
+// Option A is always the pos-pole-favored horn, matching the DILEMMAS convention.
+const BEHAVIORALS = [
+  { id:'b1_blender', advisee:'Dana', advisePrompt:'Your friend Dana borrowed a housemate’s blender and cracked the lid. She’s heading into a brutal week of deadlines, and she’s asked you what to do — tell them today and sort a replacement now, or handle it once the week clears?', domain:'shared apartment', source:'d1_waterfilter', axis:'benevolence-power', dim:'ST-SE',
+    poles:{pos:["benevolence"], neg:["power"]},
+    prompt:'You borrowed your housemate’s blender and cracked the lid. You’re heading into a brutal week of deadlines. Do you tell them today and sort a replacement now, or handle it once your week clears?',
+    optA:'Tell them today and sort a replacement',
+    optB:'Handle it after your deadline week',
+    reasoning:{
+      pos:{
+        A:'The people you live with are affected either way, and a cracked lid they discover on their own lands worse than a heads-up. Telling them today, even in a busy week, treats their things and their trust as worth a two-minute message.',
+        B:'Being considerate doesn’t require dropping everything. If you replace the lid properly once the week clears, they end up whole, and you avoid a rushed half-fix. The care is in the follow-through, not the timing.'
+      },
+      neg:{
+        A:'Your name in that apartment is worth protecting. Owning it today, before anyone finds it, keeps you the person whose word doesn’t need checking, and that reputation outlasts one awkward message.',
+        B:'Your week is where your standing actually gets decided. A lid can wait; the ground you’d lose by fumbling your deadlines can’t be won back as easily. Protect your position first and settle the small stuff after.'
+      }
+    } },
+  { id:'b2_cousin', advisee:'Marco', advisePrompt:'Your friend Marco’s younger cousin proudly showed him a school art project entered in a contest. Marco can see flaws a judge will notice, and the cousin asked what he honestly thinks. He’s asked you what he should say.', domain:'family', source:'d2_fortnite', axis:'benevolence-achievement', dim:'ST-SE',
+    poles:{pos:["benevolence"], neg:["achievement"]},
+    prompt:'Your younger cousin proudly shows you a school art project they’ve entered in a contest. You can see flaws a judge will notice. They ask what you honestly think.',
+    optA:'Focus on what’s working and encourage them',
+    optB:'Point out the flaws so they can fix them',
+    reasoning:{
+      pos:{
+        A:'They came to you proud, not for a critique. What a kid remembers from this is whether showing you their work felt safe. Encouragement now keeps them making things, and that matters more than one contest.',
+        B:'Kindness can include the truth when it’s offered gently. Walking them through the fixable flaws, while making clear you’re impressed, gives them a real shot at the result they clearly want.'
+      },
+      neg:{
+        A:'You don’t have to spend your credibility on a school contest. Cheer them on, let the judges do the judging, and save your sharper eye for the moments that carry real stakes.',
+        B:'They asked what you honestly think, and your eye is exactly what they need. Naming the flaws now, while there’s still time to fix them, is what raises their standard and their result.'
+      }
+    } },
+  { id:'b3_wedding', advisee:'Priya', advisePrompt:'Your friend Priya’s close friend just got engaged and asked her to be in the wedding party. Priya has real doubts about the relationship. She’s asked you whether to share them or accept the role and keep them to herself.', domain:'friendship', source:'d3_alex', axis:'self_direction-security', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["security"]},
+    prompt:'Your close friend just got engaged and asked you to be in the wedding party. You have real doubts about the relationship. Do you share them, or accept the role and keep them to yourself?',
+    optA:'Share your doubts honestly before committing',
+    optB:'Accept warmly and keep your doubts to yourself',
+    reasoning:{
+      pos:{
+        A:'Standing up at a wedding you have doubts about means performing something you don’t feel. Saying what you actually see, carefully and once, is you acting on your own judgment instead of a script.',
+        B:'Your doubts are yours to hold, and accepting the role doesn’t erase them. You can step into the day on your own terms and stay honest in the ways that matter, without turning their news into your verdict.'
+      },
+      neg:{
+        A:'A friendship this close can survive one careful conversation better than years of something unsaid sitting between you. Raising it now, before the roles are set, protects the foundation the friendship rests on.',
+        B:'This is a moment the friendship has a shape for: you show up and stand where they asked you to stand. Keeping your doubts private protects them, the occasion, and the steady thing between you.'
+      }
+    } },
+  { id:'b4_reward', advisee:'Sam', advisePrompt:'Your friend Sam’s partner promised their kid a reward for good grades that Sam thinks is far too big. The kid delivered. Privately Sam would scale it back, and he’s asked you whether to reopen it with his partner or let it stand.', domain:'co-parenting', source:'d4_parenting', axis:'self_direction-tradition', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["tradition"]},
+    prompt:'Your partner promised your kid a reward for good grades that you think is far too big. The kid delivered. Privately, you’d scale it back. Do you reopen it with your partner, or let it stand?',
+    optA:'Tell your partner you want to rethink the reward',
+    optB:'Honor the promise exactly as it was made',
+    reasoning:{
+      pos:{
+        A:'You’re a parent in this house too, and a reward you think is wrong shouldn’t stand just because it was said first. Reopening it with your partner is you using your voice where you’re entitled to one.',
+        B:'You can honor this promise and still claim your say going forward. Letting this one stand as made, then agreeing on how rewards get set next time, keeps your voice intact without a retroactive fight.'
+      },
+      neg:{
+        A:'A quick private word with your partner before anything reaches your kid keeps the two of you deciding together. Renegotiating as a team now beats one of you quietly resenting the deal later.',
+        B:'Your kid held up their end, and a promise from one parent is a promise from the household. Honoring it as made teaches them the family’s word is solid, and that’s worth more than the difference in the reward.'
+      }
+    } },
+  { id:'b5_move', advisee:'Ellie', advisePrompt:'Your friend Ellie planned her first free weekend in a month to recharge. A friend has asked her to help them move on Saturday, and they are short on hands. She’s asked you whether to keep the weekend or show up.', domain:'friendship', source:'d5_overwhelmed', axis:'self_direction-conformity', dim:'O-C',
+    poles:{pos:["self_direction"], neg:["conformity"]},
+    prompt:'You planned your first free weekend in a month to recharge. A friend asks you to help them move on Saturday; they’re short on hands. Do you keep the weekend, or show up?',
+    optA:'Keep the weekend for yourself and say no',
+    optB:'Show up and help with the move',
+    reasoning:{
+      pos:{
+        A:'You planned that weekend because you needed it, and that need is real. Saying no to one move is not abandoning anyone; it’s you keeping the commitment you made to yourself first.',
+        B:'Helping can be something you freely choose rather than something extracted from you. If this friend matters, a few hours on Saturday on your own terms can sit fine alongside a restful Sunday.'
+      },
+      neg:{
+        A:'Being dependable in the long run means not running yourself to empty. A rested you shows up better for the next ask; a burned-out you eventually stops showing up at all. Protecting this weekend protects your reliability.',
+        B:'This is exactly when being someone people can count on gets tested. They’re short on hands and they asked you. Showing up costs you a morning and keeps you the friend who comes through.'
+      }
+    } },
+];
+
+// AI experience / literacy covariate block (shown after consent, before the PVQ).
+// Two frequency items: overall chatbot use and advice-specific use. Self-rated
+// understanding and general attitude used to live here too; they were dropped as
+// redundant with the AI literacy scale below, which measures both more carefully.
+const AIEXP_FREQ = ['Never','Less than once a month','A few times a month','A few times a week','About once a day','Multiple times a day'];
+const AIEXP_ITEMS = [
+  {key:'use_freq',    type:'freq', t:'How often do you use AI chatbots (for example ChatGPT, Claude, Gemini, Copilot)?'},
+  {key:'advice_freq', type:'freq', t:'How often do you ask an AI chatbot for advice on personal decisions or dilemmas?'},
+];
+// Replaces the old "which chatbots have you used" checklist: same frequency scale as the
+// items above, so all use questions sit on one comparable metric.
+const AIEXP_TASKS = [
+  {key:'task_info',    t:'Finding information or getting something explained'},
+  {key:'task_writing', t:'Writing, editing, or summarising text'},
+  {key:'task_work',    t:'Work or study tasks'},
+];
+
+// AI literacy scale, AI-Q1..AI-Q8, 7-point.
+// AI-Q5 is negatively worded — it must be reverse-scored before it is summed with the rest.
+// AI-Q7/Q8 keep the same 1-7 numeric scale so the scale total still works, but carry their
+// own anchor captions: "strongly disagree" is meaningless for a frequency or familiarity item.
+const AI_LITERACY = [
+  {key:'ail1', t:'I can identify the AI technology employed in the applications and products I use.'},
+  {key:'ail2', t:'I can skillfully use AI applications or products to help me with my daily work.'},
+  {key:'ail3', t:'I can choose the most appropriate AI application or product from a variety for a particular task.'},
+  {key:'ail4', t:'I always comply with ethical principles when using AI applications or products.'},
+  {key:'ail5', t:'I am never alert to privacy and information security issues when using AI applications or products.', reverse:true},
+  {key:'ail6', t:'I am always alert to the abuse of AI technology.'},
+  {key:'ail7', t:'How frequently do you use generative AI (i.e., artificial intelligence that is capable of producing high quality texts, images, etc. in response to prompts) products such as ChatGPT, Gemini, DALL·E, Claude, etc.?',
+    caps:['1 · Never','4 · Sometimes','Very frequently · 7']},
+  {key:'ail8', t:'How familiar are you with limitations and shortcomings of generative AI?',
+    caps:['1 · Not at all familiar','4 · Moderately familiar','Extremely familiar · 7']},
+];
+
+// Demographics, asked on the consent screen. Every question offers "Prefer not to say".
+const DEMOGRAPHICS = [
+  {key:'age', label:'Age group',
+    options:['18–24','25–34','35–44','45–54','55–64','65 or older','Prefer not to say']},
+  {key:'gender', label:'Gender',
+    options:['Woman','Man','Non-binary','Prefer to self-describe','Prefer not to say']},
+  {key:'education', label:'Highest level of education completed',
+    options:['Less than high school','High school / secondary','Some college, no degree','Associate / vocational qualification','Bachelor’s degree','Master’s degree','Doctorate or professional degree','Prefer not to say']},
+];
+
+const LIKERT7 = ['Strongly disagree','Disagree','Slightly disagree','Neither agree nor disagree','Slightly agree','Agree','Strongly agree'];
+
+/* ============================================================
+   THE THREE ADVISORS
+   Within-subjects: every participant sees all three conditions, as three named
+   advisors answering side by side. The look (name, icon, colour, column) is fixed
+   by slot; which condition sits in which slot is one of six permutations, chosen
+   per participant. Conditions are never mixed within an advisor, so "Blue" is the
+   same policy on all ten situations and a participant can learn it.
+   ============================================================ */
+const AGENT_STYLES = [
+  // Icons: one robot (data/robot-pic.svg, Gregor Cresnar / Noun Project) recoloured to each
+  // advisor's color, embedded once in the CSS as .ic-a/.ic-b/.ic-c. soft = its tint.
+  {key:'a', name:'AdvisorBot Blue', color:'#2E6A9E', soft:'#E6F2FD'},
+  {key:'b', name:'AdvisorBot Green', color:'#2F7A55', soft:'#E3F6EB'},
+  {key:'c', name:'AdvisorBot Pink', color:'#A8457A', soft:'#FDE9F1'},
+];
+const CONDITIONS = ['C1','C2','C3'];
+const PERMS = [['C1','C2','C3'],['C1','C3','C2'],['C2','C1','C3'],['C2','C3','C1'],['C3','C1','C2'],['C3','C2','C1']];
+
+// Agent-level questions after the ten situations. Same wording as the v4 trust
+// battery, asked once per advisor, so the levels stay comparable across designs.
+const AGENT_ITEMS = [
+  {key:'competence',        t:'… is skilled at thinking through moral problems.'},
+  {key:'overlap',           t:'… seems to share my values.'},
+  {key:'decision_style',    t:'Regardless of the reasons it gave, … reached the decisions I would have.'},
+  {key:'reasoning_process', t:'Regardless of which option it picked, … reasoned the way I would have.'},
+  {key:'predictability',    t:'I can anticipate what … would choose in a new situation.'},
+  {key:'reliance',          t:'I would trust …’s choice on a moral question that matters to me.'},
+];
+// Value words, one per Schwartz value in plain language. Each advisor page asks which
+// of these the advisor seems to care about, before its ratings, so people stop and
+// form a view of its values. No right answer is enforced; the advisor's actual value
+// profile on this participant's ten situations is logged next to the picks for scoring.
+const VALUE_TAGS = [
+  {v:'self_direction', t:'Independence and making your own choices'},
+  {v:'stimulation',    t:'Excitement and new experiences'},
+  {v:'hedonism',       t:'Enjoying life and treating yourself'},
+  {v:'achievement',    t:'Career and getting ahead'},
+  {v:'power',          t:'Money, status and being in charge'},
+  {v:'security',       t:'Safety and financial stability'},
+  {v:'conformity',     t:'Fitting in and meeting others\u2019 expectations'},
+  {v:'tradition',      t:'Tradition and custom'},
+  {v:'benevolence',    t:'Taking care of family and friends'},
+  {v:'universalism',   t:'Fairness and the wider world'},
+];
+const VALUE_TAG_MAX = 3;
+// v4's behavioural-intent items, asked per advisor ('AdvisorBot' becomes 'this advisor').
+const INTENT_ITEMS = UPTAKE_INTENT.map(it=>({key:it.key, t:it.t.split('AdvisorBot').join('…')}));
+// v4's delegation tasks become "which advisor, if any" in both framings.
+const DELEG_W = DELEGATION.map(t=>({id:t.id, title:t.title,
+  advisor:t.advisor.replace(/Would you consult AdvisorBot on (.*)\?$/, 'Which advisor, if any, would you consult on $1?'),
+  delegate:t.delegate.replace(/^Would you let AdvisorBot (.*)\?$/, 'Which advisor, if any, would you let $1?')}));
+const UPTAKE_MIN_READ_MS = 3000;   // friend scenarios: choices unlock after this
+const UPTAKE_LOCK_MS = 1000;       // pause after choosing, identical whichever option
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const S = {
+  perm:null,               // index into PERMS
+  permSource:null,         // 'key_hash' | 'random' | 'forced'
+  forcedPerm:null,         // researcher override
+  aiexp:{}, demog:{}, ailit:{},
+  pvq:{},
+  valueScores:{}, valueScoresRaw:{}, pvqGrandMean:null,
+  topValuesByAxis:{},      // dilemma id -> aligned pole ('pos'|'neg'), tie -> pos
+  poleDelta:{},            // dilemma id -> |pos - neg|; near zero = low-signal item
+  poleScores:{},
+  poleTie:{},              // dilemma id -> true when the two poles tied and the side was drawn at random           // dilemma id -> {pos, neg}
+  order:[],                // shuffled dilemma indices
+  di:0, p2stage:null, detailOn:null,
+  comp:{},                 // dilemma id -> detail-check state
+  resp:{},                 // dilemma id -> {handoff, handoff_changes, t0, ms, position}
+  final:{},                // recap screen timing {t0, ms}
+  advOrder:[], advIdx:0,   // order of the per-advisor rating pages (conditions), and the current page
+  advPages:{},             // condition -> {ms, t0}: time on that advisor's rating page
+  recapViews:{},           // condition -> {opens, ms, t}: the all-advisor recap toggle on that advisor's page
+  ratings:{},              // item key -> {C1, C2, C3}
+  slots:{},                // screen key -> conditions left to right, fixed once shown (w5)
+  tagOrder:null,           // VALUE_TAGS display order, shuffled once per participant, same on all three pages
+  valueTags:{},            // condition -> [value keys] or ['unsure']
+  valueTagChanges:{},      // condition -> number of clicks after the first pick
+  intent:{},               // item key -> {C1, C2, C3}
+  ui:0, uptake:{},         // friend scenario id -> {choice:'own'|C1|C2|C3, decide_ms}
+  delIdx:0, deleg:{},      // task id -> {advisor:'C1'|…|'none', delegate:…}
+  free:'',
+  screenName:'welcome',
+};
+
+const SCREENS = ['welcome','aiexp','pvq','dilemmaIntro','dilemmas','advisor','phase3Intro','delegation','uptake','checks','done'];
+const PHASE_OF = {welcome:'Intro',aiexp:'Intro',pvq:'Part 1',dilemmaIntro:'Part 2',dilemmas:'Part 2',advisor:'Part 2',phase3Intro:'Part 3',uptake:'Part 3',delegation:'Part 3',checks:'Part 3',done:'Done'};
+const WIDE_SCREENS = ['dilemmas','advisor'];
+
+// Participant-typed text goes back into innerHTML on re-render, so it has to be
+// escaped or a stray '</textarea>' ends the element early and breaks their own page.
+function escHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>(
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* Slot permutation. Deterministic in the participant key, so a refresh shows the
+   same advisor in the same place. Six permutations, so balance holds to within one
+   per six participants without a server round trip. */
+function assignPerm(){
+  if(S.forcedPerm!=null){ S.perm=S.forcedPerm; S.permSource='forced'; return; }
+  const q = URLP.get('perm');
+  if(DEMO && q!=null && PERMS[+q]){ S.perm=+q; S.permSource='forced'; return; }
+  const key = PARTICIPANT.participant_key;
+  if(key){
+    let h=0;
+    for(let i=0;i<key.length;i++){ h=((h<<5)-h+key.charCodeAt(i))|0; }
+    S.perm = Math.abs(h)%PERMS.length; S.permSource='key_hash'; return;
+  }
+  S.perm = Math.floor(Math.random()*PERMS.length); S.permSource='random';
+}
+function agents(){
+  if(S.perm==null) assignPerm();
+  const p = PERMS[S.perm];
+  return AGENT_STYLES.map((st,i)=>Object.assign({slot:i+1, cond:p[i]}, st));
+}
+function agentByCond(c){ return agents().find(a=>a.cond===c); }
+/* w5: the advisors' left-to-right order is drawn once per screen and kept, so a
+   re-render or Back shows the same order. Colours and names stay with their
+   advisors; only where they sit changes. In the pilot the right-hand advisor took
+   46% of Part 2 picks whatever it said, which a fixed order loads onto one condition. */
+function slotted(key){
+  const ag = agents();
+  if(!S.slots[key]) S.slots[key] = shuffle(ag.map(a=>a.cond));
+  return S.slots[key].map(c=>ag.find(a=>a.cond===c));
+}
+function agentTag(a){ return `<span class="agwrap" style="--ag:${a.color};--ags:${a.soft}"><i class="aicon ic-${a.key}" aria-hidden="true"></i><span class="agtag">${a.name}</span></span>`; }
+function agentStyle(a){ return `--ag:${a.color};--ags:${a.soft}`; }
+
+/* ---- scoring ---- */
+function scorePVQ(){
+  const sums={}, counts={};
+  PVQ_ITEMS.forEach((it,i)=>{
+    if(S.pvq[i]==null) return;
+    sums[it.v]=(sums[it.v]||0)+S.pvq[i];
+    counts[it.v]=(counts[it.v]||0)+1;
+  });
+  // mean-centre (ipsatise) per Schwartz convention so high-low is relative
+  const raw={}; let all=0,n=0;
+  VALUES.forEach(v=>{ if(counts[v.key]){ raw[v.key]=sums[v.key]/counts[v.key]; all+=raw[v.key]; n++; } });
+  const grand = n? all/n : 0;
+  const out={};
+  VALUES.forEach(v=> out[v.key] = raw[v.key]!=null ? +(raw[v.key]-grand).toFixed(3) : 0);
+  S.valueScores=out;
+  S.valueScoresRaw={}; VALUES.forEach(v=> S.valueScoresRaw[v.key] = raw[v.key]!=null ? +raw[v.key].toFixed(3) : null);
+  S.pvqGrandMean = +grand.toFixed(3);
+  // aligned pole per dilemma = the pole the participant leans toward; a tie is drawn at random and logged
+  const poleScore=(keys)=>{ const xs=keys.map(k=>out[k]??0); return xs.reduce((a,b)=>a+b,0)/(xs.length||1); };
+  DILEMMAS.forEach(d=>{
+    const sp=poleScore(d.poles.pos), sn=poleScore(d.poles.neg);
+    // A tie used to go to pos every time, which tilted assignment toward one pole.
+    S.poleTie[d.id] = sp === sn;
+    S.topValuesByAxis[d.id] = sp > sn ? 'pos' : sp < sn ? 'neg' : (Math.random() < .5 ? 'pos' : 'neg');
+    // Logged so analysis can weight or drop items where the two poles sit close
+    // together for this person: there the "aligned" side is close to a coin flip.
+    S.poleDelta[d.id] = +Math.abs(sp-sn).toFixed(3);
+    S.poleScores[d.id] = {pos:+sp.toFixed(3), neg:+sn.toFixed(3)};
+  });
+}
+
+/* ---- AI response construction: condition × decision × value pole ---- */
+function aiResponseFor(d, cond){
+  const alignedPole = S.topValuesByAxis[d.id];      // 'pos' | 'neg'
+  const otherPole = alignedPole==='pos' ? 'neg' : 'pos';
+  const alignedDecision = alignedPole==='pos' ? 'A' : 'B';  // value-favored horn (A=decision_pos)
+  // C3 = decision misaligned (opposite of the value-favored horn); else aligned
+  const aiDecision = (cond==='C3') ? (alignedDecision==='A'?'B':'A') : alignedDecision;
+  // C2 = reasoning misaligned (opposing pole); else aligned pole
+  const reasonPole = (cond==='C2') ? otherPole : alignedPole;
+  const verdict = aiDecision==='A' ? d.optA : d.optB;
+  const reason = d.reasoning[reasonPole][aiDecision];
+  return {verdict, reason, aiDecision, reasonPole};
+}
+
+/* One paragraph, reasoning first and the recommendation as its closing sentence,
+   so the recommendation cannot be reached without passing through the reasons. */
+function adviceParagraph(r){
+  const v = String(r.verdict || '').trim();
+  if(!v) return r.reason;
+  const tail = v.charAt(0).toLowerCase() + v.slice(1);
+  return `${r.reason} <i class="rec">So my advice would be to ${tail}</i>`;
+}
+
+// Short labels for the decision history. The prompts' closing questions do not stand
+// alone out of context ("Do I hand it to her, or keep it?"), so each gets a name.
+const HISTORY_LABEL = {
+ "mb162": "Turning down or accepting a new job",
+ "mb028": "Writing or declining an anniversary feature",
+ "mb366": "Maya's party or work preparation",
+ "mb422": "Playing free or charging Sarah",
+ "mb288": "Painting or taking a traditional job",
+ "mb380": "Paying or accepting dinner with your boss",
+ "mb367": "A fitness class programming choice",
+ "mb471": "Art residency or corporate job"
+};
+function dilemmaQuestion(d){
+  if(HISTORY_LABEL[d.id]) return HISTORY_LABEL[d.id];
+  const m = String(d.prompt).match(/[^.!?]*\?\s*$/);
+  return (m ? m[0] : d.prompt).trim();
+}
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+const app = document.getElementById('app');
+
+let NAV=[]; let restoring=false;
+function snapshot(){ return {screenName:S.screenName, di:S.di, p2stage:S.p2stage, ui:S.ui, delIdx:S.delIdx, advIdx:S.advIdx}; }
+function markNav(){
+  if(restoring) return;
+  const snap=snapshot();
+  const top=NAV[NAV.length-1];
+  if(top && JSON.stringify(top)===JSON.stringify(snap)) return;
+  NAV.push(snap);
+}
+function dispatch(name){
+  ({welcome:Screens.welcome, aiexp:Screens.aiExperience, pvq:Screens.pvq, dilemmaIntro:Screens.dilemmaIntro,
+    dilemmas:Screens.dilemmas, advisor:Screens.advisor,
+    phase3Intro:Screens.phase3Intro, uptake:Screens.uptake, delegation:Screens.delegation, checks:Screens.checks,
+    done:Screens.done}[name] || Screens.welcome)();
+}
+/* Prototype navigation, only with ?demo (which flags every row is_test).
+     ?demo&skipto=dilemmas   jump to the side-by-side situations
+     ?demo&skipto=advisor    jump to the per-advisor rating pages
+     ?demo&perm=3            force one of the six slot permutations */
+function seedPrototype(){
+  const LEAN = {self_direction:5.4, universalism:5.2, benevolence:5.5, stimulation:4.6,
+                hedonism:4.2, achievement:3.0, power:2.2, security:3.1,
+                conformity:2.6, tradition:2.4};
+  PVQ_ITEMS.forEach((it,i)=>{ if(S.pvq[i]==null) S.pvq[i] = Math.round(LEAN[it.v] ?? 3.5); });
+  scorePVQ();
+  if(S.perm==null) assignPerm();
+  if(!S.order || !S.order.length) S.order = DILEMMAS.map((_,i)=>i);
+}
+function protoBar(){
+  if(!DEMO) return;
+  if(document.getElementById('protobar')) return;
+  const jumps = [['aiexp','AI use'],['pvq','PVQ'],['dilemmas','Part 2 · situations'],
+                 ['advisor','trust + intent'],['delegation','Part 3 · tasks'],
+                 ['uptake','friends'],['checks','end']];
+  const bar = document.createElement('div');
+  bar.id = 'protobar';
+  bar.innerHTML = `<span>prototype · within</span>` +
+    jumps.map(([k,l])=>`<button data-go="${k}">${l}</button>`).join('');
+  document.body.appendChild(bar);
+  document.body.style.paddingBottom = '46px';
+  bar.addEventListener('click', e=>{
+    const k = e.target && e.target.getAttribute('data-go');
+    if(!k) return;
+    seedPrototype();
+    S.di=0; S.p2stage=null; S.ui=0; S.delIdx=0; S.advIdx=0;
+    dispatch(k);
+  });
+}
+
+function goBack(){
+  if(NAV.length<2) return;
+  NAV.pop();
+  const p=NAV[NAV.length-1];
+  restoring=true;
+  S.di=p.di||0; S.p2stage=p.p2stage||null; S.ui=p.ui||0; S.delIdx=p.delIdx||0; S.advIdx=p.advIdx||0;
+  dispatch(p.screenName);
+  restoring=false;
+  updateBack();
+}
+function updateBack(){
+  const b=document.getElementById('backbtn');
+  if(!b) return;
+  // No going back into the situations from the first advisor page: the ratings are
+  // meant to run off what they remember plus that advisor's history, not a re-read.
+  const locked = ['uptake','checks','done'].indexOf(S.screenName)>=0 || (S.screenName==='advisor' && !S.advIdx);
+  b.style.visibility = (NAV.length>1 && !locked) ? 'visible' : 'hidden';
+}
+function setProgress(){
+  let idx = SCREENS.indexOf(S.screenName);
+  // count progress through the ten situations, which are most of the study
+  if(S.screenName==='dilemmas') idx += S.di/Math.max(1,S.order.length);
+  const pct = Math.round((idx/(SCREENS.length-1))*100);
+  document.getElementById('progbar').style.width = pct+'%';
+  document.getElementById('phasetag').textContent = PHASE_OF[S.screenName] || '';
+}
+let _renderKey = null;
+function render(html){
+  markNav();
+  const key = S.screenName + '|' + ({dilemmas:S.di, uptake:S.ui, delegation:S.delIdx}[S.screenName] ?? '');
+  const fresh = (key !== _renderKey);
+  _renderKey = key;
+  const y = window.scrollY;
+  app.classList.toggle('wide', WIDE_SCREENS.indexOf(S.screenName)>=0);
+  app.innerHTML = html;
+  if(fresh){
+    app.classList.remove('fade'); void app.offsetWidth; app.classList.add('fade');
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    app.classList.remove('fade');
+    window.scrollTo({top:y});
+  }
+  setProgress(); updateBack();
+}
+function likertRow(name, val, onpick, caps){
+  const c = caps || ['1 · Strongly disagree','4 · Neither agree nor disagree','Strongly agree · 7'];
+  return `<div class="scale likert7" role="radiogroup">${LIKERT7.map((lab,i)=>{
+    const v=i+1, id=`${name}_${v}`;
+    return `<div class="opt"><input type="radio" name="${name}" id="${id}" value="${v}" ${val==v?'checked':''} onchange="${onpick}(${v})"><label for="${id}" title="${caps?v:lab}">${v}</label></div>`;
+  }).join('')}</div>
+  <div class="scalecaps"><span>${c[0]}</span><span>${c[1]}</span><span>${c[2]}</span></div>`;
+}
+
+/* Decision history: what each advisor recommended on every situation so far, and in
+   one line why. It no longer shows whom the participant said they would ask: that
+   reminder pulled the ratings toward consistency with their own picks. Addresses the worry that nobody can hold ten
+   situations × three advisors in their head by the final choice. */
+// Fallback one-line reason (first sentence) for any cell missing from WHY.
+function firstSentence(t){ const m = String(t||'').match(/^.*?[.!?](?=\s|$)/); return m ? m[0] : String(t||''); }
+function whyLine(d, r){ return ((WHY[d.id]||{})[r.reasonPole]||{})[r.aiDecision] || firstSentence(r.reason); }
+function historyTable(upto){
+  const ag = agents();
+  const ids = S.order.slice(0, upto).map(i=>DILEMMAS[i]);
+  if(!ids.length) return '';
+  const rows = ids.map((d,k)=>{
+    const rr = S.resp[d.id]||{};
+    const cells = ag.map(a=>{
+      const r = aiResponseFor(d, a.cond);
+      return `<td style="${agentStyle(a)}" class="hcell"><span class="hdec">${escHtml(d.recap[r.aiDecision])}</span><span class="hwhy">${escHtml(whyLine(d, r))}</span></td>`;
+    }).join('');
+    return `<tr><td class="hq"><span class="hn">${k+1}</span>${escHtml(dilemmaQuestion(d))}</td>${cells}</tr>`;
+  }).join('');
+  return `<div class="hwrap"><table class="history">
+    <thead><tr><th>Situation</th>${ag.map(a=>`<th>${agentTag(a)}</th>`).join('')}</tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+const Screens = {
+  welcome(){
+    S.screenName='welcome';
+    const ag = agents();
+    render(`
+      <p class="eyebrow">Research study · about 30 minutes</p>
+      <h1>Three AI advisors, eight everyday decisions.</h1>
+      <p class="lead">${ag.map(agentTag).join(' ')} are three AI assistants that give advice on everyday decisions: disagreements with people close to you, family choices, how to spend your time and money.</p>
+      <p class="lead">First, you'll rate 21 short statements about what is important to you in life. Next, you'll read ${DILEMMAS.length} situations other people have posed, with all three advisors' answers side by side. For each, you'll pick which advisor you would want to ask if you faced a decision like it yourself. Then you'll tell us what you think of each advisor. Finally, five friends will come to you for advice: for each you'll say whether you'd write to them yourself or let one of the advisors draft a first version (you won't have to write any advice), and then which advisor, if any, you'd let handle some everyday tasks.</p>
+      <p class="lead">There are no right or wrong answers anywhere in this study. We want your honest reactions.</p>
+      <div class="card">
+        <h2 style="margin-top:0">A little about you</h2>
+        <p class="muted" style="margin-top:0">Used only to describe the sample as a whole. Every question has a “prefer not to say”.</p>
+        ${DEMOGRAPHICS.map(q=>`
+          <div style="margin-bottom:16px">
+            <label class="qtext" for="dg_${q.key}" style="display:block;margin-bottom:6px">${q.label}</label>
+            <select id="dg_${q.key}" onchange="setDemog('${q.key}',this.value)"
+              style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:var(--card);font-family:inherit;font-size:15px;color:var(--ink)">
+              <option value="">Select…</option>
+              ${q.options.map(o=>`<option value="${o}" ${S.demog[q.key]===o?'selected':''}>${o}</option>`).join('')}
+            </select>
+            ${q.key==='gender'?`<input type="text" id="dg_gender_self" placeholder="How would you describe yourself? (optional)"
+              value="${escHtml(S.demog.gender_self||'')}" oninput="S.demog.gender_self=this.value"
+              style="display:${S.demog.gender==='Prefer to self-describe'?'block':'none'};width:100%;margin-top:8px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:var(--card);font-family:inherit;font-size:15px">`:''}
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h2>Before you begin</h2>
+        <p class="muted">${LOG_ENDPOINT?'Your responses are recorded securely as you go for research purposes.':'Your responses are recorded only on this device and can be exported at the end.'}</p>
+        <label class="check"><input type="checkbox" id="c1"> I’m 18 or older and consent to take part.</label>
+        <label class="check"><input type="checkbox" id="c2"> I understand I can stop at any time.</label>
+        <div class="btnrow">
+          <button class="btn" id="start" disabled onclick="Screens.aiExperience()">Begin</button>
+        </div>
+      </div>
+      ${researcherStrip()}
+    `);
+    document.getElementById('c1').onchange=updateStartBtn;
+    document.getElementById('c2').onchange=updateStartBtn;
+    updateStartBtn();
+    wireResearcher();
+  },
+
+  aiExperience(){
+    S.screenName='aiexp';
+    const a=S.aiexp;
+    const freqRow=(key)=>`<div class="scale" role="radiogroup">${AIEXP_FREQ.map((lab,j)=>{
+      const v=j+1,id=`ax_${key}_${v}`;
+      return `<div class="opt"><input type="radio" name="ax_${key}" id="${id}" ${a[key]==v?'checked':''} onchange="setAiexp('${key}',${v})"><label for="${id}">${lab}</label></div>`;
+    }).join('')}</div>`;
+    const items=AIEXP_ITEMS.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${it.type==='freq'?freqRow(it.key):likertRow('ax_'+it.key, a[it.key], `setAiexp.bind(null,'${it.key}')`)}
+      <div style="height:20px"></div>`).join('');
+    const tasks=AIEXP_TASKS.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${freqRow(it.key)}
+      <div style="height:20px"></div>`).join('');
+    const lit=AI_LITERACY.map(it=>`
+      <p class="qtext">${it.t}</p>
+      ${likertRow('ail_'+it.key, S.ailit[it.key], `setAiLit.bind(null,'${it.key}')`, it.caps)}
+      <div style="height:20px"></div>`).join('');
+    render(`
+      <p class="eyebrow">Background · Your experience with AI</p>
+      <h1 style="font-size:30px">A little about your AI use</h1>
+      <p class="lead">Before we begin, a few quick questions about your experience with AI. There are no right or wrong answers.</p>
+      <div class="card">${items}</div>
+      <div class="card">
+        <h2 style="margin-top:0">How often do you use AI for each of these?</h2>
+        ${tasks}
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">How much do you agree with each statement?</h2>
+        ${lit}
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finishAiexp()">Continue</button></div>
+    `);
+  },
+  finishAiexp(){
+    if(!DEMO && (AIEXP_ITEMS.some(it=>S.aiexp[it.key]==null)
+              || AIEXP_TASKS.some(it=>S.aiexp[it.key]==null)
+              || AI_LITERACY.some(it=>S.ailit[it.key]==null))){ flashIncomplete(); return; }
+    logSnapshot('intake_done');
+    Screens.pvq();
+  },
+
+  pvq(){
+    S.screenName='pvq';
+    const items = PVQ_ITEMS.map((it,i)=>`
+      <div class="qitem">
+        <p class="qtext"><span class="n">${String(i+1).padStart(2,'0')}</span>${it.t}</p>
+        <div class="scale" role="radiogroup" aria-label="response">
+          ${PVQ_SCALE.map((lab,j)=>{
+            const v=j+1,id=`pvq_${i}_${v}`;
+            return `<div class="opt"><input type="radio" name="pvq_${i}" id="${id}" ${S.pvq[i]==v?'checked':''} onchange="setPVQ(${i},${v})"><label for="${id}">${lab}</label></div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+    render(`
+      <p class="eyebrow">Part 1 · About you</p>
+      <h1>About you</h1>
+      <p class="lead">Please read each statement below and indicate how much you think it reflects how you see yourself. There are no right or wrong answers.</p>
+      <div class="card">${items}</div>
+      <div class="btnrow">
+        <span class="muted" id="pvqcount"></span>
+        <button class="btn" id="pvqnext" onclick="Screens.afterPVQ()">Continue</button>
+      </div>
+    `);
+    updatePVQCount();
+  },
+  afterPVQ(){
+    const answered = PVQ_ITEMS.filter((_,i)=>S.pvq[i]!=null).length;
+    if(!DEMO && answered < PVQ_ITEMS.length){
+      const first = PVQ_ITEMS.findIndex((_,i)=>S.pvq[i]==null);
+      const el = document.querySelector(`[name="pvq_${first}"]`);
+      if(el){ el.closest('.qitem').scrollIntoView({behavior:'smooth',block:'center'}); el.closest('.qitem').style.background='#FFF6F0'; setTimeout(()=>el.closest('.qitem').style.background='',1200); }
+      return;
+    }
+    scorePVQ();
+    if(S.perm==null) assignPerm();
+    if(!S.order.length) S.order = shuffle(DILEMMAS.map((_,i)=>i));
+    logSnapshot('pvq_done');
+    Screens.dilemmaIntro();   // value profile is revealed only at the end, to avoid priming
+  },
+
+  dilemmaIntro(){
+    S.screenName='dilemmaIntro';
+    const ag = agents();
+    render(`
+      <p class="eyebrow">Part 2 · Getting to know the advisors</p>
+      <h1>Getting to know ${ag.map(agentTag).join(' ')}</h1>
+      <p class="lead">You'll read ${DILEMMAS.length} short, everyday situations that other people have posed to three AI advisors. Thoughtful people can reasonably disagree on all of them; none are about you, and there are no right or wrong answers.</p>
+      <div class="card">
+        <p style="margin:0 0 12px"><b>For each situation:</b></p>
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">1</span><p style="margin:0">You'll read the situation, as a quick chat message.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">2</span><p style="margin:0">When you're ready, you'll open all three advisors' replies, side by side: each one's decision and its reasoning. Each advisor keeps its name and colour throughout; the order they appear in changes from situation to situation.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start">
+          <span class="stepnum">3</span><p style="margin:0">You'll pick which advisor you would want to ask if you faced a decision like this yourself.</p></div>
+      </div>
+      <p class="muted">A running record of what each advisor decided is available under every situation, so you don't need to memorise anything.</p>
+      <div class="btnrow"><button class="btn" onclick="Screens.dilemmas()">Start Part 2</button></div>
+    `);
+  },
+
+  dilemmas(){
+    S.screenName='dilemmas';
+    S.di = S.di||0;
+    if(!S.order.length) S.order = shuffle(DILEMMAS.map((_,i)=>i));
+    const d = DILEMMAS[S.order[S.di]];
+    const total = S.order.length;
+    const ag = slotted('d:'+d.id);
+    // The vignette-detail check runs on a random four of the ten: it confirms the
+    // situation was read before any advice appears.
+    if(!S.detailOn) S.detailOn = shuffle(DILEMMAS.map(x=>x.id)).slice(0, DETAIL_CHECK_COUNT);
+    const wantsDetail = S.detailOn.indexOf(d.id) >= 0;
+    const c = ensureCompOrders(d);
+    if(!wantsDetail) S.p2stage='shown';
+    else if(!S.p2stage) S.p2stage = (c.detail===0) ? 'shown' : 'detail';
+    const stage = S.p2stage;
+    const rr = (S.resp[d.id] = S.resp[d.id] || {});
+
+    const ask = '<br><br><i style="opacity:.85">What would you do?</i>';
+    let detail = '';
+    if(stage==='detail'){
+      const cls=(sel,wrong)=>'compopt'+(sel?(wrong?' wrong':' sel'):'');
+      const detailWrong = c.detail!=null && c.detail!==0;
+      detail = `
+        <div class="compbox">
+          <p class="compq">${d.detail.q}</p>
+          <div class="compopts">
+            ${c.detail_order.map(i=>`<button class="${cls(c.detail===i, detailWrong && c.detail===i)}" onclick="setDetail(${i})">${d.detail.answers[i]}</button>`).join('')}
+          </div>
+          ${detailWrong?`<p class="comphint">Not quite. Take another look at the situation above.</p>`:''}
+        </div>`;
+    }
+
+    let body = '';
+    if(!rr.t_prompt) rr.t_prompt = Date.now();
+    if(stage==='shown' && !rr.revealed){
+      body = `<div class="revealrow"><button class="btn" onclick="revealAdvisors()">See the advisors\u2019 replies</button></div>`;
+    }
+    else if(stage==='shown'){
+      if(!rr.t0) rr.t0 = Date.now();
+      const cols = ag.map(a=>{
+        const r = aiResponseFor(d, a.cond);
+        return `<div class="agcol" style="${agentStyle(a)}">
+          <p class="who">${agentTag(a)}</p>
+          <p class="answer">${adviceParagraph(r)}</p>
+        </div>`;
+      }).join('');
+      const pick = ag.map(a=>`<button class="pickbtn${rr.handoff===a.cond?' sel':''}" style="${agentStyle(a)}" onclick="setHandoff('${a.cond}')">${agentTag(a)}</button>`).join('');
+      const ready = respComplete(d) || DEMO;
+      body = `
+        <div class="agrid${rr.anim?' in':''}">${cols}</div>
+        <div class="card handoff">
+          <p class="compq" style="font-size:15px">If you faced a decision like this yourself, which advisor would you want to ask?</p>
+          <div class="pickrow">${pick}</div>
+        </div>
+        ${S.di>0?`<details class="hist"><summary>What each advisor decided so far (${S.di})</summary>${historyTable(S.di)}</details>`:''}
+        <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="Screens.nextP2()">${S.di+1<total?'Next situation':'Continue'}</button></div>`;
+    }
+
+    rr.anim = false;
+    render(`
+      <p class="eyebrow">Part 2 · Situation ${S.di+1} of ${total}</p>
+      <h1 style="font-size:30px">Someone asked the three advisors</h1>
+      <div class="card narrow"><div class="chat"><div class="msg me">${d.prompt+ask}</div></div>${detail}</div>
+      ${body}
+    `);
+  },
+  nextP2(){
+    const d = DILEMMAS[S.order[S.di]];
+    if(!DEMO && !respComplete(d)){ flashIncomplete(); return; }
+    const rr = S.resp[d.id];
+    rr.ms = Date.now() - (rr.t0||Date.now());
+    rr.position = S.di+1;
+    logSnapshot('dilemma_'+(S.di+1));
+    if(S.di+1 < S.order.length){ S.di++; S.p2stage=null; Screens.dilemmas(); }
+    else { logSnapshot('dilemmas_done'); S.advIdx=0; Screens.advisor(); }
+  },
+
+  /* One page per advisor, in a random order per participant, with that advisor's
+     full decision history at the top. Rating all three side by side meant recalling
+     all of them at once, and people fell back on how often they had picked each. */
+  advisor(){
+    S.screenName='advisor';
+    if(!S.advOrder || !S.advOrder.length) S.advOrder = shuffle(CONDITIONS);
+    S.advIdx = S.advIdx||0;
+    const c = S.advOrder[S.advIdx], a = agentByCond(c);
+    const pg = (S.advPages[c] = S.advPages[c] || {ms:0});
+    if(!pg.t0) pg.t0 = Date.now();
+    const name = `<b class="advname" style="${agentStyle(a)}">${a.name}</b>`;
+    const items = (list, bucket)=>list.map(it=>{
+      const stem = it.t.split('…').join(name);
+      return `<div class="aditem"><p class="qtext">${stem}</p>${likertRow(`${bucket}_${it.key}_${c}`, (S[bucket][it.key]||{})[c], `setRating.bind(null,'${bucket}','${it.key}','${c}')`)}</div>`;
+    }).join('');
+    render(`
+      <p class="eyebrow narrow">Part 2 · Advisor ${S.advIdx+1} of ${S.advOrder.length}</p>
+      <h1 class="narrow" style="font-size:30px">Tell us what you think of ${agentTag(a)}</h1>
+      <p class="lead narrow">Here is what ${a.name} decided in each of the ${S.order.length} situations, and in one line why. Answer about this advisor only; the other two each get their own page. There are no right answers, just your honest impression.</p>
+      ${advisorHistory(a)}
+      <details class="hist recapt narrow" ontoggle="recapToggle('${c}', this.open)"><summary>Recap: what all three advisors decided, and why (all ${S.order.length} situations)</summary>${historyTable(S.order.length)}</details>
+      <div class="card narrow" style="${agentStyle(a)}" id="vtagcard"><p class="battlab">What it cares about</p>${valueTagsBlock(a)}</div>
+      <div class="card narrow" style="${agentStyle(a)}"><p class="battlab">Your impression</p>${items(AGENT_ITEMS,'ratings')}</div>
+      <div class="card narrow" style="${agentStyle(a)}"><p class="battlab">Acting on its advice</p>${items(INTENT_ITEMS,'intent')}</div>
+      <div class="btnrow narrow"><button class="btn" onclick="Screens.finishAdvisor()">Continue</button></div>
+    `);
+  },
+  finishAdvisor(){
+    const c = S.advOrder[S.advIdx];
+    if(!DEMO && !advisorDone(c)){ flashIncomplete(); return; }
+    recapClose(c);
+    const pg = S.advPages[c];
+    if(pg && pg.t0){ pg.ms += Date.now() - pg.t0; pg.t0 = null; }
+    logSnapshot('advisor_'+(S.advIdx+1)+'_done');
+    if(S.advIdx+1 < S.advOrder.length){ S.advIdx++; Screens.advisor(); }
+    else { logSnapshot('part2_measures_done'); Screens.phase3Intro(); }
+  },
+
+  phase3Intro(){
+    S.screenName='phase3Intro';
+    render(`
+      <p class="eyebrow">Part 3 · Using the advisors</p>
+      <h1>How would you use them?</h1>
+      <p class="lead">You&rsquo;ve now seen how and why ${agents().map(agentTag).join(' ')} answer a range of situations. In this part you decide how, if at all, you&rsquo;d use them: first for some everyday tasks, then when friends come to <i>you</i> for advice. As before, there are no right or wrong answers.</p>
+      <div class="card">
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">1</span><p style="margin:0">${DELEG_W.length} <b>everyday tasks</b>. For each, which advisor, if any, you&rsquo;d consult, and which, if any, you&rsquo;d let act for you.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start;margin-bottom:12px">
+          <span class="stepnum">2</span><p style="margin:0">${BEHAVIORALS.length} <b>friends asking you for advice</b>. For each, you choose one thing: whether you&rsquo;d write to them yourself from scratch, or let one of the advisors draft a first version for you to work from. You never have to write the advice itself.</p></div>
+        <div style="display:flex;gap:13px;align-items:flex-start">
+          <span class="stepnum">3</span><p style="margin:0">You <b>won&rsquo;t see what any advisor would say</b> before you choose, and you won&rsquo;t see it afterwards either. Go on what you already know about how each one answers. If you want a reminder, each screen has a recap of what you said about each advisor and what each one decided.</p></div>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="S.delIdx=0; Screens.delegation()">Start Part 3</button></div>
+    `);
+  },
+
+  /* One choice per friend, with nothing shown about what any advisor would say:
+     write it yourself, or have one of the three draft it. Choices unlock after a
+     short read, and the same pause follows every option, so none is the cheaper click. */
+  uptake(){
+    S.screenName='uptake';
+    const b = BEHAVIORALS[S.ui], u = (S.uptake[b.id] = S.uptake[b.id] || {});
+    if(!u.tShown) u.tShown = Date.now();
+    const ag = slotted('f:'+b.id);
+    const body = u.choice ? `
+        <div class="card">
+          <p class="dilemma dim">${b.advisePrompt}</p>
+          <div class="sending"><span class="dots"><i></i><i></i><i></i></span>
+            <span>Noted &mdash; ${u.choice==='own' ? 'you&rsquo;d write to '+b.advisee+' yourself' : agentTag(agentByCond(u.choice))+' would draft it and you&rsquo;d take it from there'}.</span></div>
+        </div>` : `
+        <div class="card">
+          <p class="dilemma">${b.advisePrompt}</p>
+          <p class="chatask big" style="margin-top:18px">You want to write back to ${b.advisee}. How would you start?</p>
+          <div class="pickrow four">
+            <button class="pickbtn own gated" disabled onclick="uptakePick('own')"><span class="ownlab">Write it myself from scratch</span></button>
+            ${ag.map(a=>`<button class="pickbtn gated" disabled style="${agentStyle(a)}" onclick="uptakePick('${a.cond}')"><span>Let ${agentTag(a)} draft it</span></button>`).join('')}
+          </div>
+          <p class="muted" style="font-size:13px;margin:12px 0 0">If an advisor drafts it, you&rsquo;d see the draft and could edit it before it goes.</p>
+        </div>`;
+    render(`
+      <p class="eyebrow">Part 3 · Friend ${S.ui+1} of ${BEHAVIORALS.length}</p>
+      <h1 style="font-size:30px">Someone asked you for advice</h1>
+      ${u.choice ? '' : part3Recap('friend:'+b.id)}
+      ${body}
+    `);
+    if(!u.choice){
+      const wait = DEMO ? 0 : Math.max(0, UPTAKE_MIN_READ_MS - (Date.now()-u.tShown));
+      setTimeout(()=>document.querySelectorAll('.pickbtn.gated').forEach(x=>x.disabled=false), wait);
+    }
+  },
+
+  delegation(){
+    S.screenName='delegation';
+    const t = DELEG_W[S.delIdx], cur = (S.deleg[t.id] = S.deleg[t.id] || {});
+    const ag = slotted('t:'+t.id);
+    const row = (frame)=>`<div class="pickrow four">${ag.map(a=>
+        `<button class="pickbtn${cur[frame]===a.cond?' sel':''}" style="${agentStyle(a)}" onclick="setDeleg('${t.id}','${frame}','${a.cond}')">${agentTag(a)}</button>`).join('')}
+        <button class="pickbtn own${cur[frame]==='none'?' sel':''}" onclick="setDeleg('${t.id}','${frame}','none')"><span class="ownlab">None of them</span></button></div>`;
+    const ready = (cur.advisor && cur.delegate) || DEMO;
+    render(`
+      <p class="eyebrow">Part 3 · Using the advisors · Task ${S.delIdx+1} of ${DELEG_W.length}</p>
+      <h1 style="font-size:30px">How would you use the advisors?</h1>
+      ${part3Recap('task:'+t.id)}
+      <div class="deltask">
+        <h3>${t.title}</h3>
+        <div class="frame"><p class="q">${t.advisor}</p>${row('advisor')}</div>
+        <div class="frame" style="margin-top:20px"><p class="q">${t.delegate}</p>${row('delegate')}</div>
+      </div>
+      <div class="btnrow"><button class="btn" ${ready?'':'disabled'} onclick="Screens.nextDeleg()">${S.delIdx+1<DELEG_W.length?'Next':'Continue'}</button></div>
+    `);
+  },
+  nextDeleg(){
+    const cur = S.deleg[DELEG_W[S.delIdx].id]||{};
+    if(!DEMO && !(cur.advisor && cur.delegate)){ flashIncomplete(); return; }
+    if(S.delIdx+1 < DELEG_W.length){ S.delIdx++; Screens.delegation(); }
+    else { logSnapshot('delegation_done'); S.ui=0; Screens.uptake(); }
+  },
+
+  checks(){
+    if(S.p3Key){ recapClose(S.p3Key); S.p3Key=null; }
+    S.screenName='checks';
+    render(`
+      <p class="eyebrow">Part 3 · Almost done</p>
+      <h1 style="font-size:30px">Any final thoughts?</h1>
+      <div class="card">
+        <p class="qtext" style="margin-bottom:8px">Anything you'd like to add about how you compared the advisors, or how they made you feel? (optional)</p>
+        <textarea id="freetext" rows="3" style="width:100%;border:1px solid var(--line-strong);border-radius:10px;padding:12px;font-family:inherit;font-size:15px;background:var(--card)" placeholder="Type here…">${escHtml(S.free)}</textarea>
+      </div>
+      <div class="btnrow"><button class="btn" onclick="Screens.finish()">Finish</button></div>
+    `);
+  },
+  finish(){
+    S.free=(document.getElementById('freetext')||{}).value||'';
+    logSnapshot('complete', true);
+    Screens.done();
+  },
+
+  done(){
+    S.screenName='done';
+    const counts = handoffCounts();
+    render(`
+      <p class="eyebrow">Complete</p>
+      <h1>Thank you.</h1>
+      <p class="lead">${LOG_ENDPOINT?'Your responses have been submitted automatically. You can close this window.':'Your responses are recorded on this device. You can export them below.'}</p>
+      ${(LOG_ENDPOINT && PARTICIPANT.prolific_pid)?`<div class="card" style="text-align:center"><p class="muted" style="margin:0 0 6px">Your completion code</p><p style="font-family:'Spline Sans Mono',monospace;font-size:22px;letter-spacing:.08em;margin:0"><b>${COMPLETION_CODE}</b></p></div>`:''}
+      <div class="card">
+        <table class="sum">
+          ${agents().map(a=>`<tr><td>Situations where you would ask ${agentTag(a)}</td><td>${counts[a.cond]} of ${S.order.length}</td></tr>`).join('')}
+        </table>
+      </div>
+      <div class="btnrow">
+        <button class="btn ${LOG_ENDPOINT?'ghost':''}" onclick="downloadJSON()">${LOG_ENDPOINT?'Download a copy (JSON)':'Download responses (JSON)'}</button>
+        <button class="btn ${LOG_ENDPOINT?'ghost':'line'}" onclick="downloadCSV()">Download (CSV)</button>
+        <button class="btn ghost" onclick="restart()">New session</button>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="margin:0 0 12px" class="muted">Curious what your answers say about your values?</p>
+        <button class="btn line" id="showprofile" onclick="toggleProfile()">Show my value profile</button>
+        <div id="profilereveal" style="display:none;margin-top:20px">
+          <div class="wheelwrap">${circumplexSVG()}<div class="legend">${legendHTML()}</div></div>
+          <p class="muted" style="font-size:13px;margin-top:14px">Shown only now, after your responses were recorded, so it couldn’t affect your answers.</p>
+        </div>
+      </div>
+    `);
+  }
+};
+
+/* ============================================================
+   SETTERS
+   ============================================================ */
+function setAiexp(key,v){ S.aiexp[key]=v; }
+function setAiLit(key,v){ S.ailit[key]=v; }
+function setDemog(key,val){
+  S.demog[key]=val||null;
+  if(key==='gender'){
+    const self=document.getElementById('dg_gender_self');
+    if(self) self.style.display = (val==='Prefer to self-describe') ? 'block' : 'none';
+  }
+  updateStartBtn();
+}
+function updateStartBtn(){
+  const b=document.getElementById('start'); if(!b) return;
+  const c1=document.getElementById('c1'), c2=document.getElementById('c2');
+  const consented = !!(c1&&c1.checked && c2&&c2.checked);
+  const demogDone = DEMO || DEMOGRAPHICS.every(q=>S.demog[q.key]);
+  b.disabled = !(consented && demogDone);
+}
+function setPVQ(i,v){ S.pvq[i]=v; updatePVQCount(); }
+function updatePVQCount(){
+  const a=PVQ_ITEMS.filter((_,i)=>S.pvq[i]!=null).length;
+  const el=document.getElementById('pvqcount'); if(el) el.textContent=`${a} / ${PVQ_ITEMS.length} answered`;
+}
+function ensureCompOrders(d){
+  // Per-participant shuffled display order for the detail-check options, fixed on first render.
+  const c=(S.comp[d.id]=S.comp[d.id]||{});
+  if(!c.detail_order) c.detail_order=shuffle([0,1,2]);          // 0 = correct answer
+  return c;
+}
+function setDetail(idx){
+  const d=DILEMMAS[S.order[S.di]];
+  const c=(S.comp[d.id]=S.comp[d.id]||{});
+  if(c.detail===idx) return;
+  const correct = (idx===0);
+  if(c.detail_first===undefined) c.detail_first=correct;   // first-attempt correctness, logged once
+  c.detail_tries=(c.detail_tries||0)+1;
+  c.detail=idx;
+  Screens.dilemmas();
+  if(correct){
+    const dd=d;
+    setTimeout(()=>{
+      if(S.screenName!=='dilemmas' || S.p2stage!=='detail') return;
+      if(DILEMMAS[S.order[S.di]]!==dd) return;
+      S.p2stage='shown'; markReveal(dd, 'detail'); Screens.dilemmas();
+    }, reduceMotion()?0:400);
+  }
+}
+/* The situation shows alone first; the replies appear on a click (or straight after
+   a correct detail check). read_ms is the time from the situation to the replies. */
+function markReveal(d, via){
+  const rr=(S.resp[d.id]=S.resp[d.id]||{});
+  if(rr.revealed) return;
+  rr.revealed=true; rr.reveal_via=via; rr.anim=!reduceMotion();
+  rr.read_ms = Date.now() - (rr.t_prompt||Date.now());
+}
+function revealAdvisors(){
+  const d=DILEMMAS[S.order[S.di]];
+  markReveal(d, 'click');
+  Screens.dilemmas();
+  const g=document.querySelector('.agrid'); if(g) g.scrollIntoView({behavior:reduceMotion()?'auto':'smooth', block:'start'});
+}
+function respComplete(d){
+  const rr=S.resp[d.id]||{};
+  return !!rr.handoff;
+}
+function setHandoff(cond){
+  const d=DILEMMAS[S.order[S.di]];
+  const rr=(S.resp[d.id]=S.resp[d.id]||{});
+  if(rr.handoff && rr.handoff!==cond) rr.handoff_changes=(rr.handoff_changes||0)+1;
+  rr.handoff=cond;
+  Screens.dilemmas();
+}
+function setRating(bucket,key,cond,v){ (S[bucket][key]=S[bucket][key]||{})[cond]=v; }
+/* The all-advisor recap as a toggle on each advisor page, closed by default, so
+   people can look up the other two while rating this one. Opens and open time are
+   logged per page. */
+function recapToggle(key, open){
+  S.recapViews = S.recapViews || {};
+  const v = S.recapViews[key] = S.recapViews[key] || {opens:0, ms:0, t:null};
+  if(v.t){ v.ms += Date.now() - v.t; v.t = null; }   // a re-render drops the open table without a toggle event
+  if(open){ v.opens++; v.t = Date.now(); }
+}
+function recapClose(key){ const v = (S.recapViews||{})[key]; if(v && v.t) recapToggle(key, false); }
+function valueTagsBlock(a){
+  if(!S.tagOrder) S.tagOrder = shuffle(VALUE_TAGS.map(x=>x.v));
+  const picked = S.valueTags[a.cond]||[];
+  const unsure = picked[0]==='unsure';
+  const full = !unsure && picked.length>=VALUE_TAG_MAX;
+  const lab = Object.fromEntries(VALUE_TAGS.map(x=>[x.v,x.t]));
+  const btn = (v,t,extra)=>{
+    const sel = picked.indexOf(v)>=0;
+    return `<button type="button" class="vtag${extra||''}${sel?' sel':''}" aria-pressed="${sel}" ${(!sel && full && v!=='unsure')?'disabled':''} onclick="toggleValueTag('${a.cond}','${v}')">${t}</button>`;
+  };
+  return `<p class="qtext" style="margin-top:6px">Looking at its decisions and reasons, what does <b class="advname" style="${agentStyle(a)}">${a.name}</b> seem to care about most? Pick up to ${VALUE_TAG_MAX}.</p>
+    <div class="vtags">${S.tagOrder.map(v=>btn(v, lab[v])).join('')}${btn('unsure','Hard to tell',' none')}</div>
+    <p class="muted" style="margin:10px 0 0;font-size:13px">${unsure?'':`${picked.length} of ${VALUE_TAG_MAX} picked`}</p>`;
+}
+function toggleValueTag(c, v){
+  let cur = (S.valueTags[c]||[]).slice();
+  if(cur.length) S.valueTagChanges[c] = (S.valueTagChanges[c]||0)+1;
+  if(v==='unsure') cur = (cur[0]==='unsure') ? [] : ['unsure'];
+  else {
+    cur = cur.filter(x=>x!=='unsure');
+    const i = cur.indexOf(v);
+    if(i>=0) cur.splice(i,1); else if(cur.length<VALUE_TAG_MAX) cur.push(v);
+  }
+  S.valueTags[c] = cur;
+  const card = document.getElementById('vtagcard');
+  if(card) card.innerHTML = `<p class="battlab">What it cares about</p>${valueTagsBlock(agentByCond(c))}`;
+}
+/* The values an advisor actually argued from (reason pole) and sided with (decision
+   pole) on this participant's ten situations, for scoring the tags. */
+function advisorValueProfile(c){
+  const reason={}, decision={};
+  DILEMMAS.forEach(d=>{
+    if(S.topValuesByAxis[d.id]==null) return;
+    const r = aiResponseFor(d, c);
+    (d.poles[r.reasonPole]||[]).forEach(v=>reason[v]=(reason[v]||0)+1);
+    (d.poles[r.aiDecision==='A'?'pos':'neg']||[]).forEach(v=>decision[v]=(decision[v]||0)+1);
+  });
+  return {reason, decision};
+}
+/* Part 3 recap: closed by default on every task and friend screen. Holds what the
+   participant said each advisor cares about (their own tags, nothing from us) and the
+   all-advisor decision table. Opens and open time are logged per screen. */
+function part3Recap(key){
+  S.p3Open = S.p3Open || {};
+  if(S.p3Key && S.p3Key!==key){ recapClose(S.p3Key); }
+  S.p3Key = key;
+  const lab = Object.fromEntries(VALUE_TAGS.map(x=>[x.v,x.t]));
+  const said = c=>{ const t=(S.valueTags||{})[c]||[];
+    if(!t.length) return '<span class="muted">No words picked</span>';
+    if(t[0]==='unsure') return 'Hard to tell';
+    return t.map(v=>escHtml(lab[v]||v)).join('<br>'); };
+  const tags = agents().map(a=>`<div class="p3tag" style="${agentStyle(a)}">${agentTag(a)}<span class="lab">You said it cares about</span>${said(a.cond)}</div>`).join('');
+  return `<details class="hist recapt p3recap" ${S.p3Open[key]?'open':''} ontoggle="p3RecapToggle('${key}', this.open)">
+    <summary>Recap: what you said about each advisor, and what each one decided</summary>
+    <div class="p3tags">${tags}</div>
+    <p class="p3sub">What each advisor decided in the ${S.order.length} situations</p>
+    ${historyTable(S.order.length)}</details>`;
+}
+function p3RecapToggle(key, open){
+  S.p3Open = S.p3Open || {};
+  S.p3Open[key] = open;
+  const v = (S.recapViews||{})[key];
+  const isOpen = !!(v && v.t);
+  if(open===isOpen) return;          // a re-render restoring the open state is not a new open
+  recapToggle(key, open);
+}
+function advisorDone(c){ return (S.valueTags[c]||[]).length>0 && AGENT_ITEMS.every(it=>(S.ratings[it.key]||{})[c]!=null) && INTENT_ITEMS.every(it=>(S.intent[it.key]||{})[c]!=null); }
+/* One advisor's decisions on all ten situations, with the one-line reason, in the
+   order the participant saw them. All ten rather than a sample, so every participant
+   rates against the same record. */
+function advisorHistory(a){
+  return `<div class="advgrid" style="${agentStyle(a)}">${S.order.map(i=>DILEMMAS[i]).map((d,k)=>{
+    const r = aiResponseFor(d, a.cond);
+    return `<div class="advbox"><span class="hn">${k+1}</span><span class="aq">${escHtml(dilemmaQuestion(d))}</span><span class="hdec">${escHtml(d.recap[r.aiDecision])}</span><span class="hwhy">${escHtml(whyLine(d, r))}</span></div>`;
+  }).join('')}</div>`;
+}
+function uptakePick(choice){
+  if(S.p3Key){ recapClose(S.p3Key); }
+  const b = BEHAVIORALS[S.ui], u = S.uptake[b.id];
+  if(u.choice) return;
+  u.choice = choice; u.decide_ms = Date.now() - u.tShown;
+  Screens.uptake();
+  setTimeout(()=>{
+    if(S.screenName!=='uptake' || BEHAVIORALS[S.ui]!==b) return;
+    logSnapshot('friend_'+(S.ui+1));
+    if(S.ui+1 < BEHAVIORALS.length){ S.ui++; Screens.uptake(); }
+    else { logSnapshot('friends_done'); Screens.checks(); }
+  }, reduceMotion()?0:UPTAKE_LOCK_MS);
+}
+function setDeleg(id,frame,v){ (S.deleg[id]=S.deleg[id]||{})[frame]=v; Screens.delegation(); }
+function mostlyChoseLine(){
+  const n = handoffCounts();
+  const max = Math.max(...CONDITIONS.map(c=>n[c]));
+  const top = CONDITIONS.filter(c=>n[c]===max).map(agentByCond);
+  return top.length===1
+    ? `You chose to ask ${agentTag(top[0])} in ${max} of the ${S.order.length} situations, more often than either of the others.`
+    : `You chose to ask ${top.map(agentTag).join(' and ')} in ${max} of the ${S.order.length} situations each.`;
+}
+function handoffCounts(){
+  const n={C1:0,C2:0,C3:0};
+  Object.values(S.resp).forEach(rr=>{ if(rr && rr.handoff) n[rr.handoff]++; });
+  return n;
+}
+function toggleProfile(){
+  const r=document.getElementById('profilereveal'); const b=document.getElementById('showprofile');
+  if(!r) return;
+  const open = r.style.display!=='none';
+  r.style.display = open ? 'none' : 'block';
+  if(b) b.textContent = open ? 'Show my value profile' : 'Hide my value profile';
+}
+function reduceMotion(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches; }
+function flashIncomplete(){
+  const btn=document.querySelector('.btnrow .btn'); if(!btn) return;
+  btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:250});
+  let t=document.getElementById('incomplete'); if(!t){t=document.createElement('span');t.id='incomplete';t.className='muted';t.style.marginLeft='10px';t.textContent='Please answer all items above.';btn.parentNode.appendChild(t);}
+}
+
+/* ============================================================
+   CIRCUMPLEX
+   ============================================================ */
+function circumplexSVG(){
+  const cx=130,cy=130,rIn=30,rOut=100, n=VALUES.length;
+  const scores=VALUES.map(v=>S.valueScores[v.key]||0);
+  const max=Math.max(0.5,...scores.map(Math.abs));
+  const hoColor={'Openness to Change':'#3D7A8C','Openness / Self-Enhancement':'#6A7A8C','Self-Enhancement':'#A9603A','Conservation':'#8A7A4A','Self-Transcendence':'#3F6B52'};
+  let segs='';
+  for(let i=0;i<n;i++){
+    const a0=(i/n)*2*Math.PI - Math.PI/2 - Math.PI/n;
+    const a1=((i+1)/n)*2*Math.PI - Math.PI/2 - Math.PI/n;
+    const norm=(scores[i]+max)/(2*max);
+    const r=rIn+(rOut-rIn)*Math.max(.08,norm);
+    const p=(ang,rr)=>[cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)];
+    const [x0,y0]=p(a0,rIn),[x1,y1]=p(a0,r),[x2,y2]=p(a1,r),[x3,y3]=p(a1,rIn);
+    const fill=hoColor[VALUES[i].ho]||'#888';
+    const op=(0.25+0.6*norm).toFixed(2);
+    segs+=`<path d="M${x0},${y0} L${x1},${y1} A${r},${r} 0 0 1 ${x2},${y2} L${x3},${y3} A${rIn},${rIn} 0 0 0 ${x0},${y0} Z" fill="${fill}" fill-opacity="${op}" stroke="#fff" stroke-width="1"/>`;
+    const am=(a0+a1)/2; const lr=rOut+10;
+    const [lx,ly]=p(am,lr);
+    const anchor = Math.cos(am)>0.2?'start':(Math.cos(am)<-0.2?'end':'middle');
+    segs+=`<text x="${lx}" y="${ly}" font-size="8" fill="#565B64" text-anchor="${anchor}" dominant-baseline="middle" font-family="Spline Sans Mono, monospace">${VALUES[i].label}</text>`;
+  }
+  return `<svg viewBox="-74 -22 418 322" width="300" height="231" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schwartz value circumplex">${segs}<circle cx="${cx}" cy="${cy}" r="${rIn-2}" fill="#FBF9F5" stroke="var(--line)"/></svg>`;
+}
+function legendHTML(){
+  const groups={};
+  VALUES.forEach(v=>{(groups[v.ho]=groups[v.ho]||[]).push(v);});
+  let h='';
+  Object.entries(groups).forEach(([ho,vs])=>{
+    h+=`<div class="ho">${ho}</div>`;
+    vs.forEach(v=>{ h+=`<div class="v"><b>${v.label}</b><span>${(S.valueScores[v.key]>=0?'+':'')}${(S.valueScores[v.key]||0).toFixed(2)}</span></div>`; });
+  });
+  return h;
+}
+
+/* ============================================================
+   EXPORT
+   Everything per-condition is keyed C1/C2/C3, not by advisor name, so the sheet
+   reads the same whichever slot a condition landed in. agent_map says where.
+   ============================================================ */
+function collect(){
+  const ag = (S.perm!=null) ? agents() : [];
+  const ready = (d)=> S.perm!=null && S.topValuesByAxis[d.id]!=null;
+  return {
+    timestamp:new Date().toISOString(),
+    design:'within',
+    participant:PARTICIPANT,
+    demographics:S.demog,
+    ai_experience:S.aiexp,
+    ai_literacy:S.ailit,
+    ai_literacy_mean:aiLiteracyMean(),
+    is_test:IS_TEST,
+    perm:S.perm, perm_source:S.permSource,
+    agent_map:Object.fromEntries(ag.map(a=>[a.cond,{name:a.name, slot:a.slot}])),
+    valueScores:S.valueScores,
+    valueScoresRaw:S.valueScoresRaw,
+    pvq_grand_mean:S.pvqGrandMean,
+    pvq_raw:S.pvq,
+    dilemma_order:S.order.map(i=>DILEMMAS[i].id),
+    dilemmas:Object.fromEntries(DILEMMAS.map(d=>{
+      const rr=S.resp[d.id]||{}, c=S.comp[d.id]||{};
+      const per=Object.fromEntries(CONDITIONS.map(cond=>{
+        const r = ready(d) ? aiResponseFor(d, cond) : {aiDecision:null, reasonPole:null};
+        return [cond,{ai_decision:r.aiDecision, reason_pole:r.reasonPole}];
+      }));
+      return [d.id, Object.assign({
+        axis:d.axis, dim:d.dim,
+        aligned_pole:S.topValuesByAxis[d.id]||null,
+        pole_delta:S.poleDelta[d.id]??null,
+        pole_pos:(S.poleScores[d.id]||{}).pos??null,
+        pole_neg:(S.poleScores[d.id]||{}).neg??null,
+        pole_tie:!!(S.poleTie||{})[d.id],
+        position:rr.position??null, ms:rr.ms??null,
+        // v4: time reading the situation alone before the replies; 'click' or 'detail'
+        read_ms:rr.read_ms??null, reveal_via:rr.reveal_via??null,
+        // "If you faced a decision like this yourself, which advisor would you want to ask?"
+        would_ask:rr.handoff??null, would_ask_changes:rr.handoff_changes||0,
+        // w5: conditions left to right as shown, and the position (1-3) of the pick
+        slot_order:(S.slots||{})['d:'+d.id]||null, pick_slot:(rr.handoff && (S.slots||{})['d:'+d.id]) ? S.slots['d:'+d.id].indexOf(rr.handoff)+1 : null,
+        detail_asked:(S.detailOn||[]).indexOf(d.id)>=0,
+        detail_first_ok:c.detail_first??null, detail_tries:c.detail_tries||0,
+      }, per)];
+    })),
+    would_ask_counts:handoffCounts(),
+    // conditions in the order their rating pages came, and time on each page
+    advisor_order:S.advOrder||[],
+    advisor_page_ms:Object.fromEntries(CONDITIONS.map(c=>[c,((S.advPages||{})[c]||{}).ms??null])),
+    // the all-advisor recap toggle, per advisor page: times opened, total ms open
+    // v4: the Part 3 recap toggle, per task ('task:<id>') and friend ('friend:<id>') screen
+    part3_recap_views:Object.fromEntries(DELEG_W.map(t=>'task:'+t.id).concat(BEHAVIORALS.map(b=>'friend:'+b.id)).map(k=>{const v=(S.recapViews||{})[k]||{};return [k,{opens:v.opens||0, ms:v.ms||0}];})),
+    recap_views:Object.fromEntries(CONDITIONS.map(c=>{const v=(S.recapViews||{})[c]||{};return [c,{opens:v.opens||0, ms:v.ms||0}];})),
+    // v4: value words picked per advisor ('unsure' = Hard to tell), their display order,
+    // and the values each advisor actually reasoned from / decided for, counted over the ten
+    value_tags:Object.fromEntries(CONDITIONS.map(c=>[c,(S.valueTags||{})[c]||[]])),
+    value_tag_changes:Object.fromEntries(CONDITIONS.map(c=>[c,(S.valueTagChanges||{})[c]||0])),
+    value_tag_order:S.tagOrder||[],
+    advisor_value_profile:Object.fromEntries(CONDITIONS.map(c=>[c, S.perm!=null ? advisorValueProfile(c) : null])),
+    ratings:Object.fromEntries(AGENT_ITEMS.map(it=>[it.key, Object.fromEntries(CONDITIONS.map(c=>[c,(S.ratings[it.key]||{})[c]??null]))])),
+    intent:Object.fromEntries(INTENT_ITEMS.map(it=>[it.key, Object.fromEntries(CONDITIONS.map(c=>[c,(S.intent[it.key]||{})[c]??null]))])),
+    // choice: 'own' (write it myself) or the condition of the advisor asked to draft
+    friends:Object.fromEntries(BEHAVIORALS.map(b=>{const u=S.uptake[b.id]||{};
+      return [b.id,{source_dilemma:b.source, axis:b.axis, dim:b.dim, choice:u.choice??null, decide_ms:u.decide_ms??null, slot_order:(S.slots||{})['f:'+b.id]||null}];})),
+    // advisor/delegate: the condition picked, or 'none'
+    delegation:Object.fromEntries(DELEG_W.map(t=>{const c=S.deleg[t.id]||{}; return [t.id,{advisor:c.advisor??null, delegate:c.delegate??null, slot_order:(S.slots||{})['t:'+t.id]||null}];})),
+    open_response:S.free||'',
+  };
+}
+function aiLiteracyMean(){
+  const vs=AI_LITERACY.map(it=>{
+    const v=S.ailit[it.key];
+    return v==null ? null : (it.reverse ? (8-v) : v);
+  });
+  if(vs.some(v=>v==null)) return null;
+  return +(vs.reduce((a,b)=>a+b,0)/vs.length).toFixed(3);
+}
+function dl(name,text,type){
+  const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+function flatten(o, pre, out){
+  Object.entries(o||{}).forEach(([k,v])=>{
+    const key = pre ? pre+'.'+k : k;
+    if(v && typeof v==='object' && !Array.isArray(v)) flatten(v, key, out);
+    else out[key] = Array.isArray(v) ? v.join('|') : v;
+  });
+  return out;
+}
+function downloadJSON(){ dl(`within_${Date.now()}.json`, JSON.stringify(collect(),null,2),'application/json'); }
+function downloadCSV(){
+  const flat = flatten(collect(), '', {});
+  const q = v => v==null ? '' : '"'+String(v).replace(/"/g,'""').replace(/\r?\n/g,' ')+'"';
+  const rows = [['field','value']].concat(Object.entries(flat).map(([k,v])=>[k,q(v)]));
+  dl(`within_${Date.now()}.csv`, rows.map(r=>r.join(',')).join('\n'),'text/csv');
+}
+function restart(){
+  // Hand the next person a fresh identity when there's no Prolific ID to key on, or
+  // the responses sheet (upserted on participant_key) would overwrite the last person.
+  if(!PARTICIPANT.prolific_pid){
+    const fresh = Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+    try{ localStorage.setItem('ras_local_id', fresh); }catch(e){}
+    PARTICIPANT.local_id = fresh;
+    PARTICIPANT.participant_key = fresh;
+  }
+  Object.assign(S,{perm:null,permSource:null,aiexp:{},demog:{},ailit:{},pvq:{},valueScores:{},valueScoresRaw:{},pvqGrandMean:null,
+    topValuesByAxis:{},poleDelta:{},poleScores:{},poleTie:{},order:[],di:0,p2stage:null,detailOn:null,comp:{},resp:{},final:{},advOrder:[],advIdx:0,advPages:{},recapViews:{},ratings:{},slots:{},tagOrder:null,valueTags:{},valueTagChanges:{},p3Open:{},p3Key:null,intent:{},ui:0,uptake:{},delIdx:0,deleg:{},free:''});
+  NAV=[]; Screens.welcome();
+}
+
+/* ============================================================
+   RESEARCHER STRIP
+   ============================================================ */
+function researcherStrip(){
+  if(!RESEARCHER) return '';
+  const opts = PERMS.map((p,i)=>`<option value="${i}" ${S.forcedPerm===i?'selected':''}>${i} · ${AGENT_STYLES.map((st,j)=>st.name+'='+p[j]).join(', ')}</option>`).join('');
+  return `<details class="rstrip"><summary>Researcher preview</summary>
+    <div class="row">
+      <label>Force slot permutation:</label>
+      <select id="rperm"><option value="">By participant key</option>${opts}</select>
+    </div>
+    <p style="margin-top:10px">This session: ${agents().map(a=>`${a.name} = <b>${a.cond}</b>`).join(' · ')} <span class="muted">(${S.permSource||'-'})</span>.
+      C1 = decision+ reasoning+, C2 = decision+ reasoning−, C3 = decision− reasoning+.</p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost" type="button" id="rping" onclick="testBackend()">Test backend</button>
+      <span class="muted" id="rpingout">${LOG_ENDPOINT?'Logging enabled.':'No LOG_ENDPOINT set — offline mode, no logging.'}</span>
+    </div>
+    <p style="margin-top:10px" class="muted">Participant key: <code>${PARTICIPANT.participant_key}</code>${IS_TEST?' · <b>test session</b> (DEMO=true or ?test=1)':''}</p>
+  </details>`;
+}
+function wireResearcher(){
+  const sel=document.getElementById('rperm');
+  if(sel) sel.onchange=()=>{
+    S.forcedPerm = sel.value==='' ? null : +sel.value;
+    S.perm=null; assignPerm(); Screens.welcome();
+  };
+}
+function pingBackend(){
+  if(!LOG_ENDPOINT) return Promise.resolve({ok:false, error:'LOG_ENDPOINT is empty'});
+  return fetch(endpointURL({action:'ping'}), {method:'GET'})
+    .then(r=>r.json())
+    .catch(err=>({ok:false, error:String(err && err.message || err)}));
+}
+function testBackend(){
+  const out=document.getElementById('rpingout');
+  if(out) out.textContent='Checking…';
+  pingBackend().then(j=>{
+    if(!out) return;
+    out.textContent = j && j.ok ? `Backend reachable (v${j.version}).` : `Backend unreachable: ${j && j.error || 'unknown error'}.`;
+  });
+}
+
+/* ---- boot ---- */
+(function boot(){
+  const SKIP = DEMO ? URLP.get('skipto') : null;
+  if(SKIP){ seedPrototype(); S.di=0; S.p2stage=null; dispatch(SKIP); }
+  else { Screens.welcome(); }
+  protoBar();
+})();
+
+// Wake the Apps Script instance on page load so the first snapshot isn't the slow one.
+if(LOG_ENDPOINT){ try{ fetch(endpointURL({action:'ping'}), {method:'GET', mode:'no-cors'}).catch(()=>{}); }catch(e){} }
+</script>
+</body>
+</html>
